@@ -1,0 +1,278 @@
+<?php
+/**
+ * @file
+ * Provides trezor connect functionality.
+ */
+
+require_once 'trezor_connect.helpers.inc';
+require_once 'trezor_connect.cron.inc';
+require_once 'trezor_connect.theme.inc';
+
+/**
+ * Implements hook_permission().
+ */
+function trezor_connect_permission() {
+  $output = array();
+
+  $output[TREZOR_CONNECT_PERMISSION] = array(
+    'title' => t('Administer Trezor Connect'),
+    'description' => t('Administer trezor connect functionality.'),
+  );
+
+  $output[TREZOR_CONNECT_PERMISSION_USE] = array(
+    'title' => t('Use Trezor Connect'),
+    'description' => t('Use trezor connect functionality.'),
+  );
+
+  return $output;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function trezor_connect_menu() {
+  $output = array();
+
+  $output[TREZOR_CONNECT_PREFIX] = array(
+    'title' => 'Trezor Connect',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('trezor_connect_admin_form'),
+    'access arguments' => array(TREZOR_CONNECT_PERMISSION),
+    'file' => 'trezor_connect.admin.inc',
+  );
+
+  $output[TREZOR_CONNECT_PREFIX . '/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Configure trezor connect settings.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $output[TREZOR_CONNECT_URL_SUCESS] = array(
+    'title' => 'Success',
+    'page callback' => 'trezor_connect_page_callback_success',
+    'access arguments' => array(TREZOR_CONNECT_PERMISSION_USE),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $output;
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Responsible for adding the Sign In button to the user registration, and
+ * login forms.
+ */
+function trezor_connect_form_alter(&$form, &$form_state, $form_id) {
+  $ids = array(
+    'user_login',
+    'user_login_block',
+    'user_register_form',
+  );
+
+  $found = in_array($form_id, $ids);
+
+  if ($found) {
+    trezor_connect_alter_form($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Responsible for adding the trezor connect functionality to a form.
+ *
+ * @param $form_id
+ * @param $form
+ * @param $form_state
+ */
+function trezor_connect_alter_form(&$form, &$form_state, $form_id) {
+  $access = user_access(TREZOR_CONNECT_PERMISSION_USE);
+
+  if ($access) {
+    $path = drupal_get_path('module', 'trezor_connect');
+
+    $data = $path . '/css/trezor_connect.css';
+
+    $form['#attached']['css'][$data] = array();
+
+    $form['#attached']['library'][] = array(
+      'system',
+      'drupal.ajax',
+    );
+
+    $options = array();
+
+    $options['scope'] = 'footer';
+
+    $external = trezor_connect_external();
+
+    if ($external) {
+      $options['type'] = 'external';
+      $data = trezor_connect_url();
+    }
+    else {
+      $data = $path . '/js/login.js';
+    }
+
+    $form['#attached']['js'][$data] = $options;
+
+    $data = $path . '/js/trezor_connect.js';
+
+    $options = array();
+
+    $options['scope'] = 'footer';
+
+    $form['#attached']['js'][$data] = $options;
+
+    $options = array(
+      //'absolute' => TRUE,
+    );
+
+    $url = url(TREZOR_CONNECT_URL_SUCESS, $options);
+
+    $form['#attached']['js'][] = array(
+      'data' => array(
+        'trezor_connect' => array(
+          'url' => $url,
+          'form_id' => $form_id,
+        ),
+      ),
+      'type' => 'setting',
+    );
+
+    $items = array();
+
+    $attributes = array();
+
+    $callback = trezor_connect_callback();
+
+    $attributes['callback'] = $callback;
+
+    if (isset($form_state['storage']['trezor_connect_challenge'])) {
+      $challenge = $form_state['storage']['trezor_connect_challenge'];
+    }
+    else {
+      $challenge = trezor_connect_challenge();
+
+      trezor_connect_write_challenge($challenge);
+    }
+
+    $attributes['challenge_hidden'] = $challenge['challenge_hidden'];
+    $attributes['challenge_visual'] = $challenge['challenge_visual'];
+
+    /*
+    $attributes = drupal_attributes($attributes);
+
+    $data = <<<EOF
+  <trezor:login $attributes />
+  EOF;
+    */
+
+    $form['trezor_connect'] = array(
+      '#type' => 'container',
+    );
+
+    $form['trezor_connect']['button'] = array(
+      '#theme' => 'html_tag',
+      '#tag' => 'trezor:login',
+      '#attributes' => $attributes,
+      '#weight' => 2,
+    );
+  }
+}
+
+/**
+ * Provides the page callback used to process a trezor connect response.
+ */
+function trezor_connect_page_callback_success($mode = 'register', $type = 'nojs') {
+  global $user;
+
+  $output = NULL;
+
+  $response = $_POST['response'];
+
+  $result = trezor_connect_response_valid($response);
+
+  if (!$result) {
+    drupal_access_denied();
+  }
+  else {
+    $_SESSION['trezor_connect_response'] = $response;
+
+    $result = trezor_connect_mapping($response);
+
+    if (isset($result['uid'])) {
+      $user = user_load($result['uid']);
+
+      drupal_session_regenerate();
+    }
+    else {
+      $variables = array(
+        'mode' => $mode,
+      );
+
+      $message = theme('trezor_connect_message', $variables);
+
+      if ($mode == 'register') {
+        if ($type == 'ajax') {
+          $commands = array();
+
+          $selector = '';
+
+          if (isset($_POST['selector'])) {
+            $selector = $_POST['selector'];
+            $selector = check_plain($selector);
+            //$selector = '#' . $selector;
+          }
+
+          $arguments = array();
+
+          $arguments['message'] = $message;
+
+          // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
+          // requires a very specific format otherwise the $arguments will be passed as undefined
+          $arguments = array(
+            'callback',
+            $arguments,
+          );
+
+          $commands[] = ajax_command_invoke($selector, 'trezor_connect', $arguments);
+
+          $output = array(
+            '#type' => 'ajax',
+            '#commands' => $commands,
+          );
+
+          $output = ajax_deliver($output);
+        }
+        else {
+          $path = 'user/register';
+
+          drupal_goto($path);
+        }
+      }
+    }
+  }
+
+  return $output;
+}
+
+/**
+ * Implements hook_user_insert().
+ *
+ * Responsible for mapping a trezor connect session to an account.
+ *
+ * @param $edit
+ * @param $account
+ * @param $category
+ *
+ * @throws \Exception
+ */
+function trezor_connect_user_insert(&$edit, $account, $category) {
+  if (isset($_SESSION['trezor_connect_response'])) {
+    $record = $_SESSION['trezor_connect_response'];
+
+    $record['uid'] = $account->uid;
+
+    trezor_connect_write_map($record);
+  }
+}

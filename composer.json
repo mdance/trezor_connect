@@ -1,0 +1,14 @@
+{
+  "name": "mdance/trezor_connect",
+  "description": "Provides trezor connect functionality.",
+  "license": "Unlicense",
+  "authors": [
+    {
+      "name": "Michael Dance",
+      "email": "michael.dance@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+  }
+}

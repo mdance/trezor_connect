@@ -1,0 +1,108 @@
+<?php
+/**
+ * @file
+ * Provides the installation hooks.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function trezor_connect_install() {
+  drupal_set_message('The trezor connect functionality has been installed.');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function trezor_connect_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'trezor_connect%'");
+
+  drupal_set_message('The trezor connect functionality has been uninstalled.');
+}
+
+/**
+ * Implements hook_schema().
+ */
+function trezor_connect_schema() {
+  $output = array();
+
+  $output['trezor_connect_challenges'] = array(
+    'description' => t('Provides the trezor connect challenges.'),
+    'fields' => array(
+      'id' => array(
+        'description' => 'Provides the primary key used to identify this item internally',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the record creation timestamp.',
+      ),
+      'challenge_hidden' => array(
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+      'challenge_visual' => array(
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  $output['trezor_connect_map'] = array(
+    'description' => t('Provides the trezor connect mappings.'),
+    'fields' => array(
+      'id' => array(
+        'description' => 'Provides the primary key used to identify this item internally',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the record creation timestamp.',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Provides the user id.',
+        'default' => 0,
+      ),
+      'challenge_hidden' => array(
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+      'challenge_visual' => array(
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+      'address' => array(
+        'type' => 'varchar',
+        'length' => 35,
+      ),
+      'public_key' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'signature' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'uid' => array(
+        'uid',
+      ),
+    ),
+  );
+
+  return $output;
+}

@@ -1,0 +1,16 @@
+$trezor-connect-bg: rgb(89, 152, 59);
+
+#edit-trezor-connect {
+  a {
+    width: 250px !important;
+  }
+
+  .trezor-connect-message {
+    color: white;
+    background: $trezor-connect-bg;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+
+    padding: 6px;
+  }
+}

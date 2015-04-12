@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAGE,sBAAE;EACA,KAAK,EAAE,gBAAgB;AAGzB,4CAAwB;EACtB,KAAK,EAAE,KAAK;EACZ,UAAU,EATM,OAAgB;EAUhC,MAAM,EAAE,4BAA4B;EACpC,aAAa,EAAE,GAAG;EAElB,OAAO,EAAE,GAAG",
+"sources": ["scss/trezor_connect.scss"],
+"names": [],
+"file": "trezor_connect.css"
+}
