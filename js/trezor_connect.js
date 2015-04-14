@@ -26,18 +26,10 @@
   };
 
   methods.authenticate = function(response) {
-    var settings, id, url, element_settings, form_id, mode, selector;
+    var settings, id, url, element_settings, selector;
 
     if (response.success) {
       settings = Drupal.settings[namespace];
-
-      form_id = settings.form_id;
-
-      mode = 'login';
-
-      if (form_id == 'user_register_form') {
-        mode = 'register';
-      }
 
       selector = '#edit-trezor-connect';
 
@@ -46,7 +38,7 @@
       if ($container.length) {
         id = namespace;
         url = settings.url;
-        url += '/' + mode + '/nojs';
+        url += '/nojs';
 
         element_settings = {
           url: url,
@@ -76,13 +68,26 @@
   window.trezorLogin = methods.authenticate;
 
   methods.callback = function(options) {
-    var message;
+    var settings, mode, message;
+
+    settings = Drupal.settings[namespace];
+
+    mode = settings.mode;
 
     message = options.message;
 
     $container.fadeOut();
     $container.html(message);
     $container.fadeIn();
+
+    if (mode == 'login' || mode == 'manage') {
+      window.setTimeout(
+        function() {
+          window.location = options.url;
+        },
+        3000
+      );
+    }
   };
 
   $.fn[namespace] = function (method) {

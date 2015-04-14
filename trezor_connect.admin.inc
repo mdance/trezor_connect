@@ -10,26 +10,6 @@
 function trezor_connect_admin_form() {
   $form = array();
 
-  $description = t('Please specify the message to display when a user has authenticated from the registration form.');
-  $default_value = trezor_connect_message('register');
-
-  $form['trezor_connect_message_register'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Registration Message'),
-    '#description' => $description,
-    '#default_value' => $default_value,
-  );
-
-  $description = t('Please specify the message to display when a user has authenticated from the login form.');
-  $default_value = trezor_connect_message('login');
-
-  $form['trezor_connect_message_login'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Login Message'),
-    '#description' => $description,
-    '#default_value' => $default_value,
-  );
-
   $description = t('Please specify whether to load the trezor connect javascript externally.');
   $options = array(
     TRUE => t('Yes'),

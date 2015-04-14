@@ -36,34 +36,29 @@ define('TREZOR_CONNECT_URL', 'https://trezor.github.io/connect/login.js');
 define('TREZOR_CONNECT_CALLBACK', 'trezorLogin');
 
 /**
- * Provides a string containing the trezor connect success callback url.
+ * Provides a string containing the trezor connect login callback url.
  */
-define('TREZOR_CONNECT_URL_SUCESS', 'trezor-connect');
+define('TREZOR_CONNECT_URL_LOGIN', 'user/login/trezor');
+
+/**
+ * Provides a string containing the trezor connect register callback url.
+ */
+define('TREZOR_CONNECT_URL_REGISTER', 'user/register/trezor');
+
+/**
+ * Provides a string containing the trezor connect manage url.
+ */
+define('TREZOR_CONNECT_URL_MANAGE', 'user/%user/trezor-connect');
+
+/**
+ * Provides a string containing the trezor connect manage callback url.
+ */
+define('TREZOR_CONNECT_URL_MANAGE_JS', TREZOR_CONNECT_URL_MANAGE . '/js');
 
 /**
  * Provides an integer containing the challenge expiration offset.
  */
 define('TREZOR_CONNECT_OFFSET', 60 * 60);
-
-/**
- * Returns a string containing the message to display upon authenticating.
- */
-function trezor_connect_message($mode) {
-  if ($mode == 'login') {
-    $default = t('You have been successfully authenticated.');
-  }
-  else {
-    $default = t('Your trezor authentication has been stored with your session,
-    please complete the registration process so you can login in the future
-    with just your trezor.');
-  }
-
-  $name = 'trezor_connect_message_' . $mode;
-
-  $output = variable_get($name, $default);
-
-  return $output;
-}
 
 /**
  * Returns a boolean indicating if the trezor connect javascript should be
@@ -264,6 +259,35 @@ function trezor_connect_mapping($response) {
 
   $query->fields('m');
   $query->condition('public_key', $response['public_key']);
+
+  $output = $query->execute()->fetchAssoc();
+
+  return $output;
+}
+
+/**
+ * Deletes any trezor connect mappings associated with an account.
+ *
+ * @param $account
+ */
+function trezor_connect_delete_mapping($account) {
+  $query = db_delete('trezor_connect_map');
+
+  $query->condition('uid', $account->uid);
+
+  $query->execute();
+}
+
+/**
+ * Returns a trezor connect mapping associated with an account.
+ *
+ * @param $response
+ */
+function trezor_connect_account_mapping($account) {
+  $query = db_select('trezor_connect_map', 'm');
+
+  $query->fields('m');
+  $query->condition('uid', $account->uid);
 
   $output = $query->execute()->fetchAssoc();
 

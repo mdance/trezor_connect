@@ -12,7 +12,7 @@ function trezor_connect_theme() {
 
   $output['trezor_connect_message'] = array(
     'variables' => array(
-      'mode' => NULL,
+      'message' => NULL,
     ),
   );
 
@@ -23,19 +23,15 @@ function trezor_connect_theme() {
  * Provides the trezor connect registration message.
  */
 function theme_trezor_connect_message(&$variables) {
-  $mode = $variables['mode'];
+  $message = $variables['message'];
 
   $attributes = array(
     'class' => array(
       'trezor-connect-message',
-      'trezor-connect-message-' . $mode,
     ),
   );
 
   $attributes = drupal_attributes($attributes);
-
-  $message = trezor_connect_message($mode);
-  $message = t($message);
 
   $output = <<<EOF
 <div {$attributes}>
