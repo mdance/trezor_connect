@@ -222,7 +222,30 @@ function trezor_connect_response_valid($response) {
       $signature = $response['signature'];
     }
 
-    $output = TRUE;
+    $R = substr($signature, 2, 64);
+    $S = substr($signature, 66, 64);
+
+    $ecdsa = new \BitcoinPHP\BitcoinECDSA\BitcoinECDSA();
+
+    $prefix = "\x18Bitcoin Signed Message:\n";
+
+    $len = strlen($message);
+    $len = $ecdsa->numToVarIntString($len);
+
+    $data = $prefix . $len . $message;
+
+    $hash = $ecdsa->hash256($data);
+
+    $result = $ecdsa->checkSignaturePoints($public_key, $R, $S, $hash);
+    $result = (bool)$result;
+
+    if($result) {
+      $result = $ecdsa->getAddress($public_key);
+
+      if ($result == $address) {
+        $output = TRUE;
+      }
+    }
   }
 
   return $output;
