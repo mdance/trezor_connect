@@ -131,11 +131,9 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
     $result = trezor_connect_mapping($response);
 
     if (is_array($result) && isset($result['uid'])) {
-      if ($type != 'ajax') {
-        $message = t('There is already an account associated with the trezor device.');
+      $message = t('There is already an account associated with the trezor device.');
 
-        drupal_set_message($message, 'warning');
-      }
+      drupal_set_message($message, 'warning');
     }
     else {
       $response['uid'] = $account->uid;
