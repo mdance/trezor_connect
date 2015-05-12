@@ -236,7 +236,7 @@ function trezor_connect_response_valid($response) {
     $len = strlen($message);
     $len = $ecdsa->numToVarIntString($len);
 
-    $data = $prefix . $len . $message . 'x';
+    $data = $prefix . $len . $message;
 
     $hash = $ecdsa->hash256($data);
 
