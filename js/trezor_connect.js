@@ -81,12 +81,14 @@
     $container.fadeIn();
 
     if (mode == 'login' || mode == 'manage') {
-      window.setTimeout(
-        function() {
-          window.location = options.url;
-        },
-        3000
-      );
+      if (options.url) {
+        window.setTimeout(
+          function () {
+            window.location = options.url;
+          },
+          3000
+        );
+      }
     }
   };
 
