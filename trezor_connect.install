@@ -5,6 +5,98 @@
  */
 
 /**
+ * Implements hook_requirements().
+ *
+ * @param $phase
+ *
+ * @return array
+ */
+function trezor_connect_requirements($phase) {
+  $output = array();
+
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  $value = phpversion();
+  $min = '5.3.0';
+
+  $result = version_compare($value, $min);
+
+  if ($result < 0) {
+    $description = <<<EOF
+You must be running PHP 5.3.0 with the OpenSSL extension which contains the
+openssl_random_pseudo_bytes function used to generate cryptographically secure
+random numbers.
+EOF;
+
+    $description = $t($description);
+
+    $output['trezor_connect_php'] = array(
+      'title' => $t('PHP'),
+      'value' => $value,
+      'description' => $description,
+      'severity' => REQUIREMENT_ERROR,
+    );
+  }
+
+  $result = extension_loaded('gmp');
+
+  if (!$result) {
+    $text = $t('the GMP extension');
+    $path = 'http://php.net/gmp';
+
+    $link = l($text, $path);
+
+    $args = array();
+
+    $args['!link'] = $link;
+
+    $description = <<<EOF
+The trezor connect module requires !link to correctly implement the Bitcoin
+ECDSA.
+EOF;
+
+    $description = $t($description, $args);
+
+    $output['trezor_connect_gmp'] = array(
+      'title' => $t('GMP Extension'),
+      'value' => $t('Not installed'),
+      'description' => $description,
+      'severity' => REQUIREMENT_ERROR,
+    );
+  }
+
+  $result = extension_loaded('openssl');
+
+  if (!$result) {
+    $text = $t('the OpenSSL extension');
+    $path = 'http://php.net/openssl';
+
+    $link = l($text, $path);
+
+    $args = array();
+
+    $args['!link'] = $link;
+
+    $description = <<<EOF
+The trezor connect module requires !link to generate cryptographically secure
+random numbers.
+EOF;
+
+    $description = $t($description, $args);
+
+    $output['trezor_connect_openssl'] = array(
+      'title' => $t('OpenSSL Extension'),
+      'value' => $t('Not installed'),
+      'description' => $description,
+      'severity' => REQUIREMENT_ERROR,
+    );
+  }
+
+  return $output;
+}
+
+/**
  * Implements hook_install().
  */
 function trezor_connect_install() {
