@@ -125,7 +125,51 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
   $result = trezor_connect_response_valid($response);
 
   if (!$result) {
-    drupal_access_denied();
+    if ($type == 'nojs') {
+      drupal_access_denied();
+    }
+    else {
+      $commands = array();
+
+      $selector = '';
+
+      if (isset($_POST['selector'])) {
+        $selector = $_POST['selector'];
+        $selector = check_plain($selector);
+        //$selector = '#' . $selector;
+      }
+
+      $arguments = array();
+
+      $arguments['error'] = TRUE;
+
+      $message = t('An error has occurred validating your trezor credentials.');
+
+      $variables = array(
+        'type' => 'error',
+        'message' => $message,
+      );
+
+      $message = theme('trezor_connect_message', $variables);
+
+      $arguments['message'] = $message;
+
+      // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
+      // requires a very specific format otherwise the $arguments will be passed as undefined
+      $arguments = array(
+        'callback',
+        $arguments,
+      );
+
+      $commands[] = ajax_command_invoke($selector, 'trezor_connect', $arguments);
+
+      $output = array(
+        '#type' => 'ajax',
+        '#commands' => $commands,
+      );
+
+      $output = ajax_deliver($output);
+    }
   }
   else {
     $result = trezor_connect_mapping($response);

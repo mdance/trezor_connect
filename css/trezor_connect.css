@@ -1,10 +1,12 @@
 #edit-trezor-connect a {
-  width: 250px !important; }
+  width: 253px !important; }
 #edit-trezor-connect .trezor-connect-message {
   color: white;
   background: #59983b;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   padding: 6px; }
+#edit-trezor-connect .trezor-connect-message-error {
+  background: #d9534f; }
 
 /*# sourceMappingURL=trezor_connect.css.map */

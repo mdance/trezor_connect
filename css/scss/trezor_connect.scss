@@ -1,4 +1,5 @@
 $trezor-connect-bg: rgb(89, 152, 59);
+$trezor-connect-bg-error: #d9534f;
 
 #edit-trezor-connect {
   a {
@@ -12,5 +13,9 @@ $trezor-connect-bg: rgb(89, 152, 59);
     border-radius: 4px;
 
     padding: 6px;
+  }
+
+  .trezor-connect-message-error {
+    background: $trezor-connect-bg-error;
   }
 }
