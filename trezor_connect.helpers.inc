@@ -133,8 +133,19 @@ function trezor_connect_random($length) {
 
   $exists = function_exists('openssl_random_pseudo_bytes');
 
-  if ($exists) {
+  if (!$exists) {
+    $message = <<<EOF
+A cryptographically secure random number can not be generated without the PHP
+5.3.0 and the OpenSSL extensions openssl_random_pseudo_bytes function.
+EOF;
+
+    $message = t($message);
+
+    throw new Exception($message);
+  }
+  else {
     $length = $length / 2;
+
     $crypto_strong = FALSE;
 
     while (!$crypto_strong) {
@@ -144,13 +155,6 @@ function trezor_connect_random($length) {
     $random = bin2hex($random);
 
     $output = str_split($random);
-  }
-  else {
-    for ($i = 0; $i < $length; $i++) {
-      $random = rand(0, 16);
-
-      $output[] = $random;
-    }
   }
 
   return $output;
@@ -232,7 +236,7 @@ function trezor_connect_response_valid($response) {
     $len = strlen($message);
     $len = $ecdsa->numToVarIntString($len);
 
-    $data = $prefix . $len . $message;
+    $data = $prefix . $len . $message . 'x';
 
     $hash = $ecdsa->hash256($data);
 
