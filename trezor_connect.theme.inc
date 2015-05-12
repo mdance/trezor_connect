@@ -23,11 +23,18 @@ function trezor_connect_theme() {
  * Provides the trezor connect registration message.
  */
 function theme_trezor_connect_message(&$variables) {
+  $type = 'info';
+
+  if (isset($variables['type'])) {
+    $type = $variables['type'];
+  }
+
   $message = $variables['message'];
 
   $attributes = array(
     'class' => array(
       'trezor-connect-message',
+      'trezor-connect-message-' . $type,
     ),
   );
 
