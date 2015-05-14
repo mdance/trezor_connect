@@ -67,30 +67,49 @@ function trezor_connect_page_callback_login($type = 'nojs') {
     $result = trezor_connect_mapping($response);
 
     if (is_array($result) && isset($result['uid'])) {
-      $user = user_load($result['uid']);
+      $account = user_load($result['uid']);
 
-      drupal_session_regenerate();
-
-      if ($type != 'ajax') {
-        $message = t('You have been successfully logged in using your trezor device.');
+      if ($account->status == 0) {
+        $message = <<<EOF
+The account associated with your trezor device is not active.  If you have just
+registered, your account may be awaiting to be approved by an administrator.
+EOF;
+        $message = t($message);
 
         drupal_set_message($message);
 
-        $path = 'user';
+        if ($type != 'ajax') {
+          $path = 'user';
 
-        drupal_goto($path);
+          drupal_goto($path);
+        }
       }
       else {
-        $text = t('click here');
-        $path = 'user';
+        $user = $account;
 
-        $link = l($text, $path);
+        drupal_session_regenerate();
 
-        $args = array(
-          '!link' => $link,
-        );
+        if ($type != 'ajax') {
+          $message = t('You have been successfully logged in using your trezor device.');
 
-        $message = t('You have been successfully logged in using your trezor device, you should now be automatically redirected, otherwise !link', $args);
+          drupal_set_message($message);
+
+          $path = 'user';
+
+          drupal_goto($path);
+        }
+        else {
+          $text = t('click here');
+          $path = 'user';
+
+          $link = l($text, $path);
+
+          $args = array(
+            '!link' => $link,
+          );
+
+          $message = t('You have been successfully logged in using your trezor device, you should now be automatically redirected, otherwise !link', $args);
+        }
       }
     }
     else {
