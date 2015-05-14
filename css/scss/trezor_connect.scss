@@ -2,8 +2,19 @@ $trezor-connect-bg: rgb(89, 152, 59);
 $trezor-connect-bg-error: #d9534f;
 
 #edit-trezor-connect {
-  a {
-    width: 253px !important;
+  #trezorconnect-wrapper {
+  }
+
+  #trezorconnect-button {
+  }
+
+  #trezorconnect-button:hover {
+  }
+
+  #trezorconnect-infolink {
+  }
+
+  #trezorconnect-infolink:hover {
   }
 
   .trezor-connect-message {
