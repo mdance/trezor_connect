@@ -68,7 +68,7 @@
   window.trezorLogin = methods.authenticate;
 
   methods.callback = function(options) {
-    var settings, mode, message;
+    var settings, mode, message, redirect;
 
     settings = Drupal.settings[namespace];
 
@@ -80,7 +80,13 @@
     $container.html(message);
     $container.fadeIn();
 
-    if (mode == 'login' || mode == 'manage') {
+    redirect = true;
+
+    if (typeof options.redirect != 'undefined') {
+      redirect = options.redirect;
+    }
+
+    if (redirect) {
       if (options.url) {
         window.setTimeout(
           function () {

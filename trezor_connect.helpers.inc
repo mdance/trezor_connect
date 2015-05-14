@@ -241,7 +241,6 @@ function trezor_connect_response_valid($response) {
     $hash = $ecdsa->hash256($data);
 
     $result = $ecdsa->checkSignaturePoints($public_key, $R, $S, $hash);
-    $result = (bool)$result;
 
     if($result) {
       $result = $ecdsa->getAddress($public_key);

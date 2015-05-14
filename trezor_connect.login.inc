@@ -64,12 +64,16 @@ function trezor_connect_page_callback_login($type = 'nojs') {
     }
   }
   else {
+    $redirect = TRUE;
+
     $result = trezor_connect_mapping($response);
 
     if (is_array($result) && isset($result['uid'])) {
       $account = user_load($result['uid']);
 
       if ($account->status == 0) {
+        $redirect = FALSE;
+
         $message = <<<EOF
 The account associated with your trezor device is not active.  If you have just
 registered, your account may be awaiting to be approved by an administrator.
@@ -133,6 +137,9 @@ EOF;
 
         drupal_goto($path);
       }
+      else {
+        $redirect = FALSE;
+      }
     }
 
     if ($type == 'ajax') {
@@ -147,6 +154,8 @@ EOF;
       }
 
       $arguments = array();
+
+      $arguments['redirect'] = $redirect;
 
       $variables = array(
         'message' => $message,

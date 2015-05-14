@@ -32,6 +32,7 @@ function trezor_connect_page_callback_register($type = 'nojs') {
 
       $arguments = array();
 
+      $arguments['redirect'] = FALSE;
       $arguments['error'] = TRUE;
 
       $message = t('An error has occurred validating your trezor credentials.');
@@ -108,6 +109,8 @@ function trezor_connect_page_callback_register($type = 'nojs') {
       }
 
       $arguments = array();
+
+      $arguments['redirect'] = FALSE;
 
       $variables = array(
         'message' => $message,
