@@ -84,5 +84,15 @@ function trezor_connect_menu() {
     'file' => 'trezor_connect.manage.inc',
   );
 
+  $output[TREZOR_CONNECT_URL_MANAGE . '/forget'] = array(
+    'title' => 'Forget Authenticated Devices',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('trezor_connect_forget_form', 1),
+    'access arguments' => array(TREZOR_CONNECT_PERMISSION_USE),
+    'type' => MENU_CALLBACK,
+    'weight' => 0,
+    'file' => 'trezor_connect.manage.inc',
+  );
+
   return $output;
 }

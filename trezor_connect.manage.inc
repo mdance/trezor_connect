@@ -111,7 +111,57 @@ function trezor_connect_manage_form_submit($form, &$form_state) {
 
   $account = $values['account'];
 
+  $uid = $account->uid;
+
+  $form_state['redirect'] = 'user/' . $uid . '/trezor-connect/forget';
+}
+
+/**
+ * Provides the forget authenticated device confirmation form.
+ *
+ * @param $form
+ * @param $form_state
+ * @param $account
+ *
+ * @return mixed
+ */
+function trezor_connect_forget_form($form, &$form_state, $account) {
+  $form['account'] = array(
+    '#type' => 'value',
+    '#value' => $account,
+  );
+
+  $question = t('Are you sure you want to forget your authentication device?');
+  $path = url('user/' . $account->uid . '/trezor-connect');
+  $description = t('You will have to re-associate your authentication device to your account if you continue.');
+  $yes = t('Confirm');
+  $no = t('Cancel');
+
+  $form = confirm_form($form, $question, $path, $description, $yes, $no);
+
+  return $form;
+}
+
+/**
+ * Provides the forget authenticated device confirmation form submit handler.
+ *
+ * @param $form
+ * @param $form_state
+ */
+function trezor_connect_forget_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+
+  $account = $values['account'];
+
   trezor_connect_delete_mapping($account);
+
+  $message = t('Your authentication device has been forgotten.');
+
+  drupal_set_message($message);
+
+  $path = url('user/' . $account->uid . '/trezor-connect');
+
+  $form_state['redirect'] = $path;
 }
 
 /**
