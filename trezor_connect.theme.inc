@@ -20,7 +20,7 @@ function trezor_connect_theme() {
 }
 
 /**
- * Provides the trezor connect registration message.
+ * Provides the TREZOR connect registration message.
  */
 function theme_trezor_connect_message(&$variables) {
   $type = 'info';

@@ -1,6 +1,6 @@
 {
   "name": "mdance/trezor_connect",
-  "description": "Provides trezor connect functionality.",
+  "description": "Provides TREZOR connect functionality.",
   "license": "Unlicense",
   "authors": [
     {

@@ -52,7 +52,7 @@ EOF;
     $args['!link'] = $link;
 
     $description = <<<EOF
-The trezor connect module requires !link to correctly implement the Bitcoin
+The TREZOR connect module requires !link to correctly implement the Bitcoin
 ECDSA.
 EOF;
 
@@ -79,7 +79,7 @@ EOF;
     $args['!link'] = $link;
 
     $description = <<<EOF
-The trezor connect module requires !link to generate cryptographically secure
+The TREZOR connect module requires !link to generate cryptographically secure
 random numbers.
 EOF;
 
@@ -100,7 +100,7 @@ EOF;
  * Implements hook_install().
  */
 function trezor_connect_install() {
-  drupal_set_message('The trezor connect functionality has been installed.');
+  drupal_set_message('The TREZOR connect functionality has been installed.');
 }
 
 /**
@@ -109,7 +109,7 @@ function trezor_connect_install() {
 function trezor_connect_uninstall() {
   db_query("DELETE FROM {variable} WHERE name LIKE 'trezor_connect%'");
 
-  drupal_set_message('The trezor connect functionality has been uninstalled.');
+  drupal_set_message('The TREZOR connect functionality has been uninstalled.');
 }
 
 /**
@@ -119,7 +119,7 @@ function trezor_connect_schema() {
   $output = array();
 
   $output['trezor_connect_challenges'] = array(
-    'description' => t('Provides the trezor connect challenges.'),
+    'description' => t('Provides the TREZOR connect challenges.'),
     'fields' => array(
       'id' => array(
         'description' => 'Provides the primary key used to identify this item internally',
@@ -146,7 +146,7 @@ function trezor_connect_schema() {
   );
 
   $output['trezor_connect_map'] = array(
-    'description' => t('Provides the trezor connect mappings.'),
+    'description' => t('Provides the TREZOR connect mappings.'),
     'fields' => array(
       'id' => array(
         'description' => 'Provides the primary key used to identify this item internally',

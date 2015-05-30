@@ -5,7 +5,7 @@
  */
 
 /**
- * Provides the page callback used to process a trezor connect login response.
+ * Provides the page callback used to process a TREZOR connect login response.
  */
 function trezor_connect_page_callback_login($type = 'nojs') {
   global $user;
@@ -35,7 +35,7 @@ function trezor_connect_page_callback_login($type = 'nojs') {
 
       $arguments['error'] = TRUE;
 
-      $message = t('An error has occurred validating your trezor credentials.');
+      $message = t('An error has occurred validating your TREZOR credentials.');
 
       $variables = array(
         'type' => 'error',
@@ -75,7 +75,7 @@ function trezor_connect_page_callback_login($type = 'nojs') {
         $redirect = FALSE;
 
         $message = <<<EOF
-The account associated with your trezor device is not active.  If you have just
+The account associated with your TREZOR device is not active.  If you have just
 registered, your account may be awaiting to be approved by an administrator.
 EOF;
         $message = t($message);
@@ -94,7 +94,7 @@ EOF;
         drupal_session_regenerate();
 
         if ($type != 'ajax') {
-          $message = t('You have been successfully logged in using your trezor device.');
+          $message = t('You have been successfully logged in using your TREZOR device.');
 
           drupal_set_message($message);
 
@@ -112,7 +112,7 @@ EOF;
             '!link' => $link,
           );
 
-          $message = t('You have been successfully logged in using your trezor device, you should now be automatically redirected, otherwise !link', $args);
+          $message = t('You have been successfully logged in using your TREZOR device, you should now be automatically redirected, otherwise !link', $args);
         }
       }
     }
@@ -128,7 +128,7 @@ EOF;
         '!register' => $register,
       );
 
-      $message = t('There is no account associated with your trezor device.  Please login with your existing username and password to associate your account with your trezor device, otherwise !register.', $args);
+      $message = t('There is no account associated with your TREZOR device.  Please login with your existing username and password to associate your account with your TREZOR device, otherwise !register.', $args);
 
       if ($type != 'ajax') {
         drupal_set_message($message, 'warning');

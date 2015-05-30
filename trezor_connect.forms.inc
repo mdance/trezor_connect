@@ -25,7 +25,7 @@ function trezor_connect_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Responsible for adding the trezor connect functionality to a form.
+ * Responsible for adding the TREZOR connect functionality to a form.
  *
  * @param $form_id
  * @param $form

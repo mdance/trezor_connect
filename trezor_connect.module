@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Provides trezor connect functionality.
+ * Provides TREZOR connect functionality.
  */
 
 require_once 'trezor_connect.helpers.inc';
@@ -19,13 +19,13 @@ function trezor_connect_permission() {
   $output = array();
 
   $output[TREZOR_CONNECT_PERMISSION] = array(
-    'title' => t('Administer Trezor Connect'),
-    'description' => t('Administer trezor connect functionality.'),
+    'title' => t('Administer TREZOR Connect'),
+    'description' => t('Administer TREZOR connect functionality.'),
   );
 
   $output[TREZOR_CONNECT_PERMISSION_USE] = array(
-    'title' => t('Use Trezor Connect'),
-    'description' => t('Use trezor connect functionality.'),
+    'title' => t('Use TREZOR Connect'),
+    'description' => t('Use TREZOR connect functionality.'),
   );
 
   return $output;
@@ -38,7 +38,7 @@ function trezor_connect_menu() {
   $output = array();
 
   $output[TREZOR_CONNECT_PREFIX] = array(
-    'title' => 'Trezor Connect',
+    'title' => 'TREZOR Connect',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('trezor_connect_admin_form'),
     'access arguments' => array(TREZOR_CONNECT_PERMISSION),
@@ -47,7 +47,7 @@ function trezor_connect_menu() {
 
   $output[TREZOR_CONNECT_PREFIX . '/settings'] = array(
     'title' => 'Settings',
-    'description' => 'Configure trezor connect settings.',
+    'description' => 'Configure TREZOR connect settings.',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 

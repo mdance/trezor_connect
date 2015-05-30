@@ -12,7 +12,7 @@ CONTENTS OF THIS FILE
 
 INTRODUCTION
 ------------
-This project provides trezor connect functionality.
+This project provides TREZOR connect functionality.
 
  * For a full description of the module, visit the project page:
    https://drupal.org/project/trezor_connect
@@ -39,13 +39,13 @@ CONFIGURATION
 -------------
  * Configure user permissions in Administration » People » Permissions:
 
- The Administer Trezor Connect is used to provide global administrative
+ The Administer TREZOR Connect is used to provide global administrative
  access to the module.
 
- The Use Trezor Connect is what determines which users can authenticate using
- their trezor.
+ The Use TREZOR Connect is what determines which users can authenticate using
+ their TREZOR.
 
- * Configure any settings under the Trezor Connect administration section at
+ * Configure any settings under the TREZOR Connect administration section at
  http://yoursite.com/admin/config/trezor-connect
 
 TROUBLESHOOTING

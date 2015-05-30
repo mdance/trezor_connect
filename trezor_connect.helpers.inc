@@ -12,46 +12,46 @@ define('TREZOR_CONNECT_PREFIX', 'admin/config/trezor-connect');
 /**
  * Provides a string containing the administration permission.
  */
-define('TREZOR_CONNECT_PERMISSION', 'administer trezor connect');
+define('TREZOR_CONNECT_PERMISSION', 'administer TREZOR connect');
 
 /**
  * Provides a string containing the use permission.
  */
-define('TREZOR_CONNECT_PERMISSION_USE', 'use trezor connect');
+define('TREZOR_CONNECT_PERMISSION_USE', 'use TREZOR connect');
 
 /**
- * Provides a boolean indicating if the trezor connect javascript should be
+ * Provides a boolean indicating if the TREZOR connect javascript should be
  * loaded externally.
  */
 define('TREZOR_CONNECT_EXTERNAL', TRUE);
 
 /**
- * Provides a string containing the trezor connect external javascript url.
+ * Provides a string containing the TREZOR connect external javascript url.
  */
 define('TREZOR_CONNECT_URL', 'https://trezor.github.io/connect/login.js');
 
 /**
- * Provides a string containing the trezor connect callback function.
+ * Provides a string containing the TREZOR connect callback function.
  */
 define('TREZOR_CONNECT_CALLBACK', 'trezorLogin');
 
 /**
- * Provides a string containing the trezor connect login callback url.
+ * Provides a string containing the TREZOR connect login callback url.
  */
 define('TREZOR_CONNECT_URL_LOGIN', 'user/login/trezor');
 
 /**
- * Provides a string containing the trezor connect register callback url.
+ * Provides a string containing the TREZOR connect register callback url.
  */
 define('TREZOR_CONNECT_URL_REGISTER', 'user/register/trezor');
 
 /**
- * Provides a string containing the trezor connect manage url.
+ * Provides a string containing the TREZOR connect manage url.
  */
 define('TREZOR_CONNECT_URL_MANAGE', 'user/%user/trezor-connect');
 
 /**
- * Provides a string containing the trezor connect manage callback url.
+ * Provides a string containing the TREZOR connect manage callback url.
  */
 define('TREZOR_CONNECT_URL_MANAGE_JS', TREZOR_CONNECT_URL_MANAGE . '/js');
 
@@ -61,7 +61,7 @@ define('TREZOR_CONNECT_URL_MANAGE_JS', TREZOR_CONNECT_URL_MANAGE . '/js');
 define('TREZOR_CONNECT_OFFSET', 60 * 60);
 
 /**
- * Returns a boolean indicating if the trezor connect javascript should be
+ * Returns a boolean indicating if the TREZOR connect javascript should be
  * loaded externally.
  */
 function trezor_connect_external() {
@@ -71,7 +71,7 @@ function trezor_connect_external() {
 }
 
 /**
- * Returns a string containing the trezor connect external javascript url.
+ * Returns a string containing the TREZOR connect external javascript url.
  */
 function trezor_connect_url() {
   $output = variable_get('trezor_connect_url', TREZOR_CONNECT_URL);
@@ -80,7 +80,7 @@ function trezor_connect_url() {
 }
 
 /**
- * Returns a string containing the trezor connect callback function.
+ * Returns a string containing the TREZOR connect callback function.
  */
 function trezor_connect_callback() {
   $output = variable_get('trezor_connect_callback', TREZOR_CONNECT_CALLBACK);
@@ -183,7 +183,7 @@ function trezor_connect_write_challenge($record) {
 
 
 /**
- * Returns a boolean indicating if a trezor response signature is valid.
+ * Returns a boolean indicating if a TREZOR response signature is valid.
  *
  * @param $response
  *
@@ -255,7 +255,7 @@ function trezor_connect_response_valid($response) {
 }
 
 /**
- * Responsible for writing a trezor connect account mapping to the database.
+ * Responsible for writing a TREZOR connect account mapping to the database.
  *
  * @param $record
  *
@@ -276,7 +276,7 @@ function trezor_connect_write_map($record) {
 }
 
 /**
- * Returns a trezor connect mapping.
+ * Returns a TREZOR connect mapping.
  *
  * @param $response
  */
@@ -292,7 +292,7 @@ function trezor_connect_mapping($response) {
 }
 
 /**
- * Deletes any trezor connect mappings associated with an account.
+ * Deletes any TREZOR connect mappings associated with an account.
  *
  * @param $account
  */
@@ -305,7 +305,7 @@ function trezor_connect_delete_mapping($account) {
 }
 
 /**
- * Returns a trezor connect mapping associated with an account.
+ * Returns a TREZOR connect mapping associated with an account.
  *
  * @param $response
  */

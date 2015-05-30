@@ -5,7 +5,7 @@
  */
 
 /**
- * Provides the page callback used to process a trezor connect registration
+ * Provides the page callback used to process a TREZOR connect registration
  * response.
  */
 function trezor_connect_page_callback_register($type = 'nojs') {
@@ -35,7 +35,7 @@ function trezor_connect_page_callback_register($type = 'nojs') {
       $arguments['redirect'] = FALSE;
       $arguments['error'] = TRUE;
 
-      $message = t('An error has occurred validating your trezor credentials.');
+      $message = t('An error has occurred validating your TREZOR credentials.');
 
       $variables = array(
         'type' => 'error',
@@ -76,7 +76,7 @@ function trezor_connect_page_callback_register($type = 'nojs') {
         '!link' => $link,
       );
 
-      $message = t('There is already an account associated with the trezor, !link', $args);
+      $message = t('There is already an account associated with the TREZOR, !link', $args);
 
       if ($type != 'ajax') {
         drupal_set_message($message, 'warning');
@@ -85,7 +85,7 @@ function trezor_connect_page_callback_register($type = 'nojs') {
     else {
       $_SESSION['trezor_connect_response'] = $response;
 
-      $message = t('Your trezor device authentication has been saved to your session, please complete the registration process to associate your trezor device with your account.');
+      $message = t('Your TREZOR device authentication has been saved to your session, please complete the registration process to associate your TREZOR device with your account.');
 
       if ($type != 'ajax') {
         drupal_set_message($message);

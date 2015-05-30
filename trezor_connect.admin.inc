@@ -10,7 +10,7 @@
 function trezor_connect_admin_form() {
   $form = array();
 
-  $description = t('Please specify whether to load the trezor connect javascript externally.');
+  $description = t('Please specify whether to load the TREZOR connect javascript externally.');
   $options = array(
     TRUE => t('Yes'),
     FALSE => t('No'),
@@ -26,22 +26,22 @@ function trezor_connect_admin_form() {
     '#default_value' => $default_value,
   );
 
-  $description = t('Please specify the external trezor connect javascript url.');
+  $description = t('Please specify the external TREZOR connect javascript url.');
   $default_value = trezor_connect_url();
 
   $form['trezor_connect_url'] = array(
     '#type' => 'textfield',
-    '#title' => t('External Trezor Connect Javascript URL'),
+    '#title' => t('External TREZOR Connect Javascript URL'),
     '#description' => $description,
     '#default_value' => $default_value,
   );
 
-  $description = t('Please specify the trezor connect callback function.');
+  $description = t('Please specify the TREZOR connect callback function.');
   $default_value = trezor_connect_callback();
 
   $form['trezor_connect_callback'] = array(
     '#type' => 'textfield',
-    '#title' => t('Trezor Connect Callback'),
+    '#title' => t('TREZOR Connect Callback'),
     '#description' => $description,
     '#default_value' => $default_value,
   );

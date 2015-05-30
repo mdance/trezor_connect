@@ -115,7 +115,7 @@ function trezor_connect_manage_form_submit($form, &$form_state) {
 }
 
 /**
- * Provides the page callback used to process a trezor connect manage response.
+ * Provides the page callback used to process a TREZOR connect manage response.
  */
 function trezor_connect_page_callback_manage($account, $type = 'nojs') {
   $output = NULL;
@@ -145,7 +145,7 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
 
       $arguments['error'] = TRUE;
 
-      $message = t('An error has occurred validating your trezor credentials.');
+      $message = t('An error has occurred validating your TREZOR credentials.');
 
       $variables = array(
         'type' => 'error',
@@ -177,7 +177,7 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
     $result = trezor_connect_mapping($response);
 
     if (is_array($result) && isset($result['uid'])) {
-      $message = t('There is already an account associated with the trezor device.');
+      $message = t('There is already an account associated with the TREZOR device.');
 
       drupal_set_message($message, 'warning');
     }
@@ -186,7 +186,7 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
 
       trezor_connect_write_map($response);
 
-      $message = t('Your trezor device has been associated to your account.  You should now be able to login with just your trezor device.');
+      $message = t('Your TREZOR device has been associated to your account.  You should now be able to login with just your TREZOR device.');
 
       drupal_set_message($message);
     }
