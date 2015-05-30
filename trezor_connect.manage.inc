@@ -41,7 +41,7 @@ function trezor_connect_manage_form($form, &$form_state, $account) {
   else {
     $header = array(
       t('Created On'),
-      t('Address'),
+      //t('Address'),
     );
 
     $rows = array();
@@ -50,8 +50,8 @@ function trezor_connect_manage_form($form, &$form_state, $account) {
 
     $row[] = format_date($created);
 
-    $address = $mapping['address'];
-    $address = check_plain($address);
+    //$address = $mapping['address'];
+    //$address = check_plain($address);
 
     /*
     $path = 'http://blockchain.info/address/' . $address;
@@ -65,9 +65,9 @@ function trezor_connect_manage_form($form, &$form_state, $account) {
     $link = l($address, $path, $options);
     */
 
-    $link = $address;
+    //$link = $address;
 
-    $row[] = $link;
+    //$row[] = $link;
 
     $rows[] = $row;
 
