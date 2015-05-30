@@ -159,6 +159,7 @@ EOF;
 
       $variables = array(
         'message' => $message,
+        'type' => 'warning',
       );
 
       $message = theme('trezor_connect_message', $variables);
