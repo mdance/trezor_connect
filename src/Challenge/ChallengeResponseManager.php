@@ -54,25 +54,21 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface, Con
     $challenge_response = $this->challenge_response;
 
     $mappings = [
-      'challenge_hidden' => [
+      'success' => [
         $challenge_response,
-        'setChallengeHidden',
-      ],
-      'challenge_visual' => [
-        $challenge_response,
-        'setChallengeVisual',
-      ],
-      'signature' => [
-        $challenge_response,
-        'setSignature',
+        'setSuccess',
       ],
       'public_key' => [
         $challenge_response,
         'setPublicKey',
       ],
-      'address' => [
+      'signature' => [
         $challenge_response,
-        'setAddress',
+        'setSignature',
+      ],
+      'version' => [
+        $challenge_response,
+        'setVersion',
       ],
     ];
 
