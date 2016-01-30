@@ -78,7 +78,11 @@ class TrezorConnectController extends ControllerBase {
     $result = $this->challenge_validator->validate();
 
     if (!$result) {
+      $message = t('An error has occurred validating your TREZOR credentials.');
+
       if ($js == 'nojs') {
+        drupal_set_message($message, 'error');
+        
         throw new AccessDeniedHttpException();
       }
       else {
@@ -98,8 +102,6 @@ class TrezorConnectController extends ControllerBase {
 
         $arguments['redirect'] = FALSE;
         $arguments['error'] = TRUE;
-
-        $message = t('An error has occurred validating your TREZOR credentials.');
 
         $message = array(
           '#theme' => 'trezor_connect_message',
