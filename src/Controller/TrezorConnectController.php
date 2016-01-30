@@ -7,17 +7,24 @@
 
 namespace Drupal\trezor_connect\Controller;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Controller\ControllerBase;
 
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Challenge\ChallengeValidatorInterface;
+use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class TrezorConnectController extends ControllerBase {
+
+  var $session;
 
   var $challenge_manager;
 
@@ -25,13 +32,17 @@ class TrezorConnectController extends ControllerBase {
 
   var $challenge_validator;
 
+  var $mapping_manager;
+
   /**
    * Constructs a new object.
    */
-  public function __construct(ChallengeManagerInterface $challenge_manager, ChallengeResponseManagerInterface $challenge_response_manager, ChallengeValidatorInterface $challenge_validator) {
+  public function __construct(SessionInterface $session, ChallengeManagerInterface $challenge_manager, ChallengeResponseManagerInterface $challenge_response_manager, ChallengeValidatorInterface $challenge_validator, MappingManagerInterface $mapping_manager) {
+    $this->session = $session;
     $this->challenge_manager = $challenge_manager;
     $this->challenge_response_manager = $challenge_response_manager;
     $this->challenge_validator = $challenge_validator;
+    $this->mapping_manager = $mapping_manager;
   }
 
   /**
@@ -39,9 +50,11 @@ class TrezorConnectController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('session'),
       $container->get('trezor_connect.challenge_manager'),
       $container->get('trezor_connect.challenge_response_manager'),
-      $container->get('trezor_connect.challenge_validator')
+      $container->get('trezor_connect.challenge_validator'),
+      $container->get('trezor_connect.mapping_manager')
     );
   }
 
@@ -69,7 +82,7 @@ class TrezorConnectController extends ControllerBase {
         throw new AccessDeniedHttpException();
       }
       else {
-        $commands = array();
+        $output = new AjaxResponse();
 
         $selector = '';
 
@@ -88,13 +101,13 @@ class TrezorConnectController extends ControllerBase {
 
         $message = t('An error has occurred validating your TREZOR credentials.');
 
-        $variables = array(
-          'type' => 'error',
-          'message' => $message,
+        $message = array(
+          '#theme' => 'trezor_connect_message',
+          '#type' => 'error',
+          '#message' => $message,
         );
 
-        // TODO: D8 theme
-        $message = theme('trezor_connect_message', $variables);
+        $message = render($message);
 
         $arguments['message'] = $message;
 
@@ -105,27 +118,24 @@ class TrezorConnectController extends ControllerBase {
           $arguments,
         );
 
-        // TODO: D8 ajax_command_invoke
-        $commands[] = ajax_command_invoke($selector, 'trezor_connect', $arguments);
+        $command = new InvokeCommand($selector, 'trezor_connect', $arguments);
 
-        $output = array(
-          '#type' => 'ajax',
-          '#commands' => $commands,
-        );
-
-        // TODO: D8 ajax_deliver
-        $output = ajax_deliver($output);
+        $output->addCommand($command);
       }
     }
     else {
-      // TODO: Finish refactoring from here....
-      $result = trezor_connect_mapping($response);
+      $mapping_manager = $this->mapping_manager;
 
-      if (is_array($result) && isset($result['uid'])) {
+      $public_key = $challenge_response->getPublicKey();
+
+      $mappings = $mapping_manager->get($public_key);
+      $total = count($mappings);
+
+      if ($total > 0) {
         $text = t('please click here to login');
         $url = Url::fromRoute('user.login');
 
-        $link = \Drupal::l($text, $url);
+        $link == Link::fromTextAndUrl($text, $url);
 
         $args = array(
           '@link' => $link,
@@ -133,34 +143,33 @@ class TrezorConnectController extends ControllerBase {
 
         $message = t('There is already an account associated with the TREZOR, @link', $args);
 
-        if ($type != 'ajax') {
+        if ($js != 'ajax') {
           drupal_set_message($message, 'warning');
         }
       }
       else {
-        $_SESSION['trezor_connect_response'] = $response;
+        $challenge_response_manager->set();
 
         $message = t('Your TREZOR device authentication has been saved to your session, please complete the registration process to associate your TREZOR device with your account.');
 
-        if ($type != 'ajax') {
+        if ($js != 'ajax') {
           drupal_set_message($message);
         }
       }
 
-      if ($type != 'ajax') {
-        $path = 'user.register';
-
-
-        drupal_goto($path);
+      if ($js != 'ajax') {
+        $this->redirect(TrezorConnectInterface::ROUTE_LOGIN);
       }
       else {
-        $commands = array();
+        $output = new AjaxResponse();
 
         $selector = '';
 
         if (isset($_POST['selector'])) {
           $selector = $_POST['selector'];
-          $selector = check_plain($selector);
+
+          // TODO: Port to drupal 8
+          //$selector = check_plain($selector);
           //$selector = '#' . $selector;
         }
 
@@ -168,11 +177,14 @@ class TrezorConnectController extends ControllerBase {
 
         $arguments['redirect'] = FALSE;
 
-        $variables = array(
-          'message' => $message,
+        // TODO: Fix trezor_connect_message twig template rendering
+        $message = array(
+          '#theme' => 'trezor_connect_message',
+          '#type' => 'error',
+          '#message' => $message,
         );
 
-        $message = theme('trezor_connect_message', $variables);
+        $message = render($message);
 
         $arguments['message'] = $message;
 
@@ -183,14 +195,9 @@ class TrezorConnectController extends ControllerBase {
           $arguments,
         );
 
-        $commands[] = ajax_command_invoke($selector, 'trezor_connect', $arguments);
+        $command = new InvokeCommand($selector, 'trezor_connect', $arguments);
 
-        $output = array(
-          '#type' => 'ajax',
-          '#commands' => $commands,
-        );
-
-        $output = ajax_deliver($output);
+        $output->addCommand($command);
       }
     }
 
