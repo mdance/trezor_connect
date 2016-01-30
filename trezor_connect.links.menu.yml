@@ -1,0 +1,20 @@
+trezor_connect.admin:
+  title: TREZOR Connect
+  description: 'Provides TREZOR Connect settings.'
+  route_name: trezor_connect.admin
+  parent: user.admin_index
+  weight: 0
+  menu_name: admin
+trezor_connect.admin.settings:
+  title: Settings
+  description: 'Provides TREZOR Connect settings.'
+  route_name: trezor_connect.admin
+  parent: trezor_connect.admin
+  weight: 0
+  menu_name: admin
+trezor_connect.user.manage:
+  title: Authenticated Devices
+  description: 'Configured authentication devices associated with your account.'
+  route_name: trezor_connect.user.manage
+  parent: user.page
+  weight: 1

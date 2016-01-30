@@ -1,0 +1,5 @@
+trezor_connect.admin.settings:
+  title: Settings
+  route_name: trezor_connect.admin.settings
+  base_route: trezor_connect.admin.settings
+  weight: 0

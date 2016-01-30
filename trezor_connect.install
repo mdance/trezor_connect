@@ -4,6 +4,8 @@
  * Provides the installation hooks.
  */
 
+use Drupal\trezor_connect\TrezorConnect;
+
 /**
  * Implements hook_requirements().
  *
@@ -13,9 +15,6 @@
  */
 function trezor_connect_requirements($phase) {
   $output = array();
-
-  // Ensure translations don't break during installation.
-  $t = get_t();
 
   $value = phpversion();
   $min = '5.3.0';
@@ -29,10 +28,10 @@ openssl_random_pseudo_bytes function used to generate cryptographically secure
 random numbers.
 EOF;
 
-    $description = $t($description);
+    $description = t($description);
 
     $output['trezor_connect_php'] = array(
-      'title' => $t('PHP'),
+      'title' => t('PHP'),
       'value' => $value,
       'description' => $description,
       'severity' => REQUIREMENT_ERROR,
@@ -42,25 +41,26 @@ EOF;
   $result = extension_loaded('gmp');
 
   if (!$result) {
-    $text = $t('the GMP extension');
+    $text = t('the GMP extension');
     $path = 'http://php.net/gmp';
 
-    $link = l($text, $path);
+    $url = Url::fromUri($path);
+    $link = \Drupal::l($text, $url);
 
     $args = array();
 
-    $args['!link'] = $link;
+    $args['@link'] = $link;
 
     $description = <<<EOF
-The TREZOR connect module requires !link to correctly implement the Bitcoin
+The TREZOR connect module requires @link to correctly implement the Bitcoin
 ECDSA.
 EOF;
 
-    $description = $t($description, $args);
+    $description = t($description, $args);
 
     $output['trezor_connect_gmp'] = array(
-      'title' => $t('GMP Extension'),
-      'value' => $t('Not installed'),
+      'title' => t('GMP Extension'),
+      'value' => t('Not installed'),
       'description' => $description,
       'severity' => REQUIREMENT_ERROR,
     );
@@ -69,47 +69,32 @@ EOF;
   $result = extension_loaded('openssl');
 
   if (!$result) {
-    $text = $t('the OpenSSL extension');
+    $text = t('the OpenSSL extension');
     $path = 'http://php.net/openssl';
 
-    $link = l($text, $path);
+    $url = Url::fromUri($path);
+    $link = \Drupal::l($text, $url);
 
     $args = array();
 
-    $args['!link'] = $link;
+    $args['@link'] = $link;
 
     $description = <<<EOF
-The TREZOR connect module requires !link to generate cryptographically secure
+The TREZOR connect module requires @link to generate cryptographically secure
 random numbers.
 EOF;
 
-    $description = $t($description, $args);
+    $description = t($description, $args);
 
     $output['trezor_connect_openssl'] = array(
-      'title' => $t('OpenSSL Extension'),
-      'value' => $t('Not installed'),
+      'title' => t('OpenSSL Extension'),
+      'value' => t('Not installed'),
       'description' => $description,
       'severity' => REQUIREMENT_ERROR,
     );
   }
 
   return $output;
-}
-
-/**
- * Implements hook_install().
- */
-function trezor_connect_install() {
-  drupal_set_message('The TREZOR connect functionality has been installed.');
-}
-
-/**
- * Implements hook_uninstall().
- */
-function trezor_connect_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'trezor_connect%'");
-
-  drupal_set_message('The TREZOR connect functionality has been uninstalled.');
 }
 
 /**
@@ -145,7 +130,7 @@ function trezor_connect_schema() {
     'primary key' => array('id'),
   );
 
-  $output['trezor_connect_map'] = array(
+  $output['trezor_connect_mappings'] = array(
     'description' => t('Provides the TREZOR connect mappings.'),
     'fields' => array(
       'id' => array(

@@ -1,0 +1,23 @@
+core:
+  version: 1.x
+  css:
+    theme:
+      css/trezor_connect.css: {}
+  js:
+    js/trezor_connect.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal.ajax
+external:
+  remote: https://trezor.github.io/connect
+  license:
+    name: MIT
+    url: https://github.com/trezor/connect/blob/gh-pages/bower.json
+    gpl-compatible: true
+  js:
+    //trezor.github.io/connect/login.js: { type: external, minified: false }
+local:
+  version: 1.x
+  js:
+    js/login.js: {}

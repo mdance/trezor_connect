@@ -10,6 +10,10 @@
 function trezor_connect_theme() {
   $output = array();
 
+  $output['trezor_connect'] = array(
+    'render element' => 'element',
+  );
+
   $output['trezor_connect_message'] = array(
     'variables' => array(
       'message' => NULL,
@@ -20,31 +24,19 @@ function trezor_connect_theme() {
 }
 
 /**
- * Provides the TREZOR connect registration message.
+ * Provides the template preprocess function.
+ *
+ * @param $variables
  */
-function theme_trezor_connect_message(&$variables) {
+function template_trezor_connect_message(&$variables) {
   $type = 'info';
 
   if (isset($variables['type'])) {
     $type = $variables['type'];
   }
 
-  $message = $variables['message'];
+  $attributes = &$variables['attributes'];
 
-  $attributes = array(
-    'class' => array(
-      'trezor-connect-message',
-      'trezor-connect-message-' . $type,
-    ),
-  );
-
-  $attributes = drupal_attributes($attributes);
-
-  $output = <<<EOF
-<div {$attributes}>
-  {$message}
-</div>
-EOF;
-
-  return $output;
+  $attributes['class'][] = 'trezor-connect-message';
+  $attributes['class'][] = 'trezor-connect-message-type-' . $type;
 }

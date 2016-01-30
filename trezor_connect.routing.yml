@@ -1,0 +1,40 @@
+trezor_connect.admin:
+  path: '/admin/config/people/trezor-connect'
+  defaults:
+    _form: '\Drupal\trezor_connect\Form\SettingsForm'
+    _title: 'TREZOR Connect'
+  requirements:
+    _permission: 'administer TREZOR connect'
+trezor_connect.user.register:
+  path: '/user/register/trezor/{js}'
+  defaults:
+    _controller: '\Drupal\trezor_connect\Controller\TrezorConnectController::userRegister'
+  requirements:
+    _permission: 'use TREZOR connect'
+    js: 'nojs|ajax'
+trezor_connect.user.login:
+  path: '/user/login/trezor/{js}'
+  defaults:
+    _controller: '\Drupal\trezor_connect\Controller\TrezorConnectController::userLogin'
+  requirements:
+    _permission: 'use TREZOR connect'
+    js: 'nojs|ajax'
+trezor_connect.user.manage:
+  path: '/user/{user}/trezor-connect'
+  defaults:
+    _form: '\Drupal\trezor_connect\Form\ManageForm'
+  requirements:
+    _permission: 'use TREZOR connect'
+trezor_connect.user.manage.js:
+  path: '/user/{user}/trezor-connect/{js}'
+  defaults:
+    _controller: '\Drupal\trezor_connect\Controller\TrezorConnectController::userManage'
+  requirements:
+    _permission: 'use TREZOR connect'
+    js: 'nojs|ajax'
+trezor_connect.user.manage.forget:
+  path: '/user/{user}/trezor-connect/forget'
+  defaults:
+    _form: '\Drupal\trezor_connect\Form\ForgetForm'
+  requirements:
+    _permission: 'use TREZOR connect'

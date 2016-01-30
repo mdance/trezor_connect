@@ -1,0 +1,52 @@
+# Schema for trezor connect settings, and mappings.
+trezor_connect.settings:
+  type: config_object
+  label: 'Trezor Connect Settings'
+  mapping:
+    text:
+      type: string
+      label: 'Display Text'
+    external:
+      type: integer
+      label: 'Use CDN'
+    url:
+      type: string
+      label: 'External TREZOR Connect Javascript URL'
+    callback:
+      type: string
+      label: 'TREZOR Connect Callback'
+    challenge_backend:
+      type: string
+      label: 'TREZOR Connect challenge backend'
+    mapping_backend:
+      type: string
+      label: 'TREZOR Connect mapping backend'
+
+trezor_connect.mappings.*:
+  type: config_entity
+  label: 'Trezor Connect Mapping'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    created:
+      type: integer
+      label: 'Created'
+    uid:
+      type: integer
+      label: 'UID'
+    challenge_hidden:
+      type: string
+      label: 'Hidden Challenge'
+    challenge_visual:
+      type: string
+      label: 'Visual Challenge'
+    address:
+      type: string
+      label: 'Address'
+    public_key:
+      type: string
+      label: 'Public Key'
+    signature:
+      type: string
+      label: 'Signature'

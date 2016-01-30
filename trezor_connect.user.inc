@@ -4,6 +4,11 @@
  * Provides user hooks.
  */
 
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\trezor_connect\TrezorConnect;
+
 /**
  * Implements hook_user_insert().
  *
@@ -15,14 +20,8 @@
  *
  * @throws \Exception
  */
-function trezor_connect_user_insert(&$edit, $account, $category) {
-  if (isset($_SESSION['trezor_connect_response'])) {
-    $record = $_SESSION['trezor_connect_response'];
-
-    $record['uid'] = $account->uid;
-
-    trezor_connect_write_map($record);
-  }
+function trezor_connect_user_insert(AccountProxyInterface $account) {
+  \Drupal::service('trezor_connect')->handleChallengeResponse($account->id());
 }
 
 /**
@@ -33,8 +32,8 @@ function trezor_connect_user_insert(&$edit, $account, $category) {
  *
  * @param $account
  */
-function trezor_connect_user_delete($account) {
-  trezor_connect_delete_mapping($account);
+function trezor_connect_user_delete(AccountProxyInterface $account) {
+  \Drupal::service('trezor_connect')->deleteMapping($account->id());
 }
 
 /**
@@ -42,29 +41,26 @@ function trezor_connect_user_delete($account) {
  *
  * Responsible for prompting a user to map their TREZOR device to their account.
  */
-function trezor_connect_user_login(&$edit, $account) {
-  if (isset($_SESSION['trezor_connect_response'])) {
-    $response = $_SESSION['trezor_connect_response'];
+function trezor_connect_user_login($account) {
+  $result = \Drupal::service('trezor_connect')->checkChallengeResponseState($account->id());
 
-    $result = trezor_connect_response_valid($response);
+  if ($result == TrezorConnect::STATE_CHALLENGE_RESPONSE_NEW || $result == TrezorConnect::STATE_CHALLENGE_RESPONSE_UPDATE) {
+    $text = t('Click here to map your TREZOR device to your account.');
 
-    if ($result) {
-      $result = trezor_connect_mapping($response);
+    $route_parameters = array();
 
-      if (!$result) {
-        $text = t('Click here to map your TREZOR device to your account.');
-        $path = 'user/' . $account->uid . '/trezor-connect';
+    $route_parameters['user'] = $account;
 
-        $link = l($text, $path);
+    $url = Url::fromRoute(TrezorConnect::ROUTE_MANAGE, $route_parameters);
 
-        $args = array(
-          '!link' => $link,
-        );
+    $link = new Link($text, $url);
 
-        $message = t('A TREZOR device has been authenticated to saved to your session, but is not mapped to your account.  !link', $args);
+    $args = array(
+      '!link' => $link,
+    );
 
-        drupal_set_message($message);
-      }
-    }
+    $message = t('A TREZOR device has been authenticated to saved to your session, but is not mapped to your account.  @link', $args);
+
+    drupal_set_message($message);
   }
 }

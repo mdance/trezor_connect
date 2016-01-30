@@ -1,7 +1,13 @@
+/**
+ * @file
+ * Provides TREZOR Connect clientside functionality.
+ */
 /*jslint vars: false, white: true, indent: 2 */
-/*global window, document, jQuery, Drupal */
-(function ($) {
-  "use strict";
+/*global window, document, Drupal, drupalSettings */
+
+(function ($, Drupal, drupalSettings) {
+
+  'use strict';
 
   var namespace,
     methods,
@@ -9,27 +15,13 @@
 
   namespace = 'trezor_connect';
 
-  Drupal.behaviors[namespace] = {
-    attach: function (context, settings) {
-      //$(context).trezor_connect(settings);
-    }
-  };
-
   methods = {};
-
-  methods.init = function (settings) {
-    var $this;
-
-    $this = $(this);
-
-    return $this;
-  };
 
   methods.authenticate = function(response) {
     var settings, id, url, element_settings, selector;
 
     if (response.success) {
-      settings = Drupal.settings[namespace];
+      settings = drupalSettings[namespace];
 
       selector = '#edit-trezor-connect';
 
@@ -38,7 +30,6 @@
       if ($container.length) {
         id = namespace;
         url = settings.url;
-        url += '/nojs';
 
         element_settings = {
           url: url,
@@ -50,15 +41,18 @@
             selector: selector,
             response: response
           },
-          event: 'authenticate.' + namespace
+          event: 'authenticate.' + namespace,
+          base: id,
+          element: $container
         };
 
-        Drupal.ajax[id] = new Drupal.ajax(id, $container, element_settings);
+        Drupal.ajax(element_settings);
 
+        /*
         Drupal.ajax[id].success = function (response, status) {
           Drupal.ajax.prototype.success.call(this, response, status);
-
         };
+        */
 
         $container.trigger('authenticate.' + namespace);
       }
@@ -70,7 +64,7 @@
   methods.callback = function(options) {
     var settings, mode, message, redirect;
 
-    settings = Drupal.settings[namespace];
+    settings = drupalSettings[namespace];
 
     mode = settings.mode;
 
@@ -114,4 +108,5 @@
       $.error(message);
     }
   };
-})(jQuery);
+
+})(jQuery, Drupal, drupalSettings);

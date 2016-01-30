@@ -1,0 +1,6 @@
+administer TREZOR connect:
+  title: 'Administer TREZOR Connect'
+  description: 'Administer TREZOR Connect functionality.'
+use TREZOR connect:
+  title: 'Use TREZOR Connect'
+  description: 'Use TREZOR connect functionality.'

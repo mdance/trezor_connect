@@ -1,0 +1,6 @@
+text: 'Sign in with TREZOR'
+icon: ''
+external: 1
+url: 'https://trezor.github.io/connect/login.js'
+callback: 'trezorLogin'
+mapping_backend: 'trezor_connect.mappings.backend.database'

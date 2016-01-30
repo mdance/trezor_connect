@@ -1,0 +1,6 @@
+name: TREZOR Connect
+type: module
+description: 'Provides TREZOR connect functionality.'
+package: Other
+core: '8.x'
+version: '8.0.0'
