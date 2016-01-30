@@ -53,13 +53,13 @@ class ChallengeValidator implements ChallengeValidatorInterface {
     // Check challenge response matches the challenge
     // Check challenge response
 
-    //$challenge = $this->getChallenge();
+    $challenge = $this->getChallenge();
     $response = $this->getChallengeResponse();
 
-    $challenge_hidden = $response->getChallengeHidden();
+    $challenge_hidden = $challenge->getChallengeHidden();
     $challenge_hidden = hex2bin($challenge_hidden);
 
-    $challenge_visual = $response->getChallengeVisual();
+    $challenge_visual = $challenge->getChallengeVisual();
 
     $signature = $response->getSignature();
 
