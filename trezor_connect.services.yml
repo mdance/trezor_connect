@@ -23,11 +23,11 @@ services:
     class: Drupal\trezor_connect\Challenge\ChallengeResponse
   trezor_connect.challenge_response_manager:
     class: Drupal\trezor_connect\Challenge\ChallengeResponseManager
-    arguments: ['@request_stack', '@trezor_connect.challenge_response']
+    arguments: ['@session', '@request_stack', '@trezor_connect.challenge_response']
   # challenge validator service
   trezor_connect.challenge_validator:
     class: Drupal\trezor_connect\Challenge\ChallengeValidator
-  # mappings
+  # mapping services
   trezor_connect.mapping_manager_factory:
     class: Drupal\trezor_connect\Mapping\MappingManagerFactory
     arguments: ['@settings', '@config.factory', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']

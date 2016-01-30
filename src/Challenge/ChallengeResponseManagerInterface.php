@@ -18,4 +18,19 @@ interface ChallengeResponseManagerInterface {
    */
   public function get();
 
+  /**
+   * Saves a challenge response.
+   *
+   * @param ChallengeResponseInterface $challenge_response
+   *   If specified, the passed in challenge response will be saved to the
+   * session, otherwise the get method will be invoked to retrieve the
+   * challenge response.
+   */
+  public function set(ChallengeResponseInterface $challenge_response = NULL);
+
+  /**
+   * Deletes a challenge response.
+   */
+  public function delete();
+
 }
