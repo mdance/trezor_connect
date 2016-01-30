@@ -10,22 +10,22 @@ interface ChallengeResponseInterface {
   /**
    * @return mixed
    */
-  public function getChallengeHidden();
+  public function getSuccess();
 
   /**
-   * @param mixed $challenge_hidden
+   * @param mixed $success
    */
-  public function setChallengeHidden($challenge_hidden);
+  public function setSuccess($success);
 
   /**
    * @return mixed
    */
-  public function getChallengeVisual();
+  public function getVersion();
 
   /**
-   * @param mixed $challenge_visual
+   * @param mixed $version
    */
-  public function setChallengeVisual($challenge_visual);
+  public function setVersion($version);
 
   /**
    * @return mixed
@@ -46,15 +46,5 @@ interface ChallengeResponseInterface {
    * @param mixed $public_key
    */
   public function setPublicKey($public_key);
-
-  /**
-   * @return mixed
-   */
-  public function getAddress();
-
-  /**
-   * @param mixed $address
-   */
-  public function setAddress($address);
 
 }

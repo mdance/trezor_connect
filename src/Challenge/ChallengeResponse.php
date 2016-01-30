@@ -7,38 +7,37 @@ namespace Drupal\trezor_connect\Challenge;
 
 class ChallengeResponse implements ChallengeResponseInterface {
 
-  protected $challenge_hidden;
-  protected $challenge_visual;
-  protected $signature;
+  protected $success;
   protected $public_key;
-  protected $address;
+  protected $signature;
+  protected $version;
 
   /**
    * @return mixed
    */
-  public function getChallengeHidden() {
-    return $this->challenge_hidden;
+  public function getSuccess() {
+    return $this->success;
   }
 
   /**
-   * @param mixed $challenge_hidden
+   * @param mixed $success
    */
-  public function setChallengeHidden($challenge_hidden) {
-    $this->challenge_hidden = $challenge_hidden;
+  public function setSuccess($success) {
+    $this->success = $success;
   }
 
   /**
    * @return mixed
    */
-  public function getChallengeVisual() {
-    return $this->challenge_visual;
+  public function getVersion() {
+    return $this->version;
   }
 
   /**
-   * @param mixed $challenge_visual
+   * @param mixed $version
    */
-  public function setChallengeVisual($challenge_visual) {
-    $this->challenge_visual = $challenge_visual;
+  public function setVersion($version) {
+    $this->version = $version;
   }
 
   /**
@@ -67,20 +66,6 @@ class ChallengeResponse implements ChallengeResponseInterface {
    */
   public function setPublicKey($public_key) {
     $this->public_key = $public_key;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getAddress() {
-    return $this->address;
-  }
-
-  /**
-   * @param mixed $address
-   */
-  public function setAddress($address) {
-    $this->address = $address;
   }
 
 }
