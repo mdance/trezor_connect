@@ -67,26 +67,38 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface, Con
    * @inheritDoc
    */
   public function get() {
-    $challenge_response = $this->challenge_response;
+    $output = $this->getPost();
+
+    if (is_null($output)) {
+      $output = $this->getSession();
+    }
+
+    return $output;
+  }
+
+  public function getPost() {
+    $output = NULL;
 
     $response = $this->request->request->get('response');
 
     if (is_array($response)) {
+      $output = $this->challenge_response;
+
       $mappings = [
         'success' => [
-          $challenge_response,
+          $output,
           'setSuccess',
         ],
         'public_key' => [
-          $challenge_response,
+          $output,
           'setPublicKey',
         ],
         'signature' => [
-          $challenge_response,
+          $output,
           'setSignature',
         ],
         'version' => [
-          $challenge_response,
+          $output,
           'setVersion',
         ],
       ];
@@ -97,12 +109,14 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface, Con
         }
       }
     }
-    else {
-      // Check the session for a challenge response
-      $challenge_response = $this->session->get(self::SESSION_KEY);
-    }
 
-    return $challenge_response;
+    return $output;
+  }
+
+  public function getSession() {
+    $output = $this->session->get(self::SESSION_KEY);
+
+    return $output;
   }
 
   /**

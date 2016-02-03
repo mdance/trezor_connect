@@ -19,6 +19,22 @@ interface ChallengeResponseManagerInterface {
   public function get();
 
   /**
+   * Returns a challenge response from the request POST.
+   *
+   * @return ChallengeResponse|false
+   *   The challenge response object or FALSE.
+   */
+  public function getPost();
+
+  /**
+   * Returns a challenge response from the session.
+   *
+   * @return ChallengeResponse|false
+   *   The challenge response object or FALSE.
+   */
+  public function getSession();
+
+  /**
    * Saves a challenge response.
    *
    * @param ChallengeResponseInterface $challenge_response
