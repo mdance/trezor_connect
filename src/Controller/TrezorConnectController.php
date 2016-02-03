@@ -82,7 +82,7 @@ class TrezorConnectController extends ControllerBase {
 
       if ($js == 'nojs') {
         drupal_set_message($message, 'error');
-        
+
         throw new AccessDeniedHttpException();
       }
       else {
