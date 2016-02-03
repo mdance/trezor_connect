@@ -101,4 +101,5 @@ class ChallengeValidator implements ChallengeValidatorInterface {
 
     return $output;
   }
+
 }
