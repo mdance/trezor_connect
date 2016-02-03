@@ -10,16 +10,6 @@ interface ChallengeInterface {
   /**
    * @return mixed
    */
-  public function getId();
-
-  /**
-   * @param mixed $id
-   */
-  public function setId($id);
-
-  /**
-   * @return mixed
-   */
   public function getCreated();
 
   /**

@@ -7,7 +7,6 @@ namespace Drupal\trezor_connect\Challenge;
 
 class Challenge implements ChallengeInterface {
 
-  protected $id;
   protected $created;
   protected $challenge_hidden;
   protected $challenge_visual;
@@ -26,20 +25,6 @@ class Challenge implements ChallengeInterface {
     $output = serialize($output);
 
     return $output;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getId() {
-    return $this->id;
-  }
-
-  /**
-   * @param mixed $id
-   */
-  public function setId($id) {
-    $this->id = $id;
   }
 
   /**
@@ -89,7 +74,6 @@ class Challenge implements ChallengeInterface {
    */
   public static function keys() {
     $output = array(
-      'id',
       'created',
       'challenge_hidden',
       'challenge_visual',
@@ -102,7 +86,6 @@ class Challenge implements ChallengeInterface {
    */
   public static function toArray(ChallengeInterface $challenge) {
     $output = array(
-      'id' => $challenge->getId(),
       'created' => $challenge->getCreated(),
       'challenge_hidden' => $challenge->getChallengeHidden(),
       'challenge_visual' => $challenge->getChallengeVisual(),
