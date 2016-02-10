@@ -21,7 +21,7 @@ class Challenge implements ChallengeInterface {
    * @inheritDoc
    */
   function __toString() {
-    $output = self::toArray($this);
+    $output = $this->toArray();
     $output = serialize($output);
 
     return $output;
@@ -81,37 +81,16 @@ class Challenge implements ChallengeInterface {
 
     return $output;
   }
+
   /**
    * @inheritdoc
    */
-  public static function toArray(ChallengeInterface $challenge) {
+  public function toArray() {
     $output = array(
-      'created' => $challenge->getCreated(),
-      'challenge_hidden' => $challenge->getChallengeHidden(),
-      'challenge_visual' => $challenge->getChallengeVisual(),
+      'created' => $this->getCreated(),
+      'challenge_hidden' => $this->getChallengeHidden(),
+      'challenge_visual' => $this->getChallengeVisual(),
     );
-
-    return $output;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public static function fromArray(array $challenge) {
-    $output = new Challenge();
-
-    $keys = static::keys();
-
-    foreach ($keys as $key) {
-      if (!isset($challenge[$key])) {
-        $message = sprintf('The array must contain the key %s', $key);
-
-        throw new \Exception($message);
-      }
-      else {
-        $output->$key = $challenge[$key];
-      }
-    }
 
     return $output;
   }

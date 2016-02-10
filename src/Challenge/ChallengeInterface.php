@@ -47,20 +47,9 @@ interface ChallengeInterface {
   /**
    * Returns a Challenge as an array.
    *
-   * @param \Drupal\trezor_connect\ChallengeInterface $challenge
-   *
    * @return array
    */
-  public static function toArray(ChallengeInterface $challenge);
-
-  /**
-   * Returns a Challenge from an array.
-   *
-   * @param array $challenge
-   *
-   * @return \Drupal\trezor_connect\Challenge
-   */
-  public static function fromArray(array $challenge);
+  public function toArray();
 
   /**
    * Generates a new challenge.
