@@ -30,7 +30,7 @@ services:
   # mapping services
   trezor_connect.mapping_manager_factory:
     class: Drupal\trezor_connect\Mapping\MappingManagerFactory
-    arguments: ['@settings', '@config.factory', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
+    arguments: ['@settings', '@config.factory', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@cache_tags.invalidator']
     calls:
       - [setContainer, ['@service_container']]
   trezor_connect.mapping_manager:
@@ -44,4 +44,4 @@ services:
   # helper service
   trezor_connect:
     class: Drupal\trezor_connect\TrezorConnect
-    arguments: ['@session', '@config.factory', '@trezor_connect.challenge_manager', '@trezor_connect.mapping_manager', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
+    arguments: ['@session', '@config.factory', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@trezor_connect.mapping_manager', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
