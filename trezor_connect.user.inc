@@ -4,7 +4,7 @@
  * Provides user hooks.
  */
 
-use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\user\Entity\User;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\trezor_connect\TrezorConnect;
@@ -12,7 +12,7 @@ use Drupal\trezor_connect\TrezorConnect;
 /**
  * Implements hook_user_insert().
  *
- * Responsible for mapping a TREZOR connect session to an account.
+ * Responsible for mapping a challenge response to an account.
  *
  * @param $edit
  * @param $account
@@ -20,8 +20,8 @@ use Drupal\trezor_connect\TrezorConnect;
  *
  * @throws \Exception
  */
-function trezor_connect_user_insert(AccountProxyInterface $account) {
-  \Drupal::service('trezor_connect')->handleChallengeResponse($account->id());
+function trezor_connect_user_insert(User $account) {
+  \Drupal::service('trezor_connect')->mapChallengeResponse($account->id());
 }
 
 /**
