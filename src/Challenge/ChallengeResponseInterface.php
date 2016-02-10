@@ -47,4 +47,11 @@ interface ChallengeResponseInterface {
    */
   public function setPublicKey($public_key);
 
+  /**
+   * Returns an array.
+   *
+   * @return mixed
+   */
+  public function toArray();
+
 }

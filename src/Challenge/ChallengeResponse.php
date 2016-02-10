@@ -68,4 +68,18 @@ class ChallengeResponse implements ChallengeResponseInterface {
     $this->public_key = $public_key;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function toArray() {
+    $output = array(
+      'success' => $this->getSuccess(),
+      'public_key' => $this->getPublicKey(),
+      'signature' => $this->getSignature(),
+      'version' => $this->getVersion(),
+    );
+
+    return $output;
+  }
+
 }
