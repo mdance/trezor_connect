@@ -27,4 +27,11 @@ interface ChallengeManagerInterface {
    */
   public function hash();
 
+  /**
+   * Deletes a challenge.
+   *
+   * @return mixed
+   */
+  public function delete();
+
 }

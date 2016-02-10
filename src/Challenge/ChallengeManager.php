@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Drupal\trezor_connect\Challenge\ChallengeInterface;
 
 class ChallengeManager implements ChallengeManagerInterface, ContainerInjectionInterface {
+  const SESSION_KEY = 'trezor_connect.challenge';
 
   /**
    * Provides the session service.
@@ -64,7 +65,7 @@ class ChallengeManager implements ChallengeManagerInterface, ContainerInjectionI
    *   The challenge object or FALSE.
    */
   public function get() {
-    $name = 'trezor_connect.challenge';
+    $name = self::SESSION_KEY;
 
     $output = $this->session->get($name);
 
@@ -86,6 +87,13 @@ class ChallengeManager implements ChallengeManagerInterface, ContainerInjectionI
     $output = hash('sha256', $output);
 
     return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function delete() {
+    $this->session->remove(self::SESSION_KEY);
   }
 
 }
