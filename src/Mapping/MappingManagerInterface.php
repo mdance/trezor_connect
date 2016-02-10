@@ -6,6 +6,8 @@
 
 namespace Drupal\trezor_connect\Mapping;
 
+use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
+use Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Mapping\MappingBackendInterface;
 
 interface MappingManagerInterface {
@@ -25,6 +27,52 @@ interface MappingManagerInterface {
    * @return \Drupal\trezor_connect\Mapping\MappingBackendInterface
    */
   public function getBackend();
+
+  /**
+   * Sets the challenge manager.
+   *
+   * @param \Drupal\trezor_connect\Challenge\ChallengeManagerInterface $challenge_manager
+   *
+   * @return mixed
+   */
+  public function setChallengeManager(ChallengeManagerInterface $challenge_manager);
+
+  /**
+   * Gets the challenge manager.
+   *
+   * @return \Drupal\trezor_connect\Challenge\ChallengeManagerInterface $challenge_manager
+   */
+  public function getChallengeManager();
+
+  /**
+   * Sets the challenge response manager.
+   *
+   * @param \Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface $challenge_response_manager
+   *
+   * @return mixed
+   */
+  public function setChallengeResponseManager(ChallengeResponseManagerInterface $challenge_response_manager);
+
+  /**
+   * Gets the challenge response manager.
+   *
+   * @return \Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface $challenge_response_manager
+   */
+  public function getChallengeResponseManager();
+
+  /**
+   * Gets the cache tags invalidator service.
+   *
+   * @return mixed
+   */
+  public function getCacheTagsInvalidator();
+
+  /**
+   * Sets the cache tags invalidator service.
+   *
+   * @param mixed $cache_tags_invalidator
+   */
+  public function setCacheTagsInvalidator($cache_tags_invalidator);
 
   /**
    * Returns a mapping associated with a public key.
@@ -87,5 +135,14 @@ interface MappingManagerInterface {
    * @see \Drupal\trezor_connect\MappingBackendInterface::deleteAll()
    */
   public function delete($uid);
+
+  /**
+   * Maps a challenge response to an account.
+   *
+   * @param $uid
+   *
+   * @return mixed
+   */
+  public function mapChallengeResponse($uid);
 
 }

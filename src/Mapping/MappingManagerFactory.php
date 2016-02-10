@@ -7,9 +7,12 @@
 
 namespace Drupal\trezor_connect\Mapping;
 
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigFactory;
 
+use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
+use Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -59,15 +62,41 @@ class MappingManagerFactory implements MappingManagerFactoryInterface, Container
   protected $backend;
 
   /**
+   * Provides the challenge manager.
+   *
+   * @var
+   */
+  protected $challenge_manager;
+
+  /**
+   * Provides the challenge response manager.
+   *
+   * @var
+   */
+  protected $challenge_response_manager;
+
+  /**
+   * Provides the cache tags invalidator service.
+   *
+   * @var
+   */
+  protected $cache_tags_invalidator;
+
+  /**
    * Constructs a new object.
    */
-  public function __construct(Settings $settings, ConfigFactoryInterface $config_factory, array $backends = array(), $backend) {
+  public function __construct(Settings $settings, ConfigFactoryInterface $config_factory, array $backends = array(), $backend, ChallengeManagerInterface $challenge_manager, ChallengeResponseManagerInterface $challenge_response_manager, CacheTagsInvalidatorInterface $cache_tags_invalidator) {
     $this->settings = $settings;
     $this->config_factory = $config_factory;
     $this->config = $config_factory->get('trezor_connect.settings');
 
     $this->backends = $backends;
     $this->backend = $backend;
+
+    $this->challenge_manager = $challenge_manager;
+    $this->challenge_response_manager = $challenge_response_manager;
+
+    $this->cache_tags_invalidator = $cache_tags_invalidator;
   }
 
   /**
@@ -104,6 +133,9 @@ class MappingManagerFactory implements MappingManagerFactoryInterface, Container
       $output = new MappingManager($this->config_factory);
 
       $output->setBackend($backend);
+      $output->setChallengeManager($this->challenge_manager);
+      $output->setChallengeResponseManager($this->challenge_response_manager);
+      $output->setCacheTagsInvalidator($this->cache_tags_invalidator);
 
       return $output;
     }
