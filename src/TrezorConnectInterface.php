@@ -21,19 +21,24 @@ interface TrezorConnectInterface {
   const ROUTE_LOGIN = 'trezor_connect.user.login';
 
   /**
-   * Provides a string containing the TREZOR connect register callback url.
+   * Provides a string containing the TREZOR connect register callback route.
    */
   const ROUTE_REGISTER = 'trezor_connect.user.register';
 
   /**
-   * Provides a string containing the TREZOR connect manage url.
+   * Provides a string containing the TREZOR connect manage route.
    */
   const ROUTE_MANAGE = 'trezor_connect.user.manage';
 
   /**
-   * Provides a string containing the TREZOR connect manage callback url.
+   * Provides a string containing the TREZOR connect manage callback route.
    */
   const ROUTE_MANAGE_JS = 'trezor_connect.user.manage.js';
+
+  /**
+   * Provides a string containing the user page route.
+   */
+  const ROUTE_USER = 'user.page';
 
   /**
    * Provides a string containing the administration permission.
@@ -114,59 +119,19 @@ interface TrezorConnectInterface {
   public function getCallback();
 
   /**
-   * Creates a challenge.
-   *
-   * @return Challenge
-   */
-  public function newChallenge();
-
-  /**
-   * Returns a challenge response from the session.
-   *
-   * @param boolean $validate
-   *   A boolean indicating whether to validate the challenge response.
-   *
-   * @return ChallengeResponse
-   *   The challenge response stored on the session.
-   */
-  public function challengeResponse($validate = TRUE);
-
-  /**
-   * Returns a challenge response and mapping state constant.
-   *
-   * @param integer $uid
-   *   The user id to check for mappings.
-   *
-   * @return integer
-   */
-  public function checkChallengeResponseState($uid);
-
-  /**
-   * Returns a mapping associated with a user id.
-   *
-   * @param integer $uid
-   *   An integer containing the user id whose mapping should be retrieved.
+   * Returns an array of mapping backends suitable for a form api #options.
    *
    * @return mixed
    */
-  public function getMappingsFromUid($uid);
+  public function mappingBackendOptions();
 
   /**
-   * Returns a mapping associated with a public key.
+   * Responsible for mapping the challenge response to an account.
    *
-   * @param string $public_key
-   *   A string containing the public key whose mapping should be retrieved.
+   * @param $uid
    *
    * @return mixed
    */
-  public function getMappingsFromPublicKey($public_key);
+  public function mapChallengeResponse($uid);
 
-  /**
-   * Deletes a mapping.
-   *
-   * @param integer $uid
-   *
-   * @return mixed
-   */
-  public function deleteMapping($uid);
 }
