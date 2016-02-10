@@ -81,10 +81,10 @@
     }
 
     if (redirect) {
-      if (options.url) {
+      if (options.redirect_url) {
         window.setTimeout(
           function () {
-            window.location = options.url;
+            window.location = options.redirect_url;
           },
           3000
         );
