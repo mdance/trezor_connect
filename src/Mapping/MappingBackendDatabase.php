@@ -1,11 +1,15 @@
 <?php
 /**
  * Contains \Drupal\trezor_connect\MappingBackendDatabase.
+ *
+ * TODO: Use doctrine
  */
 
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\Core\Database\Connection;
+use Drupal\trezor_connect\Challenge\Challenge;
+use Drupal\trezor_connect\Challenge\ChallengeResponse;
 
 class MappingBackendDatabase implements MappingBackendInterface {
   const TABLE = 'trezor_connect_mappings';
@@ -72,11 +76,31 @@ class MappingBackendDatabase implements MappingBackendInterface {
     $query->fields('m');
     $query->condition('public_key', $public_keys, 'IN');
 
-    $results = $query->execute()->fetchAssoc();
+    $results = $query->execute();
 
     foreach ($results as $key => $value) {
-      // TODO: Test this works
-      $output[$key] = $value::fromArray($value);
+      $challenge = new Challenge(FALSE);
+
+      $challenge->setCreated($value->challenge_created);
+      $challenge->setChallengeHidden($value->challenge_hidden);
+      $challenge->setChallengeVisual($value->challenge_visual);
+
+      $challenge_response = new ChallengeResponse();
+
+      $challenge_response->setSuccess($value->success);
+      $challenge_response->setPublicKey($value->public_key);
+      $challenge_response->setSignature($value->signature);
+      $challenge_response->setVersion($value->version);
+
+      $mapping = new Mapping();
+
+      $mapping->setId($value->id);
+      $mapping->setCreated($value->created);
+      $mapping->setUid($value->uid);
+      $mapping->setChallenge($challenge);
+      $mapping->setChallengeResponse($challenge_response);
+
+      $output[$key] = $mapping;
     }
 
     return $output;
@@ -86,7 +110,22 @@ class MappingBackendDatabase implements MappingBackendInterface {
    * @inheritDoc
    */
   public function set($public_key, Mapping $mapping) {
-    $fields = $mapping::toArray($mapping);
+    $result = $mapping->toArray();
+
+    $challenge = $result['challenge'];
+    $challenge_response = $result['challenge_response'];
+
+    $fields = array();
+
+    $fields['created'] = time();
+    $fields['uid'] = $result['uid'];
+    $fields['challenge_created'] = $challenge['created'];
+    $fields['challenge_hidden'] = $challenge['challenge_hidden'];
+    $fields['challenge_visual'] = $challenge['challenge_visual'];
+    $fields['success'] = (bool)$challenge_response['success'];
+    $fields['public_key'] = $challenge_response['public_key'];
+    $fields['signature'] = $challenge_response['signature'];
+    $fields['version'] = $challenge_response['version'];
 
     $this->connection->insert(self::TABLE)
       ->fields($fields)
