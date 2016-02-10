@@ -152,6 +152,12 @@ function trezor_connect_schema() {
         'description' => 'Provides the user id.',
         'default' => 0,
       ),
+      'challenge_created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the challenge creation timestamp.',
+      ),
       'challenge_hidden' => array(
         'type' => 'varchar',
         'length' => 64,
@@ -160,9 +166,9 @@ function trezor_connect_schema() {
         'type' => 'varchar',
         'length' => 64,
       ),
-      'address' => array(
-        'type' => 'varchar',
-        'length' => 35,
+      'success' => array(
+        'type' => 'int',
+        'size' => 'tiny',
       ),
       'public_key' => array(
         'type' => 'varchar',
@@ -171,6 +177,12 @@ function trezor_connect_schema() {
       'signature' => array(
         'type' => 'varchar',
         'length' => 255,
+      ),
+      'version' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the challenge response version.',
       ),
     ),
     'primary key' => array('id'),
