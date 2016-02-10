@@ -5,6 +5,7 @@
 
 namespace Drupal\trezor_connect\Mapping;
 
+use Drupal\trezor_connect\Challenge\ChallengeInterface;
 use Drupal\trezor_connect\Challenge\ChallengeResponseInterface;
 
 class Mapping implements MappingInterface {
@@ -12,11 +13,8 @@ class Mapping implements MappingInterface {
   protected $id;
   protected $created;
   protected $uid;
-  protected $challenge_hidden;
-  protected $challenge_visual;
-  protected $address;
-  protected $public_key;
-  protected $signature;
+  protected $challenge;
+  protected $challenge_response;
 
   /**
    * @return mixed
@@ -63,128 +61,48 @@ class Mapping implements MappingInterface {
   /**
    * @return mixed
    */
-  public function getChallengeHidden() {
-    return $this->challenge_hidden;
+  public function getChallenge() {
+    return $this->challenge;
   }
 
   /**
-   * @param mixed $challenge_hidden
+   * @param mixed $challenge
    */
-  public function setChallengeHidden($challenge_hidden) {
-    $this->challenge_hidden = $challenge_hidden;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getChallengeVisual() {
-    return $this->challenge_visual;
-  }
-
-  /**
-   * @param mixed $challenge_visual
-   */
-  public function setChallengeVisual($challenge_visual) {
-    $this->challenge_visual = $challenge_visual;
+  public function setChallenge(ChallengeInterface $challenge) {
+    $this->challenge = $challenge;
   }
 
   /**
    * @return mixed
    */
-  public function getAddress() {
-    return $this->address;
+  public function getChallengeResponse() {
+    return $this->challenge_response;
   }
 
   /**
-   * @param mixed $address
+   * @param mixed $challenge_response
    */
-  public function setAddress($address) {
-    $this->address = $address;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getPublicKey() {
-    return $this->public_key;
-  }
-
-  /**
-   * @param mixed $public_key
-   */
-  public function setPublicKey($public_key) {
-    $this->public_key = $public_key;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getSignature() {
-    return $this->signature;
-  }
-
-  /**
-   * @param mixed $signature
-   */
-  public function setSignature($signature) {
-    $this->signature = $signature;
+  public function setChallengeResponse(ChallengeResponseInterface $challenge_response) {
+    $this->challenge_response = $challenge_response;
   }
 
   /**
    * @inheritdoc
    */
-  public static function keys() {
+  public function toArray() {
+    $uid = $this->getUid();
+
+    $challenge = $this->getChallenge();
+    $challenge = $challenge->toArray();
+
+    $challenge_response = $this->getChallengeResponse();
+    $challenge_response = $challenge_response->toArray();
+
     $output = array(
-      'id',
-      'created',
-      'uid',
-      'challenge_hidden',
-      'challenge_visual',
-      'address',
-      'public_key',
-      'signature',
+      'uid' => $uid,
+      'challenge' => $challenge,
+      'challenge_response' => $challenge_response,
     );
-
-    return $output;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public static function toArray(MappingInterface $mapping) {
-    $output = (array)$mapping;
-
-    return $output;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public static function fromArray(array $mapping) {
-    $output = new Mapping();
-
-    $keys = static::keys();
-
-    foreach ($keys as $key) {
-      if (!isset($mapping[$key])) {
-        $message = sprintf('The array must contain the key %s', $key);
-
-        throw new \Exception($message);
-      }
-      else {
-        $output->$key = $mapping[$key];
-      }
-    }
-
-    return $output;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public static function fromChallengeResponse(ChallengeResponseInterface $response) {
-    // TODO: Test this
-    $output = static::fromArray((array)$response);
 
     return $output;
   }

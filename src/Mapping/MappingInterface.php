@@ -5,41 +5,66 @@
 
 namespace Drupal\trezor_connect\Mapping;
 
+use Drupal\trezor_connect\Challenge\ChallengeInterface;
 use Drupal\trezor_connect\Challenge\ChallengeResponseInterface;
 
 interface MappingInterface {
 
   /**
-   * Returns an array of property keys.
-   *
-   * @return array
+   * @return mixed
    */
-  public static function keys();
+  public function getId();
 
   /**
-   * Returns a Mapping as an array.
-   *
-   * @param \Drupal\trezor_connect\MappingInterface $mapping
-   *
-   * @return array
+   * @param mixed $id
    */
-  public static function toArray(MappingInterface $mapping);
+  public function setId($id);
 
   /**
-   * Returns a Mapping from an array.
-   *
-   * @param array $mapping
-   *
-   * @return \Drupal\trezor_connect\Mapping
+   * @return mixed
    */
-  public static function fromArray(array $mapping);
+  public function getCreated();
 
   /**
-   * Returns a Mapping from a challenge response.
-   *
-   * @param \Drupal\trezor_connect\Challenge\ChallengeResponseInterface $response
-   *
-   * @return MappingInterface
+   * @param mixed $created
    */
-  public static function fromChallengeResponse(ChallengeResponseInterface $response);
+  public function setCreated($created);
+
+  /**
+   * @return mixed
+   */
+  public function getUid();
+
+  /**
+   * @param mixed $uid
+   */
+  public function setUid($uid);
+
+  /**
+   * @return mixed
+   */
+  public function getChallenge();
+
+  /**
+   * @param mixed $challenge
+   */
+  public function setChallenge(ChallengeInterface $challenge);
+
+  /**
+   * @return mixed
+   */
+  public function getChallengeResponse();
+
+  /**
+   * @param mixed $challenge_response
+   */
+  public function setChallengeResponse(ChallengeResponseInterface $challenge_response);
+
+  /**
+   * Returns a mapping in an array format.
+   *
+   * @return mixed
+   */
+  public function toArray();
+
 }
