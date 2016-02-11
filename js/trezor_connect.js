@@ -18,41 +18,61 @@
   methods = {};
 
   methods.authenticate = function(response) {
-    var settings, id, url, element_settings, selector;
+    var settings, id, url, element_settings, selector, found, event;
 
     if (response.success) {
       settings = drupalSettings[namespace];
 
+      event = 'authenticate.' + namespace;
       selector = '#edit-trezor-connect';
 
       $container = $(selector);
 
       if ($container.length) {
-        id = namespace;
-        url = settings.url;
+        found = false;
 
-        element_settings = {
-          url: url,
-          effect: 'none',
-          wrapper: null,
-          method: namespace,
-          submit: {
-            js: true,
-            selector: selector,
-            response: response
-          },
-          event: 'authenticate.' + namespace,
-          base: id,
-          element: $container
-        };
+        $.each(
+          Drupal.ajax.instances,
+          function(key, value) {
+            var result;
 
-        Drupal.ajax(element_settings);
+            if (value.event == event) {
+              result = $container.is(value.element);
 
-        /*
-        Drupal.ajax[id].success = function (response, status) {
-          Drupal.ajax.prototype.success.call(this, response, status);
-        };
-        */
+              if ( result ) {
+                found = true;
+
+                return true;
+              }
+            }
+          }
+        );
+
+        if (!found) {
+          id = namespace;
+          url = settings.url;
+
+          element_settings = {
+            url: url,
+            effect: 'none',
+            wrapper: null,
+            method: namespace,
+            submit: {
+              js: true, selector: selector, response: response
+            },
+            event: event,
+            base: id,
+            element: $container
+          };
+
+          Drupal.ajax(element_settings);
+
+          /*
+          Drupal.ajax[id].success = function (response, status) {
+            Drupal.ajax.prototype.success.call(this, response, status);
+          };
+          */
+        }
 
         $container.trigger('authenticate.' + namespace);
       }
