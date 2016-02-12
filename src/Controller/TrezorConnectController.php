@@ -14,19 +14,16 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
-use Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface;
-use Drupal\trezor_connect\Challenge\ChallengeValidatorInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
+use Drupal\trezor_connect\ChallengeValidator\ChallengeValidatorInterface;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Drupal\trezor_connect\TrezorConnectInterface;
 
 class TrezorConnectController extends ControllerBase {
-
-  var $session;
 
   var $challenge_manager;
 
@@ -39,8 +36,7 @@ class TrezorConnectController extends ControllerBase {
   /**
    * Constructs a new object.
    */
-  public function __construct(SessionInterface $session, ChallengeManagerInterface $challenge_manager, ChallengeResponseManagerInterface $challenge_response_manager, ChallengeValidatorInterface $challenge_validator, MappingManagerInterface $mapping_manager) {
-    $this->session = $session;
+  public function __construct(ChallengeManagerInterface $challenge_manager, ChallengeResponseManagerInterface $challenge_response_manager, ChallengeValidatorInterface $challenge_validator, MappingManagerInterface $mapping_manager) {
     $this->challenge_manager = $challenge_manager;
     $this->challenge_response_manager = $challenge_response_manager;
     $this->challenge_validator = $challenge_validator;
@@ -52,7 +48,6 @@ class TrezorConnectController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('session'),
       $container->get('trezor_connect.challenge_manager'),
       $container->get('trezor_connect.challenge_response_manager'),
       $container->get('trezor_connect.challenge_validator'),
@@ -153,7 +148,7 @@ class TrezorConnectController extends ControllerBase {
         }
       }
       else {
-        $challenge_response_manager->set();
+        $challenge_response_manager->remember();
 
         $message = t('Your TREZOR device authentication has been saved to your session, please complete the registration process to associate your TREZOR device with your account.');
 
