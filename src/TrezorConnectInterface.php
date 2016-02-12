@@ -119,6 +119,20 @@ interface TrezorConnectInterface {
   public function getCallback();
 
   /**
+   * Returns an array of challenge backends suitable for a form api #options.
+   *
+   * @return mixed
+   */
+  public function challengeBackendOptions();
+
+  /**
+   * Returns an array of challenge response backends suitable for a form api #options.
+   *
+   * @return mixed
+   */
+  public function challengeResponseBackendOptions();
+
+  /**
    * Returns an array of mapping backends suitable for a form api #options.
    *
    * @return mixed
