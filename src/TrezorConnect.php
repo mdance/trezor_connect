@@ -173,4 +173,11 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
     $this->mapping_manager->mapChallengeResponse($uid);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function deleteMapping($uid) {
+    $this->mapping_manager->delete($uid);
+  }
+
 }

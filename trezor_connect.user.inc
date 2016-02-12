@@ -29,8 +29,8 @@ function trezor_connect_user_insert(User $account) {
  *
  * @param $account
  */
-function trezor_connect_user_delete(AccountProxyInterface $account) {
-  //\Drupal::service('trezor_connect')->deleteMapping($account->id());
+function trezor_connect_user_delete(User $account) {
+  \Drupal::service('trezor_connect')->deleteMapping($account->id());
 }
 
 /**

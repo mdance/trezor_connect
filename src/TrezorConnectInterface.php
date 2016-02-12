@@ -148,4 +148,14 @@ interface TrezorConnectInterface {
    */
   public function mapChallengeResponse($uid);
 
+  /**
+   * Deletes mappings associated with an account.
+   *
+   * @param $uid
+   *   The account id whose mappings should be deleted.
+   *
+   * @return mixed
+   */
+  public function deleteMapping($uid);
+
 }
