@@ -1,13 +1,14 @@
 <?php
 /**
  * Contains \Drupal\trezor_connect\MappingManager
+ *
+ * TODO: Convert this to an exportable configuration entity
  */
 
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
-use Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface;
-use Drupal\trezor_connect\Mapping\Mapping;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 
 class MappingManager implements MappingManagerInterface {
   /**
@@ -17,7 +18,6 @@ class MappingManager implements MappingManagerInterface {
 
   protected $challenge_manager;
   protected $challenge_response_manager;
-  protected $cache_tags_invalidator;
 
   public function __construct() {
   }
@@ -62,20 +62,6 @@ class MappingManager implements MappingManagerInterface {
    */
   public function setChallengeResponseManager(ChallengeResponseManagerInterface $challenge_response_manager) {
     $this->challenge_response_manager = $challenge_response_manager;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getCacheTagsInvalidator() {
-    return $this->cache_tags_invalidator;
-  }
-
-  /**
-   * @param mixed $cache_tags_invalidator
-   */
-  public function setCacheTagsInvalidator($cache_tags_invalidator) {
-    $this->cache_tags_invalidator = $cache_tags_invalidator;
   }
 
   /**
@@ -142,30 +128,27 @@ class MappingManager implements MappingManagerInterface {
   }
 
   public function mapChallengeResponse($uid) {
-    $challenge = $this->challenge_manager->get();
-    $challenge_response = $this->challenge_response_manager->getSession();
+    $challenge_response = $this->challenge_response_manager->getSessionChallengeResponse();
 
-    if ($challenge && $challenge_response) {
-      $public_key = $challenge_response->getPublicKey();
-
+    if ($challenge_response) {
       $mapping = new Mapping();
 
       $mapping->setUid($uid);
-      $mapping->setChallenge($challenge);
       $mapping->setChallengeResponse($challenge_response);
 
-      $this->backend->set($public_key, $mapping);
+      $challenge = $challenge_response->getChallenge();
 
-      // TODO: Test cache tags invalidation
-      $tags = array();
+      $mapping->setChallenge($challenge);
 
-      $hash = $challenge->getHash();
-      $tags[] = 'trezor_connect_challenge:' . $hash;
+      $this->backend->set($mapping);
 
-      $this->cache_tags_invalidator->invalidateTags($tags);
+      $id = $mapping->getId();
 
-      $this->challenge_manager->delete();
-      $this->challenge_response_manager->delete();
+      if ($id) {
+        // TODO: Test forget functionality
+        $this->challenge_manager->forget();
+        $this->challenge_response_manager->forget();
+      }
     }
   }
 }

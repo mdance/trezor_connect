@@ -9,9 +9,12 @@ namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\Core\Database\Connection;
 use Drupal\trezor_connect\Challenge\Challenge;
+use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\Challenge\ChallengeResponse;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 
 class MappingBackendDatabase implements MappingBackendInterface {
+
   const TABLE = 'trezor_connect_mappings';
 
   /**
@@ -22,13 +25,21 @@ class MappingBackendDatabase implements MappingBackendInterface {
   protected $connection;
 
   /**
+   * @inheritdoc
+   *
+   * @var \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface
+   */
+  protected $challenge_response_manager;
+
+  /**
    * Construct the MappingBackendDatabase.
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
    */
-  public function __construct(Connection $connection) {
+  public function __construct(Connection $connection, ChallengeResponseManagerInterface $challenge_response_manager) {
     $this->connection = $connection;
+    $this->challenge_response_manager = $challenge_response_manager;
   }
 
   /**
@@ -55,12 +66,9 @@ class MappingBackendDatabase implements MappingBackendInterface {
     $query->fields('m');
     $query->condition('uid', $uid);
 
-    $results = $query->execute()->fetchAssoc();
+    $results = $query->execute();
 
-    foreach ($results as $key => $value) {
-      // TODO: Test this works
-      $output[$key] = $value::fromArray($value);
-    }
+    $output = $this->results($results);
 
     return $output;
   }
@@ -71,36 +79,68 @@ class MappingBackendDatabase implements MappingBackendInterface {
   public function getMultiple(array $public_keys) {
     $output = array();
 
-    $query = $this->connection->select(self::TABLE, 'm');
+    $challenge_responses = $this->challenge_response_manager->getMultiplePublicKey($public_keys);
 
-    $query->fields('m');
-    $query->condition('public_key', $public_keys, 'IN');
+    $ids = array();
 
-    $results = $query->execute();
+    foreach ($challenge_responses as $challenge_response) {
+      $ids[] = $challenge_response->getId();
+    }
+
+    $total = count($ids);
+
+    if ($total) {
+      $query = $this->connection->select(self::TABLE, 'm');
+
+      $query->fields('m');
+
+      $query->condition('id', $ids, 'IN');
+
+      $results = $query->execute();
+
+      $output = $this->results($results, $challenge_responses);
+    }
+
+    return $output;
+  }
+
+  private function results($results, array $challenge_responses = NULL) {
+    $output = array();
 
     foreach ($results as $key => $value) {
-      $challenge = new Challenge(FALSE);
+      $found = FALSE;
 
-      $challenge->setCreated($value->challenge_created);
-      $challenge->setChallengeHidden($value->challenge_hidden);
-      $challenge->setChallengeVisual($value->challenge_visual);
+      $challenge_response = NULL;
 
-      $challenge_response = new ChallengeResponse();
+      if (!is_null($challenge_responses)) {
+        foreach ($challenge_responses as $challenge_response) {
+          $id = $challenge_response->getId();
 
-      $challenge_response->setSuccess($value->success);
-      $challenge_response->setPublicKey($value->public_key);
-      $challenge_response->setSignature($value->signature);
-      $challenge_response->setVersion($value->version);
+          if ($id == $value->challenge_response_id) {
+            $found = TRUE;
 
-      $mapping = new Mapping();
+            break;
+          }
+        }
+      }
 
-      $mapping->setId($value->id);
-      $mapping->setCreated($value->created);
-      $mapping->setUid($value->uid);
-      $mapping->setChallenge($challenge);
-      $mapping->setChallengeResponse($challenge_response);
+      if (!$found) {
+        $challenge_response = $this->challenge_response_manager->get($value->challenge_response_id);
+      }
 
-      $output[$key] = $mapping;
+      if ($challenge_response) {
+        $challenge = $challenge_response->getChallenge();
+
+        $mapping = new Mapping();
+
+        $mapping->setId($value->id);
+        $mapping->setCreated($value->created);
+        $mapping->setUid($value->uid);
+        $mapping->setChallenge($challenge);
+        $mapping->setChallengeResponse($challenge_response);
+
+        $output[$key] = $mapping;
+      }
     }
 
     return $output;
@@ -109,27 +149,34 @@ class MappingBackendDatabase implements MappingBackendInterface {
   /**
    * @inheritDoc
    */
-  public function set($public_key, Mapping $mapping) {
-    $result = $mapping->toArray();
+  public function set(MappingInterface $mapping) {
+    $map = $mapping->toArray();
 
-    $challenge = $result['challenge'];
-    $challenge_response = $result['challenge_response'];
+    if (is_null($map['created'])) {
+      $map['created'] = time();
+    }
+
+    $challenge_response = $map['challenge_response'];
 
     $fields = array();
 
-    $fields['created'] = time();
-    $fields['uid'] = $result['uid'];
-    $fields['challenge_created'] = $challenge['created'];
-    $fields['challenge_hidden'] = $challenge['challenge_hidden'];
-    $fields['challenge_visual'] = $challenge['challenge_visual'];
-    $fields['success'] = (bool)$challenge_response['success'];
-    $fields['public_key'] = $challenge_response['public_key'];
-    $fields['signature'] = $challenge_response['signature'];
-    $fields['version'] = $challenge_response['version'];
+    $fields['created'] = $map['created'];
+    $fields['uid'] = $map['uid'];
+    $fields['challenge_response_id'] = $challenge_response['id'];
 
-    $this->connection->insert(self::TABLE)
-      ->fields($fields)
-      ->execute();
+    if (isset($map['id']) && !is_null($map['id'])) {
+      $this->connection->merge(self::TABLE)
+        ->key('id', $map['id'])
+        ->fields($fields)
+        ->execute();
+    }
+    else {
+      $id = $this->connection->insert(self::TABLE)
+        ->fields($fields)
+        ->execute();
+
+      $mapping->setId($id);
+    }
 
     return $this;
   }
@@ -139,7 +186,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
    */
   public function setMultiple(array $mappings) {
     foreach ($mappings as $key => $mapping) {
-      $this->set($key, $mapping);
+      $this->set($mapping);
     }
 
     return $this;
@@ -165,4 +212,5 @@ class MappingBackendDatabase implements MappingBackendInterface {
 
     return $this;
   }
+
 }

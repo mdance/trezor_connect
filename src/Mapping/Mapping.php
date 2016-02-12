@@ -6,7 +6,7 @@
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeInterface;
-use Drupal\trezor_connect\Challenge\ChallengeResponseInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 
 class Mapping implements MappingInterface {
 
@@ -90,8 +90,6 @@ class Mapping implements MappingInterface {
    * @inheritdoc
    */
   public function toArray() {
-    $uid = $this->getUid();
-
     $challenge = $this->getChallenge();
     $challenge = $challenge->toArray();
 
@@ -99,7 +97,9 @@ class Mapping implements MappingInterface {
     $challenge_response = $challenge_response->toArray();
 
     $output = array(
-      'uid' => $uid,
+      'id' => $this->getId(),
+      'created' => $this->getCreated(),
+      'uid' => $this->getUid(),
       'challenge' => $challenge,
       'challenge_response' => $challenge_response,
     );

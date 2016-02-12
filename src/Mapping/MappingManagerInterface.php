@@ -7,7 +7,7 @@
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
-use Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Mapping\MappingBackendInterface;
 
 interface MappingManagerInterface {
@@ -47,7 +47,7 @@ interface MappingManagerInterface {
   /**
    * Sets the challenge response manager.
    *
-   * @param \Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface $challenge_response_manager
+   * @param \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface $challenge_response_manager
    *
    * @return mixed
    */
@@ -56,23 +56,9 @@ interface MappingManagerInterface {
   /**
    * Gets the challenge response manager.
    *
-   * @return \Drupal\trezor_connect\Challenge\ChallengeResponseManagerInterface $challenge_response_manager
+   * @return \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface $challenge_response_manager
    */
   public function getChallengeResponseManager();
-
-  /**
-   * Gets the cache tags invalidator service.
-   *
-   * @return mixed
-   */
-  public function getCacheTagsInvalidator();
-
-  /**
-   * Sets the cache tags invalidator service.
-   *
-   * @param mixed $cache_tags_invalidator
-   */
-  public function setCacheTagsInvalidator($cache_tags_invalidator);
 
   /**
    * Returns a mapping associated with a public key.

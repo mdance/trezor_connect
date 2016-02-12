@@ -50,10 +50,10 @@ interface MappingBackendInterface {
    * @param string $public_key
    *   The mapping public key.
    *
-   * @param Mapping $mapping
+   * @param MappingInterface $mapping
    *   The mapping object to store.
    */
-  public function set($public_key, Mapping $mapping);
+  public function set(MappingInterface $mapping);
 
   /**
    * Store multiple mappings.
@@ -69,7 +69,6 @@ interface MappingBackendInterface {
    * @param integer $uid
    *   The account id whose mapping should be deleted.
    *
-   * @see \Drupal\trezor_connect\MappingBackendInterface::deleteMultiple()
    * @see \Drupal\trezor_connect\MappingBackendInterface::deleteAll()
    */
   public function delete($uid);
@@ -77,8 +76,8 @@ interface MappingBackendInterface {
   /**
    * Deletes all mappings.
    *
-   * @see \Drupal\trezor_connect\MappingBackendInterface::deleteMultiple()
    * @see \Drupal\trezor_connect\MappingBackendInterface::deleteAll()
    */
   public function deleteAll();
+
 }

@@ -6,7 +6,7 @@
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeInterface;
-use Drupal\trezor_connect\Challenge\ChallengeResponseInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 
 interface MappingInterface {
 
