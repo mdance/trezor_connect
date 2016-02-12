@@ -132,12 +132,6 @@ class TrezorConnectElement extends RenderElement {
 
       $url = $url->toString();
 
-      $element['#attached']['drupalSettings']['trezor_connect'] = array(
-        'mode' => $mode,
-        'url' => $url,
-        'form_id' => $form_id,
-      );
-
       if (!isset($element['#text'])) {
         $text = $tc->getText();
 
@@ -155,10 +149,21 @@ class TrezorConnectElement extends RenderElement {
       $challenge_manager = \Drupal::service('trezor_connect.challenge_manager');
       $challenge = $challenge_manager->get();
 
+      $element['#challenge_id'] = $challenge->getId();
       $element['#challenge_hidden'] = $challenge->getChallengeHidden();
       $element['#challenge_visual'] = $challenge->getChallengeVisual();
 
-      Element::setAttributes($element, array('text', 'callback', 'challenge_hidden', 'challenge_visual'));
+      Element::setAttributes($element, array('text', 'callback', 'challenge_id', 'challenge_hidden', 'challenge_visual'));
+
+      $challenge_js = $challenge->toArray();
+
+      $element['#attached']['drupalSettings']['trezor_connect'] = array(
+        'mode' => $mode,
+        'url' => $url,
+        'form_id' => $form_id,
+        'challenge' => $challenge_js,
+      );
+
     }
 
     return $element;
