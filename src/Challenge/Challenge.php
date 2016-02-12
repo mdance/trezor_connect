@@ -1,20 +1,18 @@
 <?php
 /**
- * Contains \Drupal\trezor_connect\Challenge
+ * Contains \Drupal\trezor_connect\Challenge\Challenge
  */
 
 namespace Drupal\trezor_connect\Challenge;
 
 class Challenge implements ChallengeInterface {
 
+  protected $id;
   protected $created;
   protected $challenge_hidden;
   protected $challenge_visual;
 
-  function __construct($generate = TRUE) {
-    if ($generate) {
-      $this->generate();
-    }
+  function __construct() {
   }
 
   /**
@@ -25,6 +23,34 @@ class Challenge implements ChallengeInterface {
     $output = serialize($output);
 
     return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function toArray() {
+    $output = array(
+      'id' => $this->getId(),
+      'created' => $this->getCreated(),
+      'challenge_hidden' => $this->getChallengeHidden(),
+      'challenge_visual' => $this->getChallengeVisual(),
+    );
+
+    return $output;
+  }
+
+  /**
+   * @return int
+   */
+  public function getId() {
+    return $this->id;
+  }
+
+  /**
+   * @param int $id
+   */
+  public function setId($id) {
+    $this->id = $id;
   }
 
   /**
@@ -70,35 +96,11 @@ class Challenge implements ChallengeInterface {
   }
 
   /**
-   * @inheritdoc
-   */
-  public static function keys() {
-    $output = array(
-      'created',
-      'challenge_hidden',
-      'challenge_visual',
-    );
-
-    return $output;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function toArray() {
-    $output = array(
-      'created' => $this->getCreated(),
-      'challenge_hidden' => $this->getChallengeHidden(),
-      'challenge_visual' => $this->getChallengeVisual(),
-    );
-
-    return $output;
-  }
-
-  /**
    * @inheritDoc
    */
   public function generate() {
+    $this->setId(null);
+
     $created = time();
 
     $this->setCreated($created);
@@ -155,4 +157,15 @@ EOF;
 
     return $output;
   }
+
+  /**
+   * @inheritdoc
+   */
+  public function hash() {
+    $output = (string)$this;
+    $output = hash('sha256', $output);
+
+    return $output;
+  }
+
 }

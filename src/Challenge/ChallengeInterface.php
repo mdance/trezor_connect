@@ -1,11 +1,28 @@
 <?php
 /**
- * Contains \Drupal\trezor_connect\ChallengeInterface.
+ * Contains \Drupal\trezor_connect\Challenge\ChallengeInterface.
  */
 
 namespace Drupal\trezor_connect\Challenge;
 
 interface ChallengeInterface {
+
+  /**
+   * Returns a Challenge as an array.
+   *
+   * @return array
+   */
+  public function toArray();
+
+  /**
+   * @return mixed
+   */
+  public function getId();
+
+  /**
+   * @param mixed $id
+   */
+  public function setId($id);
 
   /**
    * @return mixed
@@ -38,21 +55,15 @@ interface ChallengeInterface {
   public function setChallengeVisual($challenge_visual);
 
   /**
-   * Returns an array of property keys.
-   *
-   * @return array
-   */
-  public static function keys();
-
-  /**
-   * Returns a Challenge as an array.
-   *
-   * @return array
-   */
-  public function toArray();
-
-  /**
    * Generates a new challenge.
    */
   public function generate();
+
+  /**
+   * Returns the challenge hash.
+   *
+   * @return mixed
+   */
+  public function hash();
+
 }

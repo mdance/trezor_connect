@@ -1,79 +1,130 @@
 <?php
-
 /**
- * @file
- *
- * Contains \Drupal\trezor_connect\ChallengeManager
+ * Contains \Drupal\trezor_connect\Challenge\ChallengeManager
  */
 
 namespace Drupal\trezor_connect\Challenge;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Drupal\trezor_connect\Challenge\ChallengeInterface;
 
-class ChallengeManager implements ChallengeManagerInterface, ContainerInjectionInterface {
+class ChallengeManager implements ChallengeManagerInterface {
+
   const SESSION_KEY = 'trezor_connect.challenge';
 
   /**
-   * Provides the session service.
-   *
-   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+   * @inheritdoc
    */
-  var $session;
+  protected $session;
 
   /**
-   * Provides the challenge service.
-   *
-   * @var \Drupal\trezor_connect\Challenge\ChallengeInterface
+   * @inheritdoc
    */
-  var $challenge;
+  protected $backend;
 
   /**
-   * Constructs a new object.
-   *
-   * @param Symfony\Component\HttpFoundation\Session\SessionInterface $session
-   *   The session service used to store challenges.
-   *
-   * @param Drupal\trezor_connect\Challenge\ChallengeInterface $challenge
-   *   The challenge service used to create challenges.
+   * @inheritdoc
    */
-  public function __construct(SessionInterface $session, ChallengeInterface $challenge) {
+  protected $challenge;
+
+  /**
+   * @inheritdoc
+   */
+  protected $cache_tags_invalidator;
+
+  public function __construct() {
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setSession(SessionInterface $session) {
     $this->session = $session;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getSession() {
+    return $this->session;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setBackend(ChallengeBackendInterface $backend) {
+    $this->backend = $backend;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getBackend() {
+    return $this->backend;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setChallenge(ChallengeInterface $challenge) {
     $this->challenge = $challenge;
   }
 
   /**
    * @inheritDoc
    */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('session'),
-      $container->get('trezor_connect.challenge')
-    );
+  public function getChallenge() {
+    return $this->challenge;
   }
 
   /**
-   * Returns a challenge.
-   *
-   * If a challenge is not stored on the session, a new challenge will be
-   * generated.
-   *
-   * @return ChallengeInterface|false
-   *   The challenge object or FALSE.
+   * @return mixed
    */
-  public function get() {
-    $name = self::SESSION_KEY;
+  public function getCacheTagsInvalidator() {
+    return $this->cache_tags_invalidator;
+  }
 
-    $output = $this->session->get($name);
+  /**
+   * @param mixed $cache_tags_invalidator
+   */
+  public function setCacheTagsInvalidator($cache_tags_invalidator) {
+    $this->cache_tags_invalidator = $cache_tags_invalidator;
+  }
 
-    if ( is_null($output) ) {
-      $output = $this->challenge;
+  /**
+   * @inheritDoc
+   */
+  public function get($id = NULL, $reset = FALSE) {
+    if (is_null($id)) {
+      // Check if a challenge exists on the session
+      $output = $this->getSessionChallenge();
 
-      $this->session->set($name, $output);
+      if (!$output || $reset) {
+        $output = $this->getChallenge();
+
+        $id = $output->getId();
+
+        if (is_null($id)) {
+          // Generate a new challenge
+          $output->generate();
+
+          // Store the challenge on the backend
+          $this->backend->set($output);
+
+          // Save the challenge to the session
+          $this->session->set(self::SESSION_KEY, $output);
+        }
+      }
     }
+    else {
+      // Retrieve a specific challenge
+      $output = $this->backend->get($id);
+    }
+
+    return $output;
+  }
+
+  public function getSessionChallenge() {
+    $output = $this->session->get(self::SESSION_KEY);
 
     return $output;
   }
@@ -81,19 +132,65 @@ class ChallengeManager implements ChallengeManagerInterface, ContainerInjectionI
   /**
    * @inheritDoc
    */
-  public function hash() {
-    $output = $this->get();
-    $output = (string)$output;
-    $output = hash('sha256', $output);
+  public function getMultiple(array $ids) {
+    $output = $this->backend->getMultiple($ids);
 
     return $output;
   }
 
   /**
-   * @inheritdoc
+   * @inheritDoc
    */
-  public function delete() {
+  public function set(Challenge $challenge) {
+    $this->backend->set($challenge);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setMultiple(array $challenges) {
+    $this->backend->setMultiple($challenges);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function delete($id) {
+    // TODO: Implement cache tag invalidation
+    $this->backend->delete($id);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteAll() {
+    // TODO: Implement cache tag invalidation
+
+    $this->backend->deleteAll();
+
+    return $this;
+  }
+
+  public function remember() {
+    $value = $this->get();
+
+    if ($value) {
+      $this->session->set(self::SESSION_KEY, $value);
+    }
+
+    return $this;
+  }
+
+  public function forget() {
     $this->session->remove(self::SESSION_KEY);
+
+    return $this;
   }
 
 }
