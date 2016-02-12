@@ -145,7 +145,6 @@ class MappingManager implements MappingManagerInterface {
       $id = $mapping->getId();
 
       if ($id) {
-        // TODO: Test forget functionality
         $this->challenge_manager->forget();
         $this->challenge_response_manager->forget();
       }
