@@ -18,6 +18,9 @@ trezor_connect.settings:
     challenge_backend:
       type: string
       label: 'TREZOR Connect challenge backend'
+    challenge_response_backend:
+      type: string
+      label: 'TREZOR Connect challenge response backend'
     mapping_backend:
       type: string
       label: 'TREZOR Connect mapping backend'

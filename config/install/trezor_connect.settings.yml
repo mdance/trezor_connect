@@ -3,4 +3,6 @@ icon: ''
 external: 1
 url: 'https://trezor.github.io/connect/login.js'
 callback: 'trezorLogin'
+challenge_backend: 'trezor_connect.challenges.backend.database'
+challenge_response_backend: 'trezor_connect.challenge_responses.backend.database'
 mapping_backend: 'trezor_connect.mappings.backend.database'
