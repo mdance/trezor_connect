@@ -5,9 +5,6 @@
  */
 
 use Drupal\user\Entity\User;
-use Drupal\Core\Url;
-use Drupal\Core\Link;
-use Drupal\trezor_connect\TrezorConnect;
 
 /**
  * Implements hook_user_insert().
@@ -33,7 +30,7 @@ function trezor_connect_user_insert(User $account) {
  * @param $account
  */
 function trezor_connect_user_delete(AccountProxyInterface $account) {
-  \Drupal::service('trezor_connect')->deleteMapping($account->id());
+  //\Drupal::service('trezor_connect')->deleteMapping($account->id());
 }
 
 /**
@@ -42,6 +39,7 @@ function trezor_connect_user_delete(AccountProxyInterface $account) {
  * Responsible for prompting a user to map their TREZOR device to their account.
  */
 function trezor_connect_user_login($account) {
+  /*
   $result = \Drupal::service('trezor_connect')->checkChallengeResponseState($account->id());
 
   if ($result == TrezorConnect::STATE_CHALLENGE_RESPONSE_NEW || $result == TrezorConnect::STATE_CHALLENGE_RESPONSE_UPDATE) {
@@ -63,4 +61,5 @@ function trezor_connect_user_login($account) {
 
     drupal_set_message($message);
   }
+  */
 }
