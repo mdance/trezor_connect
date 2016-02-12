@@ -41,7 +41,7 @@ class TrezorConnectChallengeCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext() {
-    $output = $this->challenge_manager->hash();
+    $output = $this->challenge_manager->get();
 
     return $output;
   }
@@ -52,12 +52,16 @@ class TrezorConnectChallengeCacheContext implements CacheContextInterface {
   public function getCacheableMetadata() {
     $output = new CacheableMetadata();
 
-    $hash = $this->challenge_manager->hash();
+    $challenge = $this->challenge_manager->get();
 
-    if ($hash) {
-      $tags = ['trezor_connect_challenge:' . $hash];
+    if ($challenge) {
+      $id = $challenge->getId();
 
-      $output->setCacheTags($tags);
+      if ($id) {
+        $tags = ['trezor_connect_challenge:' . $id];
+
+        $output->setCacheTags($tags);
+      }
     }
 
     return $output;
