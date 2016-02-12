@@ -15,22 +15,42 @@ services:
   # challenge services
   trezor_connect.challenge:
     class: Drupal\trezor_connect\Challenge\Challenge
+  trezor_connect.challenge_manager_factory:
+    class: Drupal\trezor_connect\Challenge\ChallengeManagerFactory
+    arguments: ['@settings', '@config.factory', '@session', '%trezor_connect_challenge_backends%', '%trezor_connect_challenge_backend%', '@trezor_connect.challenge', '@cache_tags.invalidator']
+    calls:
+      - [setContainer, ['@service_container']]
   trezor_connect.challenge_manager:
     class: Drupal\trezor_connect\Challenge\ChallengeManager
-    arguments: ['@session', '@trezor_connect.challenge']
+    factory: trezor_connect.challenge_manager_factory:get
+  trezor_connect.challenges.backend.database:
+    class: Drupal\trezor_connect\Challenge\ChallengeBackendDatabase
+    arguments: ['@database']
+    tags:
+      - { name: trezor_connect_challenge_backend, title: 'Database', priority: 0, default: 1 }
   # challenge response services
   trezor_connect.challenge_response:
-    class: Drupal\trezor_connect\Challenge\ChallengeResponse
+    class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponse
+  trezor_connect.challenge_response_manager_factory:
+    class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerFactory
+    arguments: ['@settings', '@config.factory', '@session', '@request_stack', '%trezor_connect_challenge_response_backends%', '%trezor_connect_challenge_response_backend%', '@trezor_connect.challenge_response', '@trezor_connect.challenge_manager']
+    calls:
+      - [setContainer, ['@service_container']]
   trezor_connect.challenge_response_manager:
-    class: Drupal\trezor_connect\Challenge\ChallengeResponseManager
-    arguments: ['@session', '@request_stack', '@trezor_connect.challenge_response']
+    class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManager
+    factory: trezor_connect.challenge_response_manager_factory:get
+  trezor_connect.challenge_responses.backend.database:
+    class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendDatabase
+    arguments: ['@database', '@trezor_connect.challenge_manager']
+    tags:
+      - { name: trezor_connect_challenge_response_backend, title: 'Database', priority: 0, default: 1 }
   # challenge validator service
   trezor_connect.challenge_validator:
-    class: Drupal\trezor_connect\Challenge\ChallengeValidator
+    class: Drupal\trezor_connect\ChallengeValidator\ChallengeValidator
   # mapping services
   trezor_connect.mapping_manager_factory:
     class: Drupal\trezor_connect\Mapping\MappingManagerFactory
-    arguments: ['@settings', '@config.factory', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@cache_tags.invalidator']
+    arguments: ['@settings', '@config.factory', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager']
     calls:
       - [setContainer, ['@service_container']]
   trezor_connect.mapping_manager:
@@ -38,10 +58,10 @@ services:
     factory: trezor_connect.mapping_manager_factory:get
   trezor_connect.mappings.backend.database:
     class: Drupal\trezor_connect\Mapping\MappingBackendDatabase
-    arguments: ['@database', '@cache_tags.invalidator.checksum']
+    arguments: ['@database', '@trezor_connect.challenge_response_manager']
     tags:
       - { name: trezor_connect_mapping_backend, title: 'Database', priority: 0, default: 1 }
   # helper service
   trezor_connect:
     class: Drupal\trezor_connect\TrezorConnect
-    arguments: ['@session', '@config.factory', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@trezor_connect.mapping_manager', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
+    arguments: ['@session', '@config.factory', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@trezor_connect.mapping_manager', '%trezor_connect_challenge_backends%', '%trezor_connect_challenge_backend%', '%trezor_connect_challenge_response_backends%', '%trezor_connect_challenge_response_backend%', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
