@@ -3,12 +3,14 @@
 /**
  * @file
  *
- * Contains \Drupal\trezor_connect\ChallengeValidator
+ * Contains \Drupal\trezor_connect\ChallengeValidator\ChallengeValidator
  */
 
-namespace Drupal\trezor_connect\Challenge;
+namespace Drupal\trezor_connect\ChallengeValidator;
 
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
+use Drupal\trezor_connect\Challenge\ChallengeInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 use Symfony\Component\Process\Exception\LogicException;
 
 class ChallengeValidator implements ChallengeValidatorInterface {
