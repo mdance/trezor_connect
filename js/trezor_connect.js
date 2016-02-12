@@ -58,7 +58,10 @@
             wrapper: null,
             method: namespace,
             submit: {
-              js: true, selector: selector, response: response
+              js: true,
+              selector: selector,
+              response: response,
+              challenge: settings.challenge
             },
             event: event,
             base: id,
