@@ -130,6 +130,45 @@ function trezor_connect_schema() {
     'primary key' => array('id'),
   );
 
+  $output['trezor_connect_challenge_responses'] = array(
+    'description' => t('Provides the TREZOR connect challenge responses.'),
+    'fields' => array(
+      'id' => array(
+        'description' => 'Provides the primary key used to identify this item internally',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the record creation timestamp.',
+      ),
+      'challenge_id' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the challenge id.',
+      ),
+      'public_key' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'signature' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'version' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Provides the challenge response version.',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
   $output['trezor_connect_mappings'] = array(
     'description' => t('Provides the TREZOR connect mappings.'),
     'fields' => array(
@@ -152,37 +191,12 @@ function trezor_connect_schema() {
         'description' => 'Provides the user id.',
         'default' => 0,
       ),
-      'challenge_created' => array(
+      'challenge_response_id' => array(
         'type' => 'int',
+        'unsigned' => TRUE,
         'not null' => TRUE,
+        'description' => 'Provides the challenge response id.',
         'default' => 0,
-        'description' => 'Provides the challenge creation timestamp.',
-      ),
-      'challenge_hidden' => array(
-        'type' => 'varchar',
-        'length' => 64,
-      ),
-      'challenge_visual' => array(
-        'type' => 'varchar',
-        'length' => 64,
-      ),
-      'success' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-      ),
-      'public_key' => array(
-        'type' => 'varchar',
-        'length' => 255,
-      ),
-      'signature' => array(
-        'type' => 'varchar',
-        'length' => 255,
-      ),
-      'version' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Provides the challenge response version.',
       ),
     ),
     'primary key' => array('id'),
