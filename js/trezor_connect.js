@@ -60,8 +60,8 @@
             submit: {
               js: true,
               selector: selector,
-              response: response,
-              challenge: settings.challenge
+              trezor_connect_challenge: settings.challenge,
+              trezor_connect_challenge_response: response
             },
             event: event,
             base: id,
