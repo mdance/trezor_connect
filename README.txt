@@ -60,3 +60,17 @@ MAINTAINERS
 -----------
 Current maintainers:
  * Michael Dance (mikedance) - https://www.drupal.org/u/mikedance
+
+TODO/Wishlist
+-----------
+Add password verification before mapping a trezor device
+
+Add button styling (http://trezor.github.io/connect/examples/login-restyled.html)
+
+Add host icon configuration
+
+Add support for asynchronous challenges (http://trezor.github.io/connect/examples/login-async.html)
+
+Add an option for users to disable username, and password authentication
+
+Allow users to create accounts without entering a username/password
