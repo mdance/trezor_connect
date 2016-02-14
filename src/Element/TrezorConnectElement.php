@@ -166,6 +166,8 @@ class TrezorConnectElement extends RenderElement {
       $renderer = \Drupal::service('renderer');
 
       $renderer->addCacheableDependency($element, $challenge);
+
+      \Drupal::service('page_cache_kill_switch')->trigger();
     }
 
     return $element;
