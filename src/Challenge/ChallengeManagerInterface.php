@@ -6,9 +6,26 @@
 
 namespace Drupal\trezor_connect\Challenge;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 interface ChallengeManagerInterface {
+
+  /**
+   * Sets the current request.
+   *
+   * @param $request
+   *
+   * @return mixed
+   */
+  public function setRequest(Request $request);
+
+  /**
+   * Returns the current request.
+   *
+   * @return
+   */
+  public function getRequest();
 
   /**
    * Sets the session service.
@@ -76,14 +93,25 @@ interface ChallengeManagerInterface {
    * Returns a challenge associated with an id.
    *
    * @param int $id
-   *   The challenge id to retrieve.
+   *   The challenge id to retrieve.  If null, the current request will be
+   * checked for a challenge, otherwise a new challenge will be generated and
+   * returned.
    *
    * @return Challenge|false
    *   The challenge object or FALSE.
    *
+   * @see \Drupal\trezor_connect\ChallengeBackendInterface::getRequestChallenge()
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::getMultiple()
    */
-  public function get($id);
+  public function get($id = NULL, $reset = FALSE);
+
+  /**
+   * Returns a challenge associated with the current request.
+   *
+   * @return Challenge|false
+   *   The challenge object or FALSE.
+   */
+  public function getRequestChallenge();
 
   /**
    * Returns the challenges associated with an array of ids.
@@ -101,18 +129,10 @@ interface ChallengeManagerInterface {
   /**
    * Stores a challenge.
    *
-   * @param Challenge $challenge
+   * @param ChallengeInterface $challenge
    *   The challenge object to store.
    */
-  public function set(Challenge $challenge);
-
-  /**
-   * Store multiple challenges.
-   *
-   * @param array $challenges
-   *   An array of Challenge objects.
-   */
-  public function setMultiple(array $challenges);
+  public function set(ChallengeInterface $challenge);
 
   /**
    * Deletes a challenge.
@@ -128,19 +148,5 @@ interface ChallengeManagerInterface {
    * Deletes all challenges.
    */
   public function deleteAll();
-
-  /**
-   * Stores the active challenge on the session.
-   *
-   * @return mixed
-   */
-  public function remember();
-
-  /**
-   * Removes the active challenge from the session.
-   *
-   * @return mixed
-   */
-  public function forget();
 
 }

@@ -9,12 +9,12 @@ namespace Drupal\trezor_connect\Challenge;
 
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigFactory;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Drupal\Core\Site\Settings;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Process\Exception\LogicException;
 
@@ -35,6 +35,13 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
    * @var \Drupal\Core\Config\ImmutableConfig
    */
   protected $config;
+
+  /**
+   * The current request.
+   *
+   * @var
+   */
+  protected $request;
 
   /**
    * The session service.
@@ -82,10 +89,10 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
   /**
    * Constructs a new object.
    */
-  public function __construct(Settings $settings, ConfigFactoryInterface $config_factory, SessionInterface $session, array $backends = array(), $backend, ChallengeInterface $challenge, CacheTagsInvalidatorInterface $cache_tags_invalidator) {
+  public function __construct(Settings $settings, ConfigFactoryInterface $config_factory, RequestStack $request_stack, SessionInterface $session, array $backends = array(), $backend, ChallengeInterface $challenge, CacheTagsInvalidatorInterface $cache_tags_invalidator) {
     $this->settings = $settings;
-    $this->config_factory = $config_factory;
     $this->config = $config_factory->get('trezor_connect.settings');
+    $this->request = $request_stack->getCurrentRequest();
     $this->session = $session;
 
     $this->backends = $backends;
@@ -99,7 +106,7 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
   /**
    * Instantiates a backend class.
    *
-   * @return \Drupal\trezor_connect\ChallengeBackendInterface
+   * @return \Drupal\trezor_connect\Challenge\ChallengeBackendInterface
    *   The backend object.
    */
   public function get() {
@@ -127,8 +134,10 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
     else {
       $backend = $this->container->get($service);
 
-      $output = new ChallengeManager($this->config_factory);
+      // TODO: Refactor this so its not hardcoded
+      $output = new ChallengeManager();
 
+      $output->setRequest($this->request);
       $output->setSession($this->session);
       $output->setBackend($backend);
       $output->setChallenge($this->challenge);

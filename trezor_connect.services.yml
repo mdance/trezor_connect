@@ -17,7 +17,7 @@ services:
     class: Drupal\trezor_connect\Challenge\Challenge
   trezor_connect.challenge_manager_factory:
     class: Drupal\trezor_connect\Challenge\ChallengeManagerFactory
-    arguments: ['@settings', '@config.factory', '@session', '%trezor_connect_challenge_backends%', '%trezor_connect_challenge_backend%', '@trezor_connect.challenge', '@cache_tags.invalidator']
+    arguments: ['@settings', '@config.factory', '@request_stack', '@session', '%trezor_connect_challenge_backends%', '%trezor_connect_challenge_backend%', '@trezor_connect.challenge', '@cache_tags.invalidator']
     calls:
       - [setContainer, ['@service_container']]
   trezor_connect.challenge_manager:
