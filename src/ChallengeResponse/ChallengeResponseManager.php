@@ -13,39 +13,34 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ChallengeResponseManager implements ChallengeResponseManagerInterface {
 
-  const SESSION_KEY = 'trezor_connect.challenge_response';
+  const KEY = 'trezor_connect_challenge_response';
 
   /**
-   * @inheritdoc
+   * Provides the session object.
    */
   protected $session;
 
   /**
-   * The request to check for a challenge response.
+   * The current request.
    *
    * @var null|\Symfony\Component\HttpFoundation\Request
    */
   var $request;
 
   /**
-   * @inheritdoc
+   * Provides the backend service.
    */
   protected $backend;
 
   /**
-   * @inheritdoc
+   * Provides the challenge response object.
    */
   protected $challenge_response;
 
   /**
-   * @inheritdoc
+   * Provides the challenge manager service.
    */
   protected $challenge_manager;
-
-  /**
-   * @inheritdoc
-   */
-  protected $challenge;
 
   public function __construct() {
   }
@@ -123,37 +118,22 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function setChallenge(ChallengeInterface $challenge) {
-    $this->challenge = $challenge;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getChallenge() {
-    return $this->challenge;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function get($id = NULL) {
     if (is_null($id)) {
       // Check if a challenge exists on the current request
-      $output = $this->getPost();
+      $output = $this->getRequestChallengeResponse();
 
       if (!$output) {
         $output = $this->getSessionChallengeResponse();
       }
 
-      $id = $output->getId();
+      if ($output) {
+        $id = $output->getId();
 
-      if (is_null($id)) {
-        // Store the challenge response on the backend
-        $this->backend->set($output);
-
-        // Save the challenge response to the session
-        $this->session->set(self::SESSION_KEY, $output);
+        if (is_null($id)) {
+          // Store the challenge response
+          $this->set($output);
+        }
       }
     }
     else {
@@ -164,26 +144,22 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
     return $output;
   }
 
-  public function getPost() {
+  /**
+   * @inheritDoc
+   */
+  public function getRequestChallengeResponse() {
     $output = NULL;
 
-    $response = $this->request->request->get('response');
+    $response = $this->request->request->get(self::KEY);
 
     if (is_array($response)) {
       if (isset($response['success']) && $response['success']) {
         $output = $this->getChallengeResponse();
 
-        $challenge = $this->request->request->get('challenge');
+        $challenge = $this->challenge_manager->getRequestChallenge();
 
-        if (isset($challenge['id'])) {
-          $challenges = $this->challenge_manager->get($challenge['id']);
-          $total = count($challenges);
-
-          if ($total) {
-            $challenge = array_shift($challenges);
-
-            $output->setChallenge($challenge);
-          }
+        if ($challenge) {
+          $output->setChallenge($challenge);
         }
 
         $mappings = [
@@ -212,8 +188,11 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
     return $output;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getSessionChallengeResponse() {
-    $output = $this->session->get(self::SESSION_KEY);
+    $output = $this->session->get(self::KEY);
 
     return $output;
   }
@@ -254,8 +233,21 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function set(ChallengeResponseInterface $challenge_response) {
+  public function set(ChallengeResponseInterface $challenge_response, $session = TRUE) {
+    $created = $challenge_response->getCreated();
+
+    if (!$created) {
+      $created = time();
+
+      $challenge_response->setCreated($created);
+    }
+
+    // Save the challenge response to the session
     $this->backend->set($challenge_response);
+
+    if ($session) {
+      $this->setSessionChallengeResponse($challenge_response);
+    }
 
     return $this;
   }
@@ -263,8 +255,8 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function setMultiple(array $challenge_responses) {
-    $this->backend->setMultiple($challenge_responses);
+  public function setSessionChallengeResponse(ChallengeResponseInterface $challenge_response) {
+    $this->session->set(self::KEY, $challenge_response);
 
     return $this;
   }
@@ -287,18 +279,11 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
     return $this;
   }
 
-  public function remember() {
-    $value = $this->get();
-
-    if ($value) {
-      $this->session->set(self::SESSION_KEY, $value);
-    }
-
-    return $this;
-  }
-
-  public function forget() {
-    $this->session->remove(self::SESSION_KEY);
+  /**
+   * @inheritDoc
+   */
+  public function deleteSessionChallengeResponse() {
+    $this->session->remove(self::KEY);
 
     return $this;
   }

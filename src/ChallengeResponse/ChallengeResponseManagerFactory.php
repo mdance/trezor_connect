@@ -7,9 +7,7 @@
 
 namespace Drupal\trezor_connect\ChallengeResponse;
 
-use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigFactory;
 
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -39,18 +37,18 @@ class ChallengeResponseManagerFactory implements ChallengeResponseManagerFactory
   protected $config;
 
   /**
+   * The current request.
+   *
+   * @var
+   */
+  protected $request;
+
+  /**
    * The session service.
    *
    * @var
    */
   protected $session;
-
-  /**
-   * The request stack service.
-   *
-   * @var
-   */
-  protected $request_stack;
 
   /**
    * An array of backends.
@@ -93,10 +91,9 @@ class ChallengeResponseManagerFactory implements ChallengeResponseManagerFactory
    */
   public function __construct(Settings $settings, ConfigFactoryInterface $config_factory, SessionInterface $session, RequestStack $request_stack, array $backends = array(), $backend, ChallengeResponseInterface $challenge_response, ChallengeManagerInterface $challenge_manager) {
     $this->settings = $settings;
-    $this->config_factory = $config_factory;
     $this->config = $config_factory->get('trezor_connect.settings');
+    $this->request = $request_stack->getCurrentRequest();
     $this->session = $session;
-    $this->request_stack = $request_stack;
 
     $this->backends = $backends;
     $this->backend = $backend;
@@ -136,11 +133,11 @@ class ChallengeResponseManagerFactory implements ChallengeResponseManagerFactory
     else {
       $backend = $this->container->get($service);
 
-      // TODO: Refactor this to use a service
-      $output = new ChallengeResponseManager($this->config_factory);
+      // TODO: Refactor this so its not hardcoded
+      $output = new ChallengeResponseManager();
 
+      $output->setRequest($this->request);
       $output->setSession($this->session);
-      $output->setRequest($this->request_stack->getCurrentRequest());
       $output->setBackend($backend);
       $output->setChallengeResponse($this->challenge_response);
       $output->setChallengeManager($this->challenge_manager);

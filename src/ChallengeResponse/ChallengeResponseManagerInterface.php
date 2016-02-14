@@ -94,22 +94,6 @@ interface ChallengeResponseManagerInterface {
   public function getChallengeManager();
 
   /**
-   * Sets the challenge.
-   *
-   * @param \Drupal\trezor_connect\Challenge\ChallengeInterface $challenge
-   *
-   * @return mixed
-   */
-  public function setChallenge(ChallengeInterface $challenge);
-
-  /**
-   * Returns the challenge.
-   *
-   * @return \Drupal\trezor_connect\Challenge\ChallengeInterface
-   */
-  public function getChallenge();
-
-  /**
    * Returns a challenge response associated with an id.
    *
    * @param int $id
@@ -121,6 +105,16 @@ interface ChallengeResponseManagerInterface {
    * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::getMultiple()
    */
   public function get($id);
+
+  /**
+   * Returns a challenge response associated with the current request.
+   *
+   * @return ChallengeResponse|false
+   *   The challenge response object or FALSE.
+   *
+   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::getMultiple()
+   */
+  public function getRequestChallengeResponse();
 
   /**
    * Returns the challenges response associated with an array of ids.
@@ -158,16 +152,18 @@ interface ChallengeResponseManagerInterface {
    *
    * @param ChallengeResponse $challenge_response
    *   The challenge response object to store.
+   *
+   * @param boolean $session
+   *   Determines whether to store the challenge response on the session.
    */
-  public function set(ChallengeResponseInterface $challenge_response);
+  public function set(ChallengeResponseInterface $challenge_response, $session = TRUE);
 
   /**
-   * Store multiple challenge responses.
+   * Stores the active challenge response on the session.
    *
-   * @param array $challenge_responses
-   *   An array of ChallengeResponse objects.
+   * @return mixed
    */
-  public function setMultiple(array $challenge_responses);
+  public function setSessionChallengeResponse(ChallengeResponseInterface $challenge_response);
 
   /**
    * Deletes a challenge response.
@@ -185,17 +181,10 @@ interface ChallengeResponseManagerInterface {
   public function deleteAll();
 
   /**
-   * Stores the active challenge response on the session.
-   *
-   * @return mixed
-   */
-  public function remember();
-
-  /**
    * Removes the active challenge response from the session.
    *
    * @return mixed
    */
-  public function forget();
+  public function deleteSessionChallengeResponse();
 
 }
