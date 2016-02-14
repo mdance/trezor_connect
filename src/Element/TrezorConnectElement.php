@@ -144,7 +144,6 @@ class TrezorConnectElement extends RenderElement {
         $element['#callback'] = $callback;
       }
 
-      $element['#cache']['contexts'][] = 'trezor_connect_challenge';
 
       $challenge_manager = \Drupal::service('trezor_connect.challenge_manager');
       $challenge = $challenge_manager->get();
@@ -164,6 +163,9 @@ class TrezorConnectElement extends RenderElement {
         'challenge' => $challenge_js,
       );
 
+      $renderer = \Drupal::service('renderer');
+
+      $renderer->addCacheableDependency($element, $challenge);
     }
 
     return $element;
