@@ -94,17 +94,16 @@ class MappingManager implements MappingManagerInterface {
   /**
    * @inheritDoc
    */
-  public function set(Mapping $mapping) {
+  public function set(MappingInterface $mapping) {
+    $created = $mapping->getCreated();
+
+    if (!$created) {
+      $created = time();
+
+      $mapping->setCreated($created);
+    }
+
     $this->backend->set($mapping);
-
-    return $this;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function setMultiple(array $mappings) {
-    $this->backend->setMultiple($mappings);
 
     return $this;
   }
@@ -140,13 +139,12 @@ class MappingManager implements MappingManagerInterface {
 
       $mapping->setChallenge($challenge);
 
-      $this->backend->set($mapping);
+      $this->set($mapping);
 
       $id = $mapping->getId();
 
       if ($id) {
-        $this->challenge_manager->forget();
-        $this->challenge_response_manager->forget();
+        $this->challenge_response_manager->deleteSessionChallengeResponse();
       }
     }
   }

@@ -98,18 +98,10 @@ interface MappingManagerInterface {
   /**
    * Stores a mapping.
    *
-   * @param Mapping $mapping
+   * @param MappingInterface $mapping
    *   The mapping object to store.
    */
-  public function set(Mapping $mapping);
-
-  /**
-   * Store multiple mappings.
-   *
-   * @param array $mappings
-   *   An array of Mapping objects.
-   */
-  public function setMultiple(array $mappings);
+  public function set(MappingInterface $mapping);
 
   /**
    * Deletes a mapping.

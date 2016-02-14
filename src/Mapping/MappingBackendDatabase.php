@@ -152,10 +152,6 @@ class MappingBackendDatabase implements MappingBackendInterface {
   public function set(MappingInterface $mapping) {
     $map = $mapping->toArray();
 
-    if (is_null($map['created'])) {
-      $map['created'] = time();
-    }
-
     $challenge_response = $map['challenge_response'];
 
     $fields = array();
