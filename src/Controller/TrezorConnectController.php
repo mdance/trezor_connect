@@ -210,25 +210,9 @@ class TrezorConnectController extends ControllerBase {
   public function userLogin($js = 'nojs') {
     $output = NULL;
 
-    $challenge_validator = $this->challenge_validator;
+    $challenge_response = $this->challenge_response_manager->get();
 
-    $challenge_manager = $this->challenge_manager;
-    $challenge = $challenge_manager->get();
-    $challenge_validator->setChallenge($challenge);
-
-    $challenge_response_manager = $this->challenge_response_manager;
-    $challenge_response = $challenge_response_manager->get();
-    $challenge_validator->setChallengeResponse($challenge_response);
-
-    // TODO: Figure out why validate is returning false on log out/login pass
-    $result = $this->challenge_validator->validate();
-
-    $redirect = FALSE;
-    $redirect_url = NULL;
-    $error = FALSE;
-    $type = 'default';
-
-    if (!$result) {
+    if (!$challenge_response) {
       $message = t('An error has occurred validating your TREZOR credentials.');
 
       if ($js == 'nojs') {
@@ -241,74 +225,100 @@ class TrezorConnectController extends ControllerBase {
       $type = 'error';
     }
     else {
-      $mapping_manager = $this->mapping_manager;
+      $challenge_validator = $this->challenge_validator;
 
-      $public_key = $challenge_response->getPublicKey();
+      $challenge_validator->setChallenge($challenge_response->getChallenge());
+      $challenge_validator->setChallengeResponse($challenge_response);
 
-      $mappings = $mapping_manager->get($public_key);
-      $total = count($mappings);
+      $result = $this->challenge_validator->validate();
 
-      if (!$total) {
-        $text = t('click here to register an account');
-        $url = Url::fromRoute('user.register');
+      $redirect = FALSE;
+      $redirect_url = NULL;
+      $error = FALSE;
+      $type = 'default';
 
-        $link = Link::fromTextAndUrl($text, $url);
-        $link = $link->toString();
+      if (!$result) {
+        $message = t('An error has occurred validating your TREZOR credentials.');
 
-        $args = array(
-          '@link' => $link,
-        );
+        if ($js == 'nojs') {
+          drupal_set_message($message, 'error');
 
-        $message = t('There is no account associated with your TREZOR device.  Please login with your existing username and password to associate your account with your TREZOR device, otherwise @link.', $args);
+          throw new AccessDeniedHttpException();
+        }
 
         $error = TRUE;
         $type = 'error';
       }
       else {
-        $mapping = array_shift($mappings);
+        $mapping_manager = $this->mapping_manager;
 
-        $uid = $mapping->getUid();
+        $public_key = $challenge_response->getPublicKey();
 
-        $account = User::load($uid);
+        $mappings = $mapping_manager->get($public_key);
+        $total = count($mappings);
 
-        $result = $account->isBlocked();
+        if (!$total) {
+          $text = t('click here to register an account');
+          $url = Url::fromRoute('user.register');
 
-        if ($result) {
-          $message = <<<EOF
-The account associated with your TREZOR device is not active.  If you have just
-registered, your account may be awaiting to be approved by an administrator.
-EOF;
+          $link = Link::fromTextAndUrl($text, $url);
+          $link = $link->toString();
 
-          $message = t($message);
+          $args = array(
+            '@link' => $link,
+          );
+
+          $message = t('There is no account associated with your TREZOR device.  Please login with your existing username and password to associate your account with your TREZOR device, otherwise @link.', $args);
 
           $error = TRUE;
           $type = 'error';
         }
         else {
-          user_login_finalize($account);
+          $mapping = array_shift($mappings);
 
-          $message = t('You have been successfully logged in using your TREZOR device.');
+          $uid = $mapping->getUid();
 
-          if ($js == 'nojs') {
-            drupal_set_message($message);
+          $account = User::load($uid);
 
-            $this->redirect(TrezorConnectInterface::ROUTE_USER);
+          $result = $account->isBlocked();
+
+          if ($result) {
+            $message = <<<EOF
+The account associated with your TREZOR device is not active.  If you have just
+registered, your account may be awaiting to be approved by an administrator.
+EOF;
+
+            $message = t($message);
+
+            $error = TRUE;
+            $type = 'error';
           }
           else {
-            $text = t('click here');
-            $url = Url::fromRoute(TrezorConnectInterface::ROUTE_USER);
+            user_login_finalize($account);
 
-            $link = Link::fromTextAndUrl($text, $url);
-            $link = $link->toString();
+            $message = t('You have been successfully logged in using your TREZOR device.');
 
-            $args = array(
-              '@link' => $link,
-            );
+            if ($js == 'nojs') {
+              drupal_set_message($message);
 
-            $message = t('You have been successfully logged in using your TREZOR device, you should now be automatically redirected, otherwise @link', $args);
+              $this->redirect(TrezorConnectInterface::ROUTE_USER);
+            }
+            else {
+              $text = t('click here');
+              $url = Url::fromRoute(TrezorConnectInterface::ROUTE_USER);
 
-            $redirect = TRUE;
-            $redirect_url = $url->toString();
+              $link = Link::fromTextAndUrl($text, $url);
+              $link = $link->toString();
+
+              $args = array(
+                '@link' => $link,
+              );
+
+              $message = t('You have been successfully logged in using your TREZOR device, you should now be automatically redirected, otherwise @link', $args);
+
+              $redirect = TRUE;
+              $redirect_url = $url->toString();
+            }
           }
         }
       }
