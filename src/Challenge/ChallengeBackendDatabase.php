@@ -59,7 +59,7 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
       $challenge = new Challenge();
 
       $challenge->setId($value->id);
-      $challenge->setCreated($value->challenge_created);
+      $challenge->setCreated($value->created);
       $challenge->setChallengeHidden($value->challenge_hidden);
       $challenge->setChallengeVisual($value->challenge_visual);
 
