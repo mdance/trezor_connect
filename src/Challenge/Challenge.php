@@ -5,7 +5,10 @@
 
 namespace Drupal\trezor_connect\Challenge;
 
-class Challenge implements ChallengeInterface {
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+
+class Challenge implements ChallengeInterface, CacheableDependencyInterface {
 
   protected $id;
   protected $created;
@@ -166,6 +169,35 @@ EOF;
     $output = hash('sha256', $output);
 
     return $output;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getCacheContexts() {
+    $output = array();
+
+    //$output[] = 'trezor_connect_challenge';
+
+    return $output;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getCacheTags() {
+    $output = array();
+
+    $output[] = 'trezor_connect_challenge:' . $this->getId();
+
+    return $output;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getCacheMaxAge() {
+    return 0;
   }
 
 }
