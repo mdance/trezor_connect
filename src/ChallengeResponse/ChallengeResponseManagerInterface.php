@@ -97,14 +97,15 @@ interface ChallengeResponseManagerInterface {
    * Returns a challenge response associated with an id.
    *
    * @param int $id
-   *   The challenge response id to retrieve.
+   *   The challenge response id to retrieve.  If not specified, the request,
+   * and session will be checked for a challenge response.
    *
    * @return ChallengeResponse|false
    *   The challenge response object or FALSE.
    *
    * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::getMultiple()
    */
-  public function get($id);
+  public function get($id = NULL);
 
   /**
    * Returns a challenge response associated with the current request.
