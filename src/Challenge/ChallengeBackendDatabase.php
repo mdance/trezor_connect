@@ -75,10 +75,6 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
   public function set(ChallengeInterface $challenge) {
     $map = $challenge->toArray();
 
-    if (is_null($map['created'])) {
-      $map['created'] = time();
-    }
-
     $fields = array();
 
     $fields['created'] = $map['created'];
