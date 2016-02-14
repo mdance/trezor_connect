@@ -72,7 +72,7 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
   /**
    * @inheritDoc
    */
-  public function set(Challenge $challenge) {
+  public function set(ChallengeInterface $challenge) {
     $map = $challenge->toArray();
 
     if (is_null($map['created'])) {

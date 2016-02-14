@@ -39,7 +39,7 @@ interface ChallengeBackendInterface {
    * @param Challenge $challenge
    *   The challenge object to store.
    */
-  public function set(Challenge $challenge);
+  public function set(ChallengeInterface $challenge);
 
   /**
    * Store multiple challenges.
