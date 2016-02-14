@@ -1,8 +1,6 @@
 <?php
 /**
  * Contains \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendDatabase.
- *
- * TODO: Use doctrine
  */
 
 namespace Drupal\trezor_connect\ChallengeResponse;
@@ -12,6 +10,9 @@ use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 
 class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterface {
 
+  /**
+   * Provides the database table used to store the challenge responses.
+   */
   const TABLE = 'trezor_connect_challenge_responses';
 
   /**
@@ -21,6 +22,11 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
    */
   protected $connection;
 
+  /**
+   * Provides the challenge manager service.
+   *
+   * @var \Drupal\trezor_connect\Challenge\ChallengeManagerInterface
+   */
   protected $challenge_manager;
 
   /**
@@ -78,6 +84,9 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
     return $output;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getMultiplePublicKey(array $public_keys) {
     $output = array();
 
@@ -115,10 +124,6 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
   public function set(ChallengeResponseInterface $challenge_response) {
     $map = $challenge_response->toArray();
 
-    if (is_null($map['created'])) {
-      $map['created'] = time();
-    }
-
     $fields = array();
 
     $fields['created'] = $map['created'];
@@ -139,17 +144,6 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
         ->execute();
 
       $challenge_response->setId($id);
-    }
-
-    return $this;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function setMultiple(array $challenge_responses) {
-    foreach ($challenge_responses as $key => $challenge_response) {
-      $this->set($challenge_response);
     }
 
     return $this;

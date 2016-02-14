@@ -51,14 +51,6 @@ interface ChallengeResponseBackendInterface {
   public function set(ChallengeResponseInterface $challenge_response);
 
   /**
-   * Store multiple challenge responses.
-   *
-   * @param array $challenge_responses
-   *   An array of ChallengeResponse objects.
-   */
-  public function setMultiple(array $challenge_responses);
-
-  /**
    * Deletes a challenge response.
    *
    * @param integer $id
