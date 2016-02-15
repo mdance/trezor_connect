@@ -6,6 +6,7 @@
 namespace Drupal\trezor_connect\ChallengeResponse;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 
 class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterface {
@@ -57,8 +58,6 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
    * @inheritDoc
    */
   public function getMultiple(array $ids) {
-    $output = array();
-
     $query = $this->connection->select(self::TABLE, 'm');
 
     $query->fields('m');
@@ -66,36 +65,20 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
 
     $results = $query->execute();
 
-    foreach ($results as $key => $value) {
-      $challenge = $this->challenge_manager->get($value->challenge_id);
-
-      $challenge_response = new ChallengeResponse();
-
-      $challenge_response->setId($value->id);
-      $challenge_response->setCreated($value->created);
-      $challenge_response->setChallenge($challenge);
-      $challenge_response->setPublicKey($value->public_key);
-      $challenge_response->setSignature($value->signature);
-      $challenge_response->setVersion($value->version);
-
-      $output[$key] = $challenge_response;
-    }
+    $output = $this->results($results);
 
     return $output;
   }
 
   /**
-   * @inheritDoc
+   * Processes a database result set to an array of challenge responses.
+   *
+   * @param $results
+   *
+   * @return array
    */
-  public function getMultiplePublicKey(array $public_keys) {
+  private function results(StatementInterface $results) {
     $output = array();
-
-    $query = $this->connection->select(self::TABLE, 'm');
-
-    $query->fields('m');
-    $query->condition('public_key', $public_keys, 'IN');
-
-    $results = $query->execute();
 
     foreach ($results as $key => $value) {
       $challenge = $this->challenge_manager->get($value->challenge_id);
@@ -114,6 +97,22 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
         $output[$key] = $challenge_response;
       }
     }
+
+    return $output;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getMultiplePublicKey(array $public_keys) {
+    $query = $this->connection->select(self::TABLE, 'm');
+
+    $query->fields('m');
+    $query->condition('public_key', $public_keys, 'IN');
+
+    $results = $query->execute();
+
+    $output = $this->results($results);
 
     return $output;
   }
