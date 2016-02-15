@@ -7,41 +7,77 @@
 
 namespace Drupal\trezor_connect\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\State\StateInterface;
-use Drupal\Core\Form\ConfigFormBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Flood\FloodInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Password\PasswordInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\trezor_connect\Mapping\MappingInterface;
+use Drupal\trezor_connect\Mapping\MappingManagerInterface;
+use Drupal\trezor_connect\TrezorConnectInterface;
+use Drupal\user\UserAuthInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Allows you to manage the authenticated devices associated with your account.
  */
-class ManageForm extends ConfigFormBase {
-  /**
-   * The state keyvalue collection.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
+class ManageForm extends FormBase {
 
   /**
-   * Provides a string containing the namespace.
+   * Provides the form id.
    */
-  protected $namespace = TREZOR_CONNECT_NS_MAPPINGS;
+  const FORM_ID = 'trezor_connect_manage';
+
+  /**
+   * Provides the flood service event name.
+   */
+  const FLOOD_NAME = 'trezor_connect_manage';
+
+  /**
+   * Provides the mapping manager service.
+   *
+   * @var \Drupal\trezor_connect\Mapping\MappingManagerInterface
+   */
+  protected $mapping_manager;
+
+  /**
+   * Provides the date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   */
+  protected $date_formatter;
+
+  /**
+   * The password service.
+   *
+   * @var \Drupal\Core\Password\PasswordInterface
+   */
+  protected $password_checker;
+
+  /**
+   * The flood service.
+   *
+   * @var \Drupal\user\UserAuthInterface
+   */
+  protected $flood;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $current_user;
 
   /**
    * Constructs a new form.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state keyvalue collection to use.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state) {
-    parent::__construct($config_factory);
-
-    $this->state = $state;
+  public function __construct(MappingManagerInterface $mapping_manager, DateFormatterInterface $date_formatter, PasswordInterface $password_checker, FloodInterface $flood, AccountInterface $current_user) {
+    $this->mapping_manager = $mapping_manager;
+    $this->date_formatter = $date_formatter;
+    $this->password_checker = $password_checker;
+    $this->flood = $flood;
+    $this->current_user = $current_user;
   }
 
   /**
@@ -49,22 +85,18 @@ class ManageForm extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory'),
-      $container->get('state')
+      $container->get('trezor_connect.mapping_manager'),
+      $container->get('date.formatter'),
+      $container->get('password'),
+      $container->get('flood'),
+      $container->get('current_user')
     );
   }
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'trezor_connect_manage';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getEditableConfigNames() {
-    return [$this->namespace];
+    return static::FORM_ID;
   }
 
   /**
@@ -72,102 +104,234 @@ class ManageForm extends ConfigFormBase {
    *
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config($this->namespace);
+  public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL) {
+    $current_user = $this->current_user;
 
-    $mapping = trezor_connect_account_mapping($account);
+    $result = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
 
-    if (!$mapping) {
-      $form_id = 'trezor_connect_manage_form';
+    if (!$result) {
+      $description = $this->t('Please enter your current password to make changes to your accounts authenticated devices.');
+
+      $form['password'] = array(
+        '#type' => 'password',
+        '#required' => TRUE,
+        '#title' => t('Current Password'),
+        '#description' => $description,
+      );
+    }
+
+    $uid = (int)$user->id();
+
+    $mappings = $this->mapping_manager->getFromUid($uid);
+    $total = count($mappings);
+
+    if (!$total) {
+      $form_id = $this->getFormId();
 
       trezor_connect_alter_form($form, $form_state, $form_id);
-
-      $mode = 'manage';
-      $url = '/' . str_replace('%user', $account->uid, TREZOR_CONNECT_URL_MANAGE_JS);
-
-      $form['#attached']['js'][] = array(
-        'data' => array(
-          'trezor_connect' => array(
-            'mode' => $mode,
-            'url' => $url,
-            'form_id' => $form_id,
-          ),
-        ),
-        'type' => 'setting',
-      );
     }
     else {
       $header = array(
         t('Created On'),
-        //t('Address'),
+        t('Status'),
       );
+
+      $status = NULL;
 
       $rows = array();
 
-      $created = $mapping['created'];
+      foreach ($mappings as $mapping) {
+        $row = array();
 
-      $row[] = format_date($created);
+        $created = $mapping->getCreated();
 
-      //$address = $mapping['address'];
-      //$address = check_plain($address);
+        $row[] = $this->date_formatter->format($created);
 
-      /*
-      $path = 'http://blockchain.info/address/' . $address;
+        $status = $mapping->getStatus();
 
-      $options = array(
-        'attributes' => array(
-          'target' => '_new',
-        ),
-      );
+        if ($status == MappingInterface::STATUS_ACTIVE) {
+          $status_display = t('Active');
+        }
+        else {
+          $status_display = t('Disabled');
+        }
 
-      $link = l($address, $path, $options);
-      */
+        $row[] = $status_display;
 
-      //$link = $address;
+        $rows[] = $row;
 
-      //$row[] = $link;
-
-      $rows[] = $row;
-
-      $variables = array(
-        'header' => $header,
-        'rows' => $rows,
-      );
-
-      $markup = theme('table', $variables);
+        $form['mapping'] = array(
+          '#type' => 'value',
+          '#value' => $mapping,
+        );
+      }
 
       $form['table'] = array(
-        '#markup' => $markup,
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
       );
 
-      $form['forget'] = array(
+      if ($status == MappingInterface::STATUS_ACTIVE) {
+        $value = t('Disable Authentication Device');
+      }
+      else {
+        $value = t('Enable Authentication Device');
+      }
+
+      $form['toggle'] = array(
         '#type' => 'submit',
-        '#value' => t('Forget Authentication Device'),
+        '#name' => 'toggle',
+        '#value' => $value,
       );
 
-      $form['account'] = array(
+      $form['remove'] = array(
+        '#type' => 'submit',
+        '#name' => 'remove',
+        '#value' => t('Remove Authentication Device'),
+      );
+
+      $form['user'] = array(
         '#type' => 'value',
-        '#value' => $account,
+        '#value' =>  $user,
       );
     }
 
-    return parent::buildForm($form, $form_state);
+    return $form;
   }
 
   /**
-   * Provides the manage mappings form submit handler.
-   *
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $current_user = $this->current_user;
+
+    $result = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
+
+    if (!$result) {
+      $channel = 'trezor_connect';
+
+      $current_uid = $current_user->id();
+      $current_username = $current_user->getAccountName();
+
+      $user = $form_state->getValue('user');
+
+      $uid = $user->id();
+      $username = $user->getAccountName();
+
+      $password = $form_state->getValue('password');
+      $password = trim($password);
+
+      $config = $this->config('trezor_connect.settings');
+
+      $name = self::FLOOD_NAME;
+      $threshold = $config->get('flood_threshold');
+      $window = $config->get('flood_window');
+      $identifier = $current_uid . ':' . $uid;
+
+      $result = $this->flood->isAllowed($name, $threshold, $window, $identifier);
+
+      if (!$result) {
+        $message = $this->t('You are not allowed anymore password guesses.');
+
+        $form_state->setErrorByName('password', $message);
+
+        $context = array();
+
+        $context['%username'] = $username;
+
+        if ($current_uid != $uid) {
+          $message = 'The authentication attempt limit has been reached for %current_username attempting to authenticate for %username.';
+
+          $context['%current_username'] = $current_username;
+        }
+        else {
+          $message = 'The authentication attempt limit has been reached for %username.';
+        }
+
+        $this->logger($channel)->notice($message, $context);
+      }
+      else {
+        $hash = $user->getPassword();
+
+        $result = $this->password_checker->check($password, $hash);
+
+        if (!$result) {
+          $message = $this->t('The password you have entered is invalid.');
+
+          $form_state->setErrorByName('password', $message);
+
+          $this->flood->register($name, $window, $identifier);
+
+          $context = array();
+
+          $context['%username'] = $username;
+
+          if ($current_uid != $uid) {
+            $message = 'Invalid password attempt by %current_username attempting to authenticate for %username.';
+
+            $context['%current_username'] = $current_username;
+          }
+          else {
+            $message = 'Invalid password attempt by %username.';
+          }
+
+          $this->logger($channel)->notice($message, $context);
+        }
+      }
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $values = $form_state['values'];
+    $current_uid = $this->current_user->id();
 
-    $account = $values['account'];
+    $user = $form_state->getValue('user');
 
-    $uid = $account->uid;
+    $uid = $user->id();
 
-    $form_state['redirect'] = 'user/' . $uid . '/trezor-connect/forget';
+    $triggering_element = $form_state->getTriggeringElement();
 
-    parent::submitForm($form, $form_state);
+    $route_parameters = array(
+      'user' => $uid,
+    );
+
+    if ($triggering_element['#name'] == $form['toggle']['#name']) {
+      $mapping = $form_state->getValue('mapping');
+
+      $status = $mapping->getStatus();
+
+      if ($status == MappingInterface::STATUS_ACTIVE) {
+        $route_name = TrezorConnectInterface::ROUTE_MANAGE_DISABLE;
+      }
+      else {
+        $this->mapping_manager->enable($uid);
+
+        if ($uid == $current_uid) {
+          $target = $this->t('your account');
+        }
+        else {
+          $target = $user->getAccountName();
+        }
+
+        $args = array();
+
+        $args['%target'] = $target;
+
+        $message = $this->t('The authentication device has been enabled for %target.', $args);
+
+        drupal_set_message($message);
+
+        $route_name = TrezorConnectInterface::ROUTE_MANAGE;
+      }
+    }
+    else if ($triggering_element['#name'] == $form['remove']['#name']) {
+      $route_name = TrezorConnectInterface::ROUTE_MANAGE_REMOVE;
+    }
+
+    $form_state->setRedirect($route_name, $route_parameters);
   }
+
 }
