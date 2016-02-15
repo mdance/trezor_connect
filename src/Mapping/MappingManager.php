@@ -139,6 +139,8 @@ class MappingManager implements MappingManagerInterface {
 
       $mapping->setChallenge($challenge);
 
+      $mapping->setStatus(MappingInterface::STATUS_ACTIVE);
+
       $this->set($mapping);
 
       $id = $mapping->getId();
@@ -148,4 +150,23 @@ class MappingManager implements MappingManagerInterface {
       }
     }
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function disable($uid) {
+    $this->backend->disable($uid);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function enable($uid) {
+    $this->backend->enable($uid);
+
+    return $this;
+  }
+
 }

@@ -80,4 +80,22 @@ interface MappingBackendInterface {
    */
   public function deleteAll();
 
+  /**
+   * Disables a mapping associated with an account.
+   *
+   * @param $uid
+   *
+   * @return mixed
+   */
+  public function disable($uid);
+
+  /**
+   * Enables a mapping associated with an account.
+   *
+   * @param $uid
+   *
+   * @return mixed
+   */
+  public function enable($uid);
+
 }

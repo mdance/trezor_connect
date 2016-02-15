@@ -11,6 +11,16 @@ use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 interface MappingInterface {
 
   /**
+   * Provides the mapping disabled status.
+   */
+  const STATUS_DISABLED = 0;
+
+  /**
+   * Provides the mapping active status.
+   */
+  const STATUS_ACTIVE = 1;
+
+  /**
    * @return mixed
    */
   public function getId();
@@ -59,6 +69,16 @@ interface MappingInterface {
    * @param mixed $challenge_response
    */
   public function setChallengeResponse(ChallengeResponseInterface $challenge_response);
+
+  /**
+   * @return mixed
+   */
+  public function getStatus();
+
+  /**
+   * @param int $status
+   */
+  public function setStatus($status);
 
   /**
    * Returns a mapping in an array format.

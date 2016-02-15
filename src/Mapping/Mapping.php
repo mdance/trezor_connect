@@ -15,6 +15,7 @@ class Mapping implements MappingInterface {
   protected $uid;
   protected $challenge;
   protected $challenge_response;
+  protected $status;
 
   /**
    * @return mixed
@@ -87,6 +88,27 @@ class Mapping implements MappingInterface {
   }
 
   /**
+   * @return mixed
+   */
+  public function getStatus() {
+    return $this->status;
+  }
+
+  /**
+   * @param int $status
+   */
+  public function setStatus($status) {
+    if ($status != self::STATUS_ACTIVE && $status != self::STATUS_DISABLED) {
+      $message = 'Invalid status value';
+
+      throw new \LogicException($message);
+    }
+    else {
+      $this->status = $status;
+    }
+  }
+
+  /**
    * @inheritdoc
    */
   public function toArray() {
@@ -102,6 +124,7 @@ class Mapping implements MappingInterface {
       'uid' => $this->getUid(),
       'challenge' => $challenge,
       'challenge_response' => $challenge_response,
+      'status' => $this->getStatus(),
     );
 
     return $output;

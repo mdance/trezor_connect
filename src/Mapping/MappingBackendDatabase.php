@@ -136,6 +136,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
         $mapping->setUid($value->uid);
         $mapping->setChallenge($challenge);
         $mapping->setChallengeResponse($challenge_response);
+        $mapping->setStatus($value->status);
 
         $output[$key] = $mapping;
       }
@@ -157,6 +158,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
     $fields['created'] = $map['created'];
     $fields['uid'] = $map['uid'];
     $fields['challenge_response_id'] = $challenge_response['id'];
+    $fields['status'] = $map['status'];
 
     if (isset($map['id']) && !is_null($map['id'])) {
       $this->connection->merge(self::TABLE)
@@ -202,6 +204,46 @@ class MappingBackendDatabase implements MappingBackendInterface {
    */
   public function deleteAll() {
     $this->connection->delete(self::TABLE)
+      ->execute();
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function disable($uid) {
+    $this->status($uid, MappingInterface::STATUS_DISABLED);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function enable($uid) {
+    $this->status($uid, MappingInterface::STATUS_ACTIVE);
+
+    return $this;
+  }
+
+  /**
+   * Sets the mapping status.
+   *
+   * @param $uid
+   * @param int $status
+   *
+   * @return $this
+   * @throws \Exception
+   */
+  private function status($uid, $status = MappingInterface::STATUS_ACTIVE) {
+    $fields = array(
+      'status' => $status,
+    );
+
+    $this->connection->merge(self::TABLE)
+      ->key('uid', $uid)
+      ->fields($fields)
       ->execute();
 
     return $this;

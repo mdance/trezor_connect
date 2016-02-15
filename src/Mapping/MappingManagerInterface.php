@@ -123,4 +123,22 @@ interface MappingManagerInterface {
    */
   public function mapChallengeResponse($uid);
 
+  /**
+   * Disables a mapping associated with an account.
+   *
+   * @param $uid
+   *
+   * @return mixed
+   */
+  public function disable($uid);
+
+  /**
+   * Enables a mapping associated with an account.
+   *
+   * @param $uid
+   *
+   * @return mixed
+   */
+  public function enable($uid);
+
 }
