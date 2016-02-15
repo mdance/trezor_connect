@@ -13,6 +13,7 @@ use Drupal\Core\Render\Element\RenderElement;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
+use Drupal\trezor_connect\Form\ManageForm;
 use Drupal\trezor_connect\TrezorConnectInterface;
 
 
@@ -87,6 +88,9 @@ class TrezorConnectElement extends RenderElement {
     if ($result) {
       $mode = TrezorConnectInterface::MODE_LOGIN;
     }
+    else if ($form_id == ManageForm::FORM_ID) {
+      $mode = TrezorConnectInterface::MODE_MANAGE;
+    }
     else {
       $mode = TrezorConnectInterface::MODE_REGISTER;
     }
@@ -109,6 +113,11 @@ class TrezorConnectElement extends RenderElement {
 
     if ($mode == TrezorConnectInterface::MODE_LOGIN) {
       $url = Url::fromRoute(TrezorConnectInterface::ROUTE_LOGIN, $route_parameters, $options);
+    }
+    else if ($mode == TrezorConnectInterface::MODE_MANAGE) {
+      $route_parameters['user'] = $account->id();
+
+      $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE_JS, $route_parameters, $options);
     }
     else {
       $url = Url::fromRoute(TrezorConnectInterface::ROUTE_REGISTER, $route_parameters, $options);
@@ -143,7 +152,6 @@ class TrezorConnectElement extends RenderElement {
 
         $element['#callback'] = $callback;
       }
-
 
       $challenge_manager = \Drupal::service('trezor_connect.challenge_manager');
       $challenge = $challenge_manager->get();
