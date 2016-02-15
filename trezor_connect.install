@@ -198,6 +198,13 @@ function trezor_connect_schema() {
         'description' => 'Provides the challenge response id.',
         'default' => 0,
       ),
+      'status' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Provides the status of the mapping.',
+        'default' => 0,
+      ),
     ),
     'primary key' => array('id'),
     'unique keys' => array(
