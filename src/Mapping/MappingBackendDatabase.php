@@ -58,9 +58,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
   /**
    * @inheritDoc
    */
-  public function getFromUid(integer $uid) {
-    $output = array();
-
+  public function getFromUid($uid) {
     $query = $this->connection->select(self::TABLE, 'm');
 
     $query->fields('m');

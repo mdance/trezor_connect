@@ -29,7 +29,7 @@ interface MappingBackendInterface {
    * @return Mapping|false
    *   The mapping object or FALSE.
    */
-  public function getFromUid(integer $uid);
+  public function getFromUid($uid);
 
   /**
    * Returns the mappings associated with an array of public keys.

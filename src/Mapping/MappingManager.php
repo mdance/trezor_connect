@@ -76,7 +76,7 @@ class MappingManager implements MappingManagerInterface {
   /**
    * @inheritDoc
    */
-  public function getFromUid(integer $uid) {
+  public function getFromUid($uid) {
     $output = $this->backend->getFromUid($uid);
 
     return $output;
