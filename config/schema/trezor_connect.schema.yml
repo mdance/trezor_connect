@@ -15,6 +15,15 @@ trezor_connect.settings:
     callback:
       type: string
       label: 'TREZOR Connect Callback'
+    flood_threshold:
+      type: integer
+      label: 'Flood Threshold'
+    flood_window:
+      type: integer
+      label: 'Flood Window'
+    challenge_offset:
+      type: integer
+      label: 'Challenge Offset'
     challenge_backend:
       type: string
       label: 'TREZOR Connect challenge backend'

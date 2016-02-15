@@ -3,6 +3,9 @@ icon: ''
 external: 1
 url: 'https://trezor.github.io/connect/login.js'
 callback: 'trezorLogin'
+flood_threshold: 50
+flood_window: 3600
+challenge_offset: 3600
 challenge_backend: 'trezor_connect.challenges.backend.database'
 challenge_response_backend: 'trezor_connect.challenge_responses.backend.database'
 mapping_backend: 'trezor_connect.mappings.backend.database'

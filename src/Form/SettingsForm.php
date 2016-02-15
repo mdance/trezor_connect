@@ -8,6 +8,7 @@
 namespace Drupal\trezor_connect\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -27,6 +28,22 @@ class SettingsForm extends ConfigFormBase {
    */
   protected $state;
 
+  protected $challenge_backends;
+
+  protected $challenge_backend;
+
+  protected $challenge_response_backends;
+
+  protected $challenge_response_backend;
+
+  protected $mapping_backends;
+
+  protected $mapping_backend;
+
+  protected $trezor_connect;
+
+  protected $date_formatter;
+
   /**
    * Constructs a new form.
    *
@@ -35,7 +52,7 @@ class SettingsForm extends ConfigFormBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state keyvalue collection to use.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, $challenge_backends, $challenge_backend, $challenge_response_backends, $challenge_response_backend, $mapping_backends, $mapping_backend, TrezorConnectInterface $trezor_connect) {
+  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, $challenge_backends, $challenge_backend, $challenge_response_backends, $challenge_response_backend, $mapping_backends, $mapping_backend, TrezorConnectInterface $trezor_connect, DateFormatterInterface $date_formatter) {
     parent::__construct($config_factory);
 
     $this->state = $state;
@@ -50,6 +67,8 @@ class SettingsForm extends ConfigFormBase {
     $this->mapping_backend = $mapping_backend;
 
     $this->trezor_connect = $trezor_connect;
+
+    $this->date_formatter = $date_formatter;
   }
 
   /**
@@ -65,7 +84,8 @@ class SettingsForm extends ConfigFormBase {
       $container->getParameter('trezor_connect_challenge_response_backend'),
       $container->getParameter('trezor_connect_mapping_backends'),
       $container->getParameter('trezor_connect_mapping_backend'),
-      $container->get('trezor_connect')
+      $container->get('trezor_connect'),
+      $container->get('date.formatter')
     );
   }
   /**
@@ -142,6 +162,57 @@ class SettingsForm extends ConfigFormBase {
       '#title' => t('TREZOR Connect Callback'),
       '#description' => $description,
       '#default_value' => $default_value,
+    );
+
+    $key = 'flood_threshold';
+
+    $description = t('Please specify the number of password attempts a user should be allowed.');
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'number',
+      '#title' => t('Password Attempts'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+      '#min' => 1,
+    );
+
+    $key = 'flood_window';
+
+    $description = t('Please specify the number of seconds before an invalid password attempt is forgotten.');
+
+    $options = array(1800, 2700, 3600, 4500, 5400, 6300, 7200);
+    $options = array_combine($options, $options);
+
+    $options = array_map(array($this->date_formatter, 'formatInterval'), $options);
+
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'select',
+      '#title' => t('Password Attempt Interval'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+      '#options' => $options,
+    );
+
+    $key = 'challenge_offset';
+
+    $description = t('Please specify the number of seconds a challenge should be valid for.');
+
+    $options = array(1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400);
+    $options = array_combine($options, $options);
+
+    $options = array_map(array($this->date_formatter, 'formatInterval'), $options);
+
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'select',
+      '#title' => t('Challenge Offset'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+      '#options' => $options,
     );
 
     $key = 'challenge_backend';
@@ -233,6 +304,9 @@ class SettingsForm extends ConfigFormBase {
       'external',
       'url',
       'callback',
+      'flood_threshold',
+      'flood_window',
+      'challenge_offset',
       'challenge_backend',
       'challenge_response_backend',
       'mapping_backend',
