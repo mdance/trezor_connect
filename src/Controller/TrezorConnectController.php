@@ -12,6 +12,7 @@ use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Controller\ControllerBase;
 
 use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
@@ -350,128 +351,140 @@ EOF;
   /**
    * Provides the page callback used to process a TREZOR connect manage response.
    */
-  public function userManage($account, $type = 'nojs') {
+  public function userManage(AccountInterface $user, $js = 'nojs') {
     $output = NULL;
 
-    $response = $_POST['response'];
+    $uid = $user->id();
 
-    $result = trezor_connect_response_valid($response);
+    $route_parameters = array();
 
-    if (!$result) {
-      if ($type == 'nojs') {
-        drupal_access_denied();
-      }
-      else {
-        $commands = array();
+    $route_parameters['user'] = $uid;
 
-        $selector = '';
+    $type = 'default';
+    $redirect = FALSE;
+    $redirect_url = NULL;
 
-        if (isset($_POST['selector'])) {
-          $selector = $_POST['selector'];
-          $selector = check_plain($selector);
-          //$selector = '#' . $selector;
-        }
+    $challenge_response = $this->challenge_response_manager->get();
 
-        $arguments = array();
+    if (!$challenge_response) {
+      $message = t('An error has occurred validating your TREZOR credentials.');
 
-        $arguments['redirect'] = FALSE;
+      $type = 'error';
 
-        $arguments['error'] = TRUE;
+      if ($js == 'nojs') {
+        drupal_set_message($message, $type);
 
-        $message = t('An error has occurred validating your TREZOR credentials.');
-
-        $variables = array(
-          'type' => 'error',
-          'message' => $message,
-        );
-
-        $message = theme('trezor_connect_message', $variables);
-
-        $arguments['message'] = $message;
-
-        // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
-        // requires a very specific format otherwise the $arguments will be passed as undefined
-        $arguments = array(
-          'callback',
-          $arguments,
-        );
-
-        $commands[] = ajax_command_invoke($selector, 'trezor_connect', $arguments);
-
-        $output = array(
-          '#type' => 'ajax',
-          '#commands' => $commands,
-        );
-
-        $output = ajax_deliver($output);
+        throw new AccessDeniedHttpException();
       }
     }
     else {
-      $result = trezor_connect_mapping($response);
+      $challenge_validator = $this->challenge_validator;
 
-      if (is_array($result) && isset($result['uid'])) {
-        $message = t('There is already an account associated with the TREZOR device.');
+      $challenge_validator->setChallenge($challenge_response->getChallenge());
+      $challenge_validator->setChallengeResponse($challenge_response);
 
-        drupal_set_message($message, 'warning');
+      $result = $this->challenge_validator->validate();
+
+      if (!$result) {
+        $message = t('An error has occurred validating your TREZOR credentials.');
+
+        $type = 'error';
+
+        if ($js == 'nojs') {
+          drupal_set_message($message, $type);
+
+          throw new AccessDeniedHttpException();
+        }
       }
       else {
-        $response['uid'] = $account->uid;
+        $mapping_manager = $this->mapping_manager;
 
-        trezor_connect_write_map($response);
+        $public_key = $challenge_response->getPublicKey();
 
-        $message = t('Your TREZOR device has been associated to your account.  You should now be able to login with just your TREZOR device.');
+        $mappings = $mapping_manager->get($public_key);
+        $total = count($mappings);
 
-        drupal_set_message($message);
-      }
+        if ($total > 0) {
+          $text = t('please click here to manage your authentication device.');
 
-      $path = str_replace('%user', $account->uid, TREZOR_CONNECT_URL_MANAGE);
+          $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
 
-      if ($type != 'ajax') {
-        drupal_goto($path);
-      }
-      else {
-        $commands = array();
+          $link = Link::fromTextAndUrl($text, $url);
+          $link = $link->toString();
 
-        $selector = '';
+          $args = array(
+            '@link' => $link,
+          );
 
-        if (isset($_POST['selector'])) {
-          $selector = $_POST['selector'];
-          $selector = check_plain($selector);
-          //$selector = '#' . $selector;
+          $message = t('There is already an account associated with the TREZOR device, @link', $args);
+
+          $type = 'warning';
+
+          if ($js != 'ajax') {
+            drupal_set_message($message, $type);
+          }
+        }
+        else {
+          $this->mapping_manager->mapChallengeResponse($uid);
+
+          $message = t('Your TREZOR device has been associated to your account.  You should now be able to login with just your TREZOR device.');
+
+          $redirect = TRUE;
+          $redirect_url = $redirect_url;
+
+          if ($js != 'ajax') {
+            drupal_set_message($message);
+          }
         }
 
-        $arguments = array();
-
-        $arguments['redirect'] = TRUE;
-
-        $variables = array(
-          'message' => $message,
-        );
-
-        $message = theme('trezor_connect_message', $variables);
-
-        $arguments['message'] = $message;
-
-        $arguments['url'] = '/' . $path;
-
-        // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
-        // requires a very specific format otherwise the $arguments will be passed as undefined
-        $arguments = array(
-          'callback',
-          $arguments,
-        );
-
-        $commands[] = ajax_command_invoke($selector, 'trezor_connect', $arguments);
-
-        $output = array(
-          '#type' => 'ajax',
-          '#commands' => $commands,
-        );
-
-        $output = ajax_deliver($output);
+        if ($js != 'ajax') {
+          $this->redirect(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
+        }
       }
+    }
+
+    if ($js == 'ajax') {
+      $output = new AjaxResponse();
+
+      $selector = '';
+
+      if (isset($_POST['selector'])) {
+        $selector = $_POST['selector'];
+
+        // TODO: Port to drupal 8
+        //$selector = check_plain($selector);
+        //$selector = '#' . $selector;
+      }
+
+      $arguments = array();
+
+      $arguments['redirect'] = $redirect;
+      $arguments['redirect_url'] = $redirect_url;
+
+      // TODO: Fix trezor_connect_message twig template rendering
+      $message = array(
+        '#theme' => 'trezor_connect_message',
+        '#type' => $type,
+        '#message' => $message,
+      );
+
+      $message = render($message);
+
+      $arguments['message'] = $message;
+
+      // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
+      // requires a very specific format otherwise the $arguments will be passed as undefined
+      $arguments = array(
+        'callback',
+        $arguments,
+      );
+
+      $command = new InvokeCommand($selector, 'trezor_connect', $arguments);
+
+      $output->addCommand($command);
     }
 
     return $output;
   }
+
 }
