@@ -3,3 +3,8 @@ trezor_connect.admin.settings:
   route_name: trezor_connect.admin.settings
   base_route: trezor_connect.admin.settings
   weight: 0
+trezor_connect.user.manage:
+  title: Authentication Device
+  route_name: trezor_connect.user.manage
+  base_route: entity.user.canonical
+  weight: 1
