@@ -8,8 +8,6 @@
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\Core\Database\Connection;
-use Drupal\trezor_connect\Challenge\Challenge;
-use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\Challenge\ChallengeResponse;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 
@@ -124,6 +122,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
 
       if (!$found) {
         $challenge_response = $this->challenge_response_manager->get($value->challenge_response_id);
+        $challenge_response = array_shift($challenge_response);
       }
 
       if ($challenge_response) {
