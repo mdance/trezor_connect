@@ -13,8 +13,8 @@ trezor_connect.admin.settings:
   weight: 0
   menu_name: admin
 trezor_connect.user.manage:
-  title: Authenticated Devices
-  description: 'Configured authentication devices associated with your account.'
+  title: Authentication Device
+  description: 'Configure the authentication device for this account.'
   route_name: trezor_connect.user.manage
   parent: user.page
   weight: 1
