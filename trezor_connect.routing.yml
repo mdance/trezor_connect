@@ -22,6 +22,7 @@ trezor_connect.user.login:
 trezor_connect.user.manage:
   path: '/user/{user}/trezor-connect'
   defaults:
+    _title: 'Authentication Device'
     _form: '\Drupal\trezor_connect\Form\ManageForm'
   requirements:
     _permission: 'use TREZOR connect'
@@ -32,9 +33,17 @@ trezor_connect.user.manage.js:
   requirements:
     _permission: 'use TREZOR connect'
     js: 'nojs|ajax'
-trezor_connect.user.manage.forget:
-  path: '/user/{user}/trezor-connect/forget'
+trezor_connect.user.manage.disable:
+  path: '/user/{user}/trezor-connect/disable'
   defaults:
-    _form: '\Drupal\trezor_connect\Form\ForgetForm'
+    _title: 'Disable Authentication Device'
+    _form: '\Drupal\trezor_connect\Form\DisableForm'
+  requirements:
+    _permission: 'use TREZOR connect'
+trezor_connect.user.manage.remove:
+  path: '/user/{user}/trezor-connect/remove'
+  defaults:
+    _title: 'Remove Authentication Device'
+    _form: '\Drupal\trezor_connect\Form\RemoveForm'
   requirements:
     _permission: 'use TREZOR connect'
