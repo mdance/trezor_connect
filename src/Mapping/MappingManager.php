@@ -130,6 +130,7 @@ class MappingManager implements MappingManagerInterface {
     $challenge_response = $this->challenge_response_manager->getSessionChallengeResponse();
 
     if ($challenge_response) {
+      // TODO: Check for existing mappings
       $mapping = new Mapping();
 
       $mapping->setUid($uid);
