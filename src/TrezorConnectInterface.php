@@ -36,6 +36,18 @@ interface TrezorConnectInterface {
   const ROUTE_MANAGE_JS = 'trezor_connect.user.manage.js';
 
   /**
+   * Provides a string containing the TREZOR connect disable authentication
+   * device route.
+   */
+  const ROUTE_MANAGE_DISABLE = 'trezor_connect.user.manage.disable';
+
+  /**
+   * Provides a string containing the TREZOR connect remove authentication
+   * device route.
+   */
+  const ROUTE_MANAGE_REMOVE = 'trezor_connect.user.manage.remove';
+
+  /**
    * Provides a string containing the user page route.
    */
   const ROUTE_USER = 'user.page';
@@ -88,6 +100,7 @@ interface TrezorConnectInterface {
 
   const MODE_LOGIN = 0;
   const MODE_REGISTER = 1;
+  const MODE_MANAGE = 2;
 
   /**
    * Returns a string containing the display text.
