@@ -128,7 +128,12 @@ class ManageForm extends FormBase {
     if (!$total) {
       $form_id = $this->getFormId();
 
-      trezor_connect_alter_form($form, $form_state, $form_id);
+      $form['trezor_connect'] = array(
+        '#type' => 'trezor_connect',
+        '#form_id' => $form_id,
+        '#weight' => 1,
+        '#account' => $user,
+      );
     }
     else {
       $header = array(
