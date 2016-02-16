@@ -1,7 +1,7 @@
-text: 'Sign in with TREZOR'
-text_register: 'Register a TREZOR device to my account'
-text_manage: 'Authenticate a TREZOR device to my account'
-text_manage_admin: 'Authenticate TREZOR device to this account'
+text: 'Login with TREZOR'
+text_register: 'Register with TREZOR'
+text_manage: 'Authorise TREZOR device'
+text_manage_admin: 'Authorise TREZOR device'
 icon:
   source: ''
   path: ''
