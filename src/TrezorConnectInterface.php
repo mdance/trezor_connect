@@ -5,10 +5,16 @@
  */
 namespace Drupal\trezor_connect;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\trezor_connect\Challenge\Challenge;
 
 interface TrezorConnectInterface {
+
+  /**
+   * Provides a string containing the config namespace.
+   */
+  const CONFIG_NS = 'trezor_connect.settings';
 
   /**
    * Provides a string containing the administration menu route name.
@@ -111,7 +117,14 @@ interface TrezorConnectInterface {
    *
    * @return boolean
    */
-  public function getText();
+  public function getText($mode = MODE_LOGIN, AccountInterface $account = NULL);
+
+  /**
+   * Returns a string containing the icon path.
+   *
+   * @return mixed
+   */
+  public function getIcon();
 
   /**
    * Returns a boolean indicating if the TREZOR connect javascript should be
