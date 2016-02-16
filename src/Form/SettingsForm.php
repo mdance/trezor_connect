@@ -24,11 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SettingsForm extends ConfigFormBase {
 
   /**
-   * Provides a string containing the config namespace.
-   */
-  const NS = 'trezor_connect.settings';
-
-  /**
    * The state keyvalue collection.
    *
    * @var \Drupal\Core\State\StateInterface
@@ -165,14 +160,14 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [self::NS];
+    return [TrezorConnectInterface::CONFIG_NS];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config(self::NS);
+    $config = $this->config(TrezorConnectInterface::CONFIG_NS);
 
     $key = 'text';
 
@@ -587,7 +582,7 @@ class SettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $config = $this->config(self::NS);
+    $config = $this->config(TrezorConnectInterface::CONFIG_NS);
 
     $keys = array(
       'text',
