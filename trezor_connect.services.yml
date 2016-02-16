@@ -64,4 +64,4 @@ services:
   # helper service
   trezor_connect:
     class: Drupal\trezor_connect\TrezorConnect
-    arguments: ['@session', '@config.factory', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@trezor_connect.mapping_manager', '%trezor_connect_challenge_backends%', '%trezor_connect_challenge_backend%', '%trezor_connect_challenge_response_backends%', '%trezor_connect_challenge_response_backend%', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
+    arguments: ['@current_user', '@session', '@config.factory', '@theme_handler', '@trezor_connect.challenge_manager', '@trezor_connect.challenge_response_manager', '@trezor_connect.mapping_manager', '%trezor_connect_challenge_backends%', '%trezor_connect_challenge_backend%', '%trezor_connect_challenge_response_backends%', '%trezor_connect_challenge_response_backend%', '%trezor_connect_mapping_backends%', '%trezor_connect_mapping_backend%']
