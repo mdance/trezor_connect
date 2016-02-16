@@ -74,60 +74,72 @@ class TrezorConnectElement extends RenderElement {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRender($element) {
+    $config = \Drupal::config(TrezorConnectInterface::CONFIG_NS);
+
+    $current_user = \Drupal::currentUser();
+    $current_uid = $current_user->id();
+
     $account = NULL;
-
-    $form_id = $element['#form_id'];
-
-    $ids = array(
-      'user_login_form',
-      'user_login_block',
-    );
-
-    $result = in_array($form_id, $ids);
-
-    if ($result) {
-      $mode = TrezorConnectInterface::MODE_LOGIN;
-    }
-    else if ($form_id == ManageForm::FORM_ID) {
-      $mode = TrezorConnectInterface::MODE_MANAGE;
-    }
-    else {
-      $mode = TrezorConnectInterface::MODE_REGISTER;
-    }
 
     if (isset($element['#account'])) {
       $account = $element['#account'];
     }
 
     if (!($account instanceof AccountInterface)) {
-      $account = \Drupal::currentUser();
+      $account = $current_user;
     }
 
-    $route_parameters = array(
-      'js' => 'nojs',
-    );
+    $uid = $account->id();
 
-    $options = array(
-      'absolute' => TRUE,
-    );
-
-    if ($mode == TrezorConnectInterface::MODE_LOGIN) {
-      $url = Url::fromRoute(TrezorConnectInterface::ROUTE_LOGIN, $route_parameters, $options);
-    }
-    else if ($mode == TrezorConnectInterface::MODE_MANAGE) {
-      $route_parameters['user'] = $account->id();
-
-      $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE_JS, $route_parameters, $options);
-    }
-    else {
-      $url = Url::fromRoute(TrezorConnectInterface::ROUTE_REGISTER, $route_parameters, $options);
-    }
-
-    $tc = \Drupal::service('trezor_connect');
-
+    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
     $access = $account->hasPermission(TrezorConnectInterface::PERMISSION_USE);
 
-    if ($access) {
+    if (($uid == $current_uid && $access) || $admin) {
+      $form_id = $element['#form_id'];
+
+      $ids = array(
+        'user_login_form',
+        'user_login_block',
+      );
+
+      $result = in_array($form_id, $ids);
+
+      if ($result) {
+        $mode = TrezorConnectInterface::MODE_LOGIN;
+      }
+      else {
+        if ($form_id == ManageForm::FORM_ID) {
+          $mode = TrezorConnectInterface::MODE_MANAGE;
+        }
+        else {
+          $mode = TrezorConnectInterface::MODE_REGISTER;
+        }
+      }
+
+      $route_parameters = array(
+        'js' => 'nojs',
+      );
+
+      $options = array(
+        'absolute' => TRUE,
+      );
+
+      if ($mode == TrezorConnectInterface::MODE_LOGIN) {
+        $url = Url::fromRoute(TrezorConnectInterface::ROUTE_LOGIN, $route_parameters, $options);
+      }
+      else {
+        if ($mode == TrezorConnectInterface::MODE_MANAGE) {
+          $route_parameters['user'] = $account->id();
+
+          $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE_JS, $route_parameters, $options);
+        }
+        else {
+          $url = Url::fromRoute(TrezorConnectInterface::ROUTE_REGISTER, $route_parameters, $options);
+        }
+      }
+
+      $tc = \Drupal::service('trezor_connect');
+
       $element['#attached']['library'][] = 'trezor_connect/core';
 
       $external = $tc->getExternal();
@@ -142,9 +154,15 @@ class TrezorConnectElement extends RenderElement {
       $url = $url->toString();
 
       if (!isset($element['#text'])) {
-        $text = $tc->getText();
+        $text = $tc->getText($mode, $account);
 
         $element['#text'] = $text;
+      }
+
+      if (!isset($element['#icon'])) {
+        $icon = $tc->getIcon();
+
+        $element['#icon'] = $icon;
       }
 
       if (!isset($element['#callback'])) {
@@ -160,7 +178,14 @@ class TrezorConnectElement extends RenderElement {
       $element['#challenge_hidden'] = $challenge->getChallengeHidden();
       $element['#challenge_visual'] = $challenge->getChallengeVisual();
 
-      Element::setAttributes($element, array('text', 'callback', 'challenge_id', 'challenge_hidden', 'challenge_visual'));
+      Element::setAttributes($element, array(
+        'text',
+        'icon',
+        'callback',
+        'challenge_id',
+        'challenge_hidden',
+        'challenge_visual'
+      ));
 
       $challenge_js = $challenge->toArray();
 
