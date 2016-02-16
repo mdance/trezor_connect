@@ -34,8 +34,6 @@ function trezor_connect_form_alter(&$form, FormStateInterface $form_state, $form
  * @param $form_state
  */
 function trezor_connect_alter_form(&$form, FormStateInterface $form_state, $form_id) {
-  // TODO: Implement password authentication for manage mode
-  // TODO: Allow administrators to assign a TREZOR device user accounts
   $form['trezor_connect'] = array(
     '#type' => 'trezor_connect',
     '#form_id' => $form_id,
