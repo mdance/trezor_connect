@@ -9,9 +9,12 @@ namespace Drupal\trezor_connect\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -45,6 +48,20 @@ class SettingsForm extends ConfigFormBase {
   protected $date_formatter;
 
   /**
+   * Provides the module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $module_handler;
+
+  /**
+   * Provides the theme handler service.
+   *
+   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   */
+  protected $theme_handler;
+
+  /**
    * Constructs a new form.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -52,7 +69,7 @@ class SettingsForm extends ConfigFormBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state keyvalue collection to use.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, $challenge_backends, $challenge_backend, $challenge_response_backends, $challenge_response_backend, $mapping_backends, $mapping_backend, TrezorConnectInterface $trezor_connect, DateFormatterInterface $date_formatter) {
+  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, $challenge_backends, $challenge_backend, $challenge_response_backends, $challenge_response_backend, $mapping_backends, $mapping_backend, TrezorConnectInterface $trezor_connect, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
     parent::__construct($config_factory);
 
     $this->state = $state;
@@ -69,6 +86,10 @@ class SettingsForm extends ConfigFormBase {
     $this->trezor_connect = $trezor_connect;
 
     $this->date_formatter = $date_formatter;
+
+    $this->module_handler = $module_handler;
+
+    $this->theme_handler = $theme_handler;
   }
 
   /**
@@ -85,7 +106,9 @@ class SettingsForm extends ConfigFormBase {
       $container->getParameter('trezor_connect_mapping_backends'),
       $container->getParameter('trezor_connect_mapping_backend'),
       $container->get('trezor_connect'),
-      $container->get('date.formatter')
+      $container->get('date.formatter'),
+      $container->get('module_handler'),
+      $container->get('theme_handler')
     );
   }
   /**
@@ -163,6 +186,95 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $description,
       '#default_value' => $default_value,
     );
+
+    $features = [];
+
+    $theme = $this->theme_handler->getDefault();
+    $info = $this->theme_handler->listInfo();
+
+    if (isset($info[$theme])) {
+      $features = $info[$theme]->info['features'];
+    }
+
+    $result = $this->module_handler->moduleExists('file');
+
+    if ($result) {
+      $key = 'icon';
+      $prefix = $key;
+
+      $form[$key] = array(
+        '#type' => 'details',
+        '#title' => t('Icon'),
+        '#open' => TRUE,
+      );
+
+      $icon = &$form[$key];
+
+      $key = 'source';
+
+      $description = t('Please specify the icon source.');
+
+      $default_value = $config->get($prefix . '.' . $key);
+
+      $options = array();
+
+      $options[TrezorConnectInterface::ICON_SOURCE_DEFAULT] = $this->t('Default');
+
+      $result = in_array('logo', $features);
+
+      if ($result) {
+        $options[TrezorConnectInterface::ICON_SOURCE_THEME] = $this->t('Theme');
+      }
+
+      $options[TrezorConnectInterface::ICON_SOURCE_CUSTOM] = $this->t('Custom');
+
+      $icon[$key] = array(
+        '#type' => 'radios',
+        '#title' => t('Icon Source'),
+        '#description' => $description,
+        '#default_value' => $default_value,
+        '#options' => $options,
+      );
+
+      $key = 'settings';
+
+      $icon[$key] = array(
+        '#type' => 'container',
+        '#states' => array(
+          'visible' => array(
+            'input[name="source"]' => array(
+              'value' => 'custom',
+            ),
+          ),
+        ),
+      );
+
+      $settings = &$icon[$key];
+
+      $key = 'path';
+
+      $description = t('Please specify the path to the custom icon.');
+
+      $default_value = $config->get($prefix . '.' . $key);
+
+      $settings[$key] = array(
+        '#type' => 'textfield',
+        '#title' => t('Custom Icon Path'),
+        '#description' => $description,
+        '#default_value' => $default_value,
+      );
+
+      $key = 'upload';
+
+      $description = t('Please upload the custom icon.');
+
+      $settings[$key] = array(
+        '#type' => 'file',
+        '#title' => t('Upload Icon'),
+        '#description' => $description,
+      );
+    }
+
     $key = 'external';
 
     $description = t('Please specify whether to load the TREZOR connect javascript externally.');
@@ -338,11 +450,101 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    $source = $form_state->getValue('source');
+
+    if ($source == TrezorConnectInterface::ICON_SOURCE_CUSTOM) {
+      // Validate the custom icon upload
+      $result = $this->module_handler->moduleExists('file');
+
+      if ($result) {
+        $key = 'upload';
+
+        $validators = array(
+          'file_validate_is_image' => array(),
+        );
+
+        $file = file_save_upload($key, $validators, FALSE, 0);
+
+        if (!is_null($file)) {
+          if (!$file) {
+            $message = $this->t('An error occurred processing your icon upload.');
+
+            $form_state->setErrorByName($key, $message);
+          }
+          else {
+            $form_state->setValue($key, $file);
+          }
+        }
+      }
+
+      // Validate the custom icon path
+      $key = 'path';
+
+      $path = $form_state->getValue($key);
+
+      if ($path) {
+        $path = $this->validatePath($path);
+
+        if (!$path) {
+          $message = $this->t('Please specify a valid icon path.');
+
+          $form_state->setErrorByName($key, $message);
+        }
+      }
+    }
+  }
+
+  /**
+   * Validates a icon path.
+   *
+   * Pulled from ThemeSettingsform::validatePath
+   *
+   * Attempts to validate normal system paths, paths relative to the public files
+   * directory, or stream wrapper URIs. If the given path is any of the above,
+   * returns a valid path or URI that the theme system can display.
+   *
+   * @param string $path
+   *   A path relative to the Drupal root or to the public files directory, or
+   *   a stream wrapper URI.
+   * @return mixed
+   *   A valid path that can be displayed through the theme system, or FALSE if
+   *   the path could not be validated.
+   */
+  protected function validatePath($path) {
+    // Absolute local file paths are invalid.
+    if (drupal_realpath($path) == $path) {
+      return FALSE;
+    }
+    // A path relative to the Drupal root or a fully qualified URI is valid.
+    if (is_file($path)) {
+      return $path;
+    }
+    // Prepend 'public://' for relative file paths within public filesystem.
+    if (file_uri_scheme($path) === FALSE) {
+      $path = 'public://' . $path;
+    }
+    if (is_file($path)) {
+      return $path;
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
     $config = $this->config(self::NS);
 
     $keys = array(
       'text',
+      'text_register',
+      'text_manage',
+      'text_manage_admin',
       'external',
       'url',
       'callback',
@@ -358,9 +560,32 @@ class SettingsForm extends ConfigFormBase {
       $config->set($key, $form_state->getValue($key));
     }
 
-    $config->save();
+    $key = 'source';
 
-    parent::submitForm($form, $form_state);
+    $source = $form_state->getValue($key);
+
+    if ($source == TrezorConnectInterface::ICON_SOURCE_CUSTOM) {
+      $key = 'upload';
+
+      $upload = $form_state->getValue($key);
+
+      if ($upload) {
+        // Set the icon path to the upload path
+        $uri = $upload->getFileUri();
+
+        $path = file_unmanaged_copy($uri);
+      }
+      else {
+        // Use the icon path
+        $path = $form_state->getValue('path');
+      }
+
+      $config->set('icon.path', $path);
+    }
+
+    $config->set('icon.source', $source);
+
+    $config->save();
   }
 
 }

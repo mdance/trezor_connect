@@ -102,6 +102,10 @@ interface TrezorConnectInterface {
   const MODE_REGISTER = 1;
   const MODE_MANAGE = 2;
 
+  const ICON_SOURCE_DEFAULT = 'default';
+  const ICON_SOURCE_THEME = 'theme';
+  const ICON_SOURCE_CUSTOM = 'custom';
+
   /**
    * Returns a string containing the display text.
    *

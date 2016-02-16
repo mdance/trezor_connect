@@ -15,6 +15,19 @@ trezor_connect.settings:
     text_manage_admin:
       type: string
       label: 'Authentication Device Admin Text'
+    icon:
+      type: config_object
+      label: 'Icon'
+      mapping:
+        source:
+          type: string
+          label: 'Icon Source'
+        path:
+          type: string
+          label: 'Icon Path'
+        url:
+          type: string
+          label: 'Icon URL'
     external:
       type: integer
       label: 'Use CDN'
