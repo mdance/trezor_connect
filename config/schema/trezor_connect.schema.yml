@@ -5,7 +5,16 @@ trezor_connect.settings:
   mapping:
     text:
       type: string
-      label: 'Display Text'
+      label: 'Login Text'
+    text_register:
+      type: string
+      label: 'Register Text'
+    text_manage:
+      type: string
+      label: 'Authentication Device Text'
+    text_manage_admin:
+      type: string
+      label: 'Authentication Device Admin Text'
     external:
       type: integer
       label: 'Use CDN'

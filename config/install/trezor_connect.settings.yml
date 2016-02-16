@@ -1,5 +1,8 @@
 text: 'Sign in with TREZOR'
 icon: ''
+text_register: 'Register a TREZOR device to my account'
+text_manage: 'Authenticate a TREZOR device to my account'
+text_manage_admin: 'Authenticate TREZOR device to this account'
 external: 1
 url: 'https://trezor.github.io/connect/login.js'
 callback: 'trezorLogin'

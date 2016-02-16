@@ -110,17 +110,59 @@ class SettingsForm extends ConfigFormBase {
 
     $key = 'text';
 
-    $description = t('Please specify the display text.');
+    $description = t('Please specify the button text to display on the login page.');
 
     $default_value = $config->get($key);
 
     $form[$key] = array(
       '#type' => 'textfield',
-      '#title' => t('Display Text'),
+      '#required' => TRUE,
+      '#title' => t('Login Display Text'),
       '#description' => $description,
       '#default_value' => $default_value,
     );
 
+    $key = 'text_register';
+
+    $description = t('Please specify the button text to display on the registration page.');
+
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => t('Register Display Text'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+    );
+
+    $key = 'text_manage';
+
+    $description = t('Please specify the button text to display when a user is adding an authentication device to their account.');
+
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => t('Authentication Device Display Text'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+    );
+
+    $key = 'text_manage_admin';
+
+    $description = t('Please specify the button text to display when an administrator is adding an authentication device to an account.');
+
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => t('Administrator Authentication Device Display Text'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+    );
     $key = 'external';
 
     $description = t('Please specify whether to load the TREZOR connect javascript externally.');
