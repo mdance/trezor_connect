@@ -19,9 +19,13 @@ use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides trezor connect settings.
+ * Provides TREZOR Connect settings.
  */
 class SettingsForm extends ConfigFormBase {
+
+  /**
+   * Provides a string containing the config namespace.
+   */
   const NS = 'trezor_connect.settings';
 
   /**
@@ -31,20 +35,59 @@ class SettingsForm extends ConfigFormBase {
    */
   protected $state;
 
+  /**
+   * Provides an array containing the challenge backends.
+   *
+   * @var
+   */
   protected $challenge_backends;
 
+  /**
+   * Provides a string containing the default challenge response backend.
+   *
+   * @var
+   */
   protected $challenge_backend;
 
+  /**
+   * Provides an array containing the challenge response backends.
+   *
+   * @var
+   */
   protected $challenge_response_backends;
 
+  /**
+   * Provides a string containing the default challenge response backend.
+   *
+   * @var
+   */
   protected $challenge_response_backend;
 
+  /**
+   * Provides an array containing the mapping backends.
+   * @var
+   */
   protected $mapping_backends;
 
+  /**
+   * Provides a string containing the default mapping backend.
+   *
+   * @var
+   */
   protected $mapping_backend;
 
+  /**
+   * Provides the TREZOR Connect service.
+   *
+   * @var \Drupal\trezor_connect\TrezorConnectInterface
+   */
   protected $trezor_connect;
 
+  /**
+   * Provides the date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   */
   protected $date_formatter;
 
   /**
@@ -288,6 +331,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form[$key] = array(
       '#type' => 'radios',
+      '#required' => TRUE,
       '#title' => t('Use CDN'),
       '#description' => $description,
       '#options' => $options,
@@ -301,6 +345,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form[$key] = array(
       '#type' => 'textfield',
+      '#required' => TRUE,
       '#title' => t('External TREZOR Connect Javascript URL'),
       '#description' => $description,
       '#default_value' => $default_value,
@@ -313,6 +358,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form[$key] = array(
       '#type' => 'textfield',
+      '#required' => TRUE,
       '#title' => t('TREZOR Connect Callback'),
       '#description' => $description,
       '#default_value' => $default_value,
@@ -325,6 +371,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form[$key] = array(
       '#type' => 'number',
+      '#required' => TRUE,
       '#title' => t('Password Attempts'),
       '#description' => $description,
       '#default_value' => $default_value,
@@ -344,6 +391,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form[$key] = array(
       '#type' => 'select',
+      '#required' => TRUE,
       '#title' => t('Password Attempt Interval'),
       '#description' => $description,
       '#default_value' => $default_value,
@@ -363,6 +411,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form[$key] = array(
       '#type' => 'select',
+      '#required' => TRUE,
       '#title' => t('Challenge Offset'),
       '#description' => $description,
       '#default_value' => $default_value,
