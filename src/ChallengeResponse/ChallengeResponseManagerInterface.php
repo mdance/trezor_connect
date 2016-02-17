@@ -134,10 +134,16 @@ interface ChallengeResponseManagerInterface {
    *
    * @return ChallengeResponse|false
    *   The challenge response object or FALSE.
-   *
-   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::getMultiple()
    */
   public function getRequestChallengeResponse();
+
+  /**
+   * Returns a challenge response associated with the session.
+   *
+   * @return ChallengeResponse|false
+   *   The challenge response object or FALSE.
+   */
+  public function getSessionChallengeResponse();
 
   /**
    * Returns the challenges responses associated with an array of ids.
