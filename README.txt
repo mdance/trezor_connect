@@ -63,13 +63,21 @@ Current maintainers:
 
 TODO/Wishlist
 -----------
-Add password verification before mapping a trezor device
+Fix access control to user/[not-me]/trezor-connect
+
+For error messages, don't remove button
+
+Review services
+
+Implement additional backends
+
+Implement mapping config_object
 
 Add button styling (http://trezor.github.io/connect/examples/login-restyled.html)
 
-Add host icon configuration
-
 Add support for asynchronous challenges (http://trezor.github.io/connect/examples/login-async.html)
+
+Add reports
 
 Add an option for users to disable username, and password authentication
 

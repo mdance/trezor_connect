@@ -39,6 +39,7 @@ function trezor_connect_user_delete(User $account) {
  * Responsible for prompting a user to map their TREZOR device to their account.
  */
 function trezor_connect_user_login($account) {
+  // TODO: Refactor hook_user_login logic
   /*
   $result = \Drupal::service('trezor_connect')->checkChallengeResponseState($account->id());
 
