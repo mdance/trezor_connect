@@ -10,6 +10,7 @@ namespace Drupal\trezor_connect\Challenge;
 use Drupal\Core\Database\Connection;
 
 class ChallengeBackendDatabase implements ChallengeBackendInterface {
+
   const TABLE = 'trezor_connect_challenges';
 
   /**
@@ -32,12 +33,15 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
   /**
    * @inheritDoc
    */
-  public function get($id) {
-    if (!is_array($id)) {
+  public function get($id, array $conditions = NULL) {
+    if (is_null($id)) {
+      $id = array();
+    }
+    else if (!is_array($id)) {
       $id = array($id);
     }
 
-    $output = $this->getMultiple($id);
+    $output = $this->getMultiple($id, $conditions);
 
     return $output;
   }
@@ -45,13 +49,32 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
   /**
    * @inheritDoc
    */
-  public function getMultiple(array $ids) {
+  public function getMultiple(array $ids, array $conditions = NULL) {
     $output = array();
 
     $query = $this->connection->select(self::TABLE, 'm');
 
     $query->fields('m');
-    $query->condition('id', $ids, 'IN');
+
+    $total = count($ids);
+
+    if ($total) {
+      $query->condition('id', $ids, 'IN');
+    }
+
+    if (!is_null($conditions)) {
+      $defaults = array(
+        'field' => NULL,
+        'value' => NULL,
+        'operator' => '=',
+      );
+
+      foreach ($conditions as $key => $condition) {
+        $condition = array_merge($defaults, $condition);
+
+        $query->condition($condition['field'], $condition['value'], $condition['operator']);
+      }
+    }
 
     $results = $query->execute();
 
@@ -112,12 +135,23 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
   /**
    * @inheritDoc
    */
-  public function delete($key) {
-    $this->connection->delete(self::TABLE)
-      ->condition('challenge_hidden', $key)
-      ->execute();
+  public function delete($id) {
+    if (!is_array($id)) {
+      $id = array($id);
+    }
+
+    $this->deleteMultiple($id);
 
     return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteMultiple(array $ids) {
+    $this->connection->delete(self::TABLE)
+      ->condition('id', $ids, 'IN')
+      ->execute();
   }
 
   /**
