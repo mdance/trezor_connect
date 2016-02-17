@@ -288,6 +288,15 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
+  public function deleteMultiple(array $ids) {
+    $this->backend->deleteMultiple($ids);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function deleteAll() {
     $this->backend->deleteAll();
 

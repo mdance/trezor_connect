@@ -174,8 +174,21 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
    * @inheritDoc
    */
   public function delete($id) {
+    if (!is_array($id)) {
+      $id = array($id);
+    }
+
+    $this->deleteMultiple($id);
+
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteMultiple($ids) {
     $this->connection->delete(self::TABLE)
-      ->condition('id', $id)
+      ->condition('id', $ids, 'IN')
       ->execute();
 
     return $this;

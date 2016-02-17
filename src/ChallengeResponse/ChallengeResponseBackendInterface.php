@@ -75,6 +75,16 @@ interface ChallengeResponseBackendInterface {
   public function delete($id);
 
   /**
+   * Deletes a challenge response.
+   *
+   * @param array $ids
+   *   The challenge response ids to be deleted.
+   *
+   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::delete()
+   */
+  public function deleteMultiple($ids);
+
+  /**
    * Deletes all challenge responses.
    *
    * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::deleteAll()

@@ -201,9 +201,19 @@ interface ChallengeResponseManagerInterface {
    * @param integer $id
    *   The challenge response id to be deleted.
    *
-   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::deleteAll()
+   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::deleteMultiplel()
    */
   public function delete($id);
+
+  /**
+   * Deletes a challenge response.
+   *
+   * @param array $ids
+   *   The challenge response ids to be deleted.
+   *
+   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::delete()
+   */
+  public function deleteMultiple(array $ids);
 
   /**
    * Deletes all challenge responses.
