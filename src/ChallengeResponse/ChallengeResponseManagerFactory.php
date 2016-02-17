@@ -140,6 +140,7 @@ class ChallengeResponseManagerFactory implements ChallengeResponseManagerFactory
       $output->setSession($this->session);
       $output->setBackend($backend);
       $output->setChallengeResponse($this->challenge_response);
+      $output->setChallengeResponseOffset($this->config->get('challenge_response_offset'));
       $output->setChallengeManager($this->challenge_manager);
 
       return $output;
