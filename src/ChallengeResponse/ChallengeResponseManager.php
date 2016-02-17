@@ -216,7 +216,7 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
       );
     }
 
-    $output = $this->getMultiplePublicKey($public_key);
+    $output = $this->getMultipleFromPublicKey($public_key);
 
     return $output;
   }
@@ -224,8 +224,8 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function getMultiplePublicKey($public_keys) {
-    $output = $this->backend->getMultiplePublicKey($public_keys);
+  public function getMultipleFromPublicKey($public_keys) {
+    $output = $this->backend->getMultipleFromPublicKey($public_keys);
 
     return $output;
   }

@@ -54,7 +54,7 @@ interface ChallengeResponseBackendInterface {
    *
    * @return mixed
    */
-  public function getMultiplePublicKey(array $public_keys);
+  public function getMultipleFromPublicKey(array $public_keys);
 
   /**
    * Stores a challenge response.

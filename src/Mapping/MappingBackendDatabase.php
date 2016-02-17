@@ -75,7 +75,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
   public function getMultiple(array $public_keys) {
     $output = array();
 
-    $challenge_responses = $this->challenge_response_manager->getMultiplePublicKey($public_keys);
+    $challenge_responses = $this->challenge_response_manager->getMultipleFromPublicKey($public_keys);
 
     $ids = array();
 

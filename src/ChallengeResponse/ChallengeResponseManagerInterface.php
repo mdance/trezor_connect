@@ -146,7 +146,7 @@ interface ChallengeResponseManagerInterface {
    *
    * @return mixed
    */
-  public function getMultiplePublicKey($public_keys);
+  public function getMultipleFromPublicKey($public_keys);
 
   /**
    * Stores a challenge response.

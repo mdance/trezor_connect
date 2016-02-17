@@ -126,7 +126,7 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
   /**
    * @inheritDoc
    */
-  public function getMultiplePublicKey(array $public_keys) {
+  public function getMultipleFromPublicKey(array $public_keys) {
     $query = $this->connection->select(self::TABLE, 'm');
 
     $query->fields('m');
