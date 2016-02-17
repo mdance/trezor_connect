@@ -76,6 +76,20 @@ interface ChallengeManagerInterface {
   public function getChallenge();
 
   /**
+   * Sets the challenge offset.
+   *
+   * @param int $challenge_offset
+   */
+  public function setChallengeOffset($challenge_offset);
+
+  /**
+   * Returns the challenge offset.
+   *
+   * @return int
+   */
+  public function getChallengeOffset();
+
+  /**
    * Gets the cache tags invalidator service.
    *
    * @return mixed

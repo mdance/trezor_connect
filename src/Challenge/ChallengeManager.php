@@ -37,6 +37,13 @@ class ChallengeManager implements ChallengeManagerInterface {
   protected $challenge;
 
   /**
+   * Provides an integer containing the challenge offset.
+   *
+   * @var int
+   */
+  protected $challenge_offset;
+
+  /**
    * Provides the cache tags invalidator service.
    */
   protected $cache_tags_invalidator;
@@ -98,6 +105,20 @@ class ChallengeManager implements ChallengeManagerInterface {
    */
   public function getChallenge() {
     return $this->challenge;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setChallengeOffset($challenge_offset) {
+    $this->challenge_offset = $challenge_offset;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getChallengeOffset() {
+    return $this->challenge_offset;
   }
 
   /**
