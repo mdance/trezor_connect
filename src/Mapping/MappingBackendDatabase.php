@@ -43,7 +43,53 @@ class MappingBackendDatabase implements MappingBackendInterface {
   /**
    * @inheritDoc
    */
-  public function get($public_key) {
+  public function get($id, array $conditions = NULL) {
+    if (is_null($id)) {
+      $id = array();
+    }
+    else if (!is_array($id)) {
+      $id = array($id);
+    }
+
+    $output = $this->getMultiple($id, $conditions);
+
+    return $output;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getMultiple(array $ids, array $conditions = NULL) {
+    $query = $this->connection->select(self::TABLE, 'm');
+
+    $query->fields('m');
+
+    $total = count($ids);
+
+    if ($total) {
+      $query->condition('id', $ids, 'IN');
+    }
+
+    if (!is_null($conditions)) {
+      $defaults = array(
+        'field' => NULL,
+        'value' => NULL,
+        'operator' => '=',
+      );
+
+      foreach ($conditions as $key => $condition) {
+        $condition = array_merge($defaults, $condition);
+
+        $query->condition($condition['field'], $condition['value'], $condition['operator']);
+      }
+    }
+
+    $results = $query->execute();
+
+    $output = $this->results($results);
+
+    return $output;
+  }
     if (!is_array($public_key)) {
       $public_key = array($public_key);
     }
