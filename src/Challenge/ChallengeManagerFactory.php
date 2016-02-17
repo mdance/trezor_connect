@@ -142,6 +142,7 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
       $output->setSession($this->session);
       $output->setBackend($backend);
       $output->setChallenge($this->challenge);
+      $output->setChallengeOffset($this->config->get('challenge_offset'));
       $output->setCacheTagsInvalidator($this->cache_tags_invalidator);
 
       return $output;
