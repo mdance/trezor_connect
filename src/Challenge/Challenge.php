@@ -188,6 +188,7 @@ EOF;
   public function getCacheTags() {
     $output = array();
 
+    $output[] = 'trezor_connect_challenge';
     $output[] = 'trezor_connect_challenge:' . $this->getId();
 
     return $output;

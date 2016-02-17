@@ -5,6 +5,7 @@
 
 namespace Drupal\trezor_connect\Challenge;
 
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -132,7 +133,7 @@ class ChallengeManager implements ChallengeManagerInterface {
   /**
    * @param mixed $cache_tags_invalidator
    */
-  public function setCacheTagsInvalidator($cache_tags_invalidator) {
+  public function setCacheTagsInvalidator(CacheTagsInvalidatorInterface $cache_tags_invalidator) {
     $this->cache_tags_invalidator = $cache_tags_invalidator;
   }
 
@@ -225,8 +226,13 @@ class ChallengeManager implements ChallengeManagerInterface {
    * @inheritDoc
    */
   public function deleteAll() {
-    // TODO: Implement cache tag invalidation
     $this->backend->deleteAll();
+
+    $tags = array(
+      'trezor_connect_challenge',
+    );
+
+    $this->cache_tags_invalidator->invalidateTags($tags);
 
     return $this;
   }

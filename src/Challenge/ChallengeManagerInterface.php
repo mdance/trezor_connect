@@ -6,6 +6,7 @@
 
 namespace Drupal\trezor_connect\Challenge;
 
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -102,7 +103,7 @@ interface ChallengeManagerInterface {
    *
    * @param mixed $cache_tags_invalidator
    */
-  public function setCacheTagsInvalidator($cache_tags_invalidator);
+  public function setCacheTagsInvalidator(CacheTagsInvalidatorInterface $cache_tags_invalidator);
 
   /**
    * Returns a challenge associated with an id.
