@@ -62,12 +62,37 @@ interface TrezorConnectInterface {
   /**
    * Provides a string containing the administration permission.
    */
-  const PERMISSION_ADMIN = 'administer TREZOR connect';
+  const PERMISSION_ADMIN = 'administer authentication device settings';
 
   /**
-   * Provides a string containing the use permission.
+   * Provides a string containing the account administration permission.
    */
-  const PERMISSION_USE = 'use TREZOR connect';
+  const PERMISSION_ACCOUNTS = 'administer account authentication devices';
+
+  /**
+   * Provides a string containing the login permission.
+   */
+  const PERMISSION_LOGIN = 'login with authentication device';
+
+  /**
+   * Provides a string containing the register permission.
+   */
+  const PERMISSION_REGISTER = 'register with authentication device';
+
+  /**
+   * Provides a string containing the view permission.
+   */
+  const PERMISSION_VIEW = 'view authentication device';
+
+  /**
+   * Provides a string containing the disable permission.
+   */
+  const PERMISSION_DISABLE = 'disable authentication device';
+
+  /**
+   * Provides a string containing the remove permission.
+   */
+  const PERMISSION_REMOVE = 'remove authentication device';
 
   /**
    * Provides an integer representing when the javascript assets should be
