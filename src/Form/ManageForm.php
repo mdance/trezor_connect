@@ -105,11 +105,35 @@ class ManageForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL) {
+    $config = $this->config('trezor_connect.settings');
+
+    $uid = $user->id();
+
     $current_user = $this->current_user;
+    $current_uid = $current_user->id();
 
-    $result = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
+    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
+    $view = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_VIEW);
+    $toggle = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_DISABLE);
+    $remove = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_REMOVE);
 
-    if (!$result) {
+    $name = self::FLOOD_NAME;
+    $threshold = $config->get('flood_threshold');
+    $window = $config->get('flood_window');
+    $identifier = $current_uid . ':' . $uid;
+
+    $flood = $this->flood->isAllowed($name, $threshold, $window, $identifier);
+
+    if (!$flood) {
+      $toggle = FALSE;
+      $remove = FALSE;
+
+      $message = $this->t('The authentication device actions have been temporarily disabled because you have failed to authenticate too many times.');
+
+      drupal_set_message($message, 'warning');
+    }
+
+    if (!$admin && $toggle || $remove) {
       $description = $this->t('Please enter your current password to make changes to your accounts authenticated devices.');
 
       $form['password'] = array(
@@ -175,6 +199,7 @@ class ManageForm extends FormBase {
         '#theme' => 'table',
         '#header' => $header,
         '#rows' => $rows,
+        '#access' => $view,
       );
 
       if ($status == MappingInterface::STATUS_ACTIVE) {
@@ -188,12 +213,14 @@ class ManageForm extends FormBase {
         '#type' => 'submit',
         '#name' => 'toggle',
         '#value' => $value,
+        '#access' => $toggle,
       );
 
       $form['remove'] = array(
         '#type' => 'submit',
         '#name' => 'remove',
         '#value' => t('Remove Authentication Device'),
+        '#access' => $remove,
       );
 
       $form['user'] = array(
@@ -211,7 +238,7 @@ class ManageForm extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $current_user = $this->current_user;
 
-    $result = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
+    $result = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
 
     if (!$result) {
       $channel = 'trezor_connect';
