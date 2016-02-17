@@ -111,7 +111,27 @@ interface MappingManagerInterface {
    *
    * @see \Drupal\trezor_connect\MappingBackendInterface::getMultiple()
    */
-  public function get($public_key);
+  public function getFromPublicKey($public_key);
+
+  /**
+   * Returns the mappings associated with an array of public keys.
+   *
+   * @param array $public_keys
+   *   The public keys to retrieve.
+   *
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
+   *
+   * @return array
+   *   An array of Mapping objects.
+   *
+   * @see \Drupal\trezor_connect\Mapping\MappingManagerInterface::getFromPublicKey()
+   */
+  public function getMultipleFromPublicKeys(array $public_keys);
 
   /**
    * Returns a mapping associated with an account uid.
@@ -121,19 +141,6 @@ interface MappingManagerInterface {
    * @return mixed
    */
   public function getFromUid($uid);
-
-  /**
-   * Returns the mappings associated with an array of public keys.
-   *
-   * @param array $public_keys
-   *   An array of mapping public keys.
-   *
-   * @return array
-   *   An array of Mapping objects.
-   *
-   * @see \Drupal\trezor_connect\MappingBackendInterface::get()
-   */
-  public function getMultiple(array $public_keys);
 
   /**
    * Stores a mapping.
