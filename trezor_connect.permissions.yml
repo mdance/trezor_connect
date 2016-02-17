@@ -1,6 +1,21 @@
-administer TREZOR connect:
-  title: 'Administer TREZOR Connect'
-  description: 'Administer TREZOR Connect functionality.'
-use TREZOR connect:
-  title: 'Use TREZOR Connect'
-  description: 'Use TREZOR connect functionality.'
+administer authentication device settings:
+  title: 'Administer authentication device settings'
+  description: 'Should the user be allowed to administer global authentication device settings.'
+administer account authentication devices:
+  title: 'Administer account authentication devices'
+  description: 'Should the user be allowed to administer authentication device settings for accounts.'
+login with authentication device:
+  title: 'Login with authentication device'
+  description: 'Should the user be allowed to login with an authentication device.'
+register with authentication device:
+  title: 'Register with authentication device'
+  description: 'Should the user be allowed to register with an authentication device.'
+view authentication device:
+  title: 'View authentication device'
+  description: 'Should the user be allowed to view their authentication device.'
+disable authentication device:
+  title: 'Disable authentication device'
+  description: 'Should the user be allowed to disable their authentication device.'
+remove authentication device:
+  title: 'Remove authentication device'
+  description: 'Should the user be allowed to remove their authentication device.'
