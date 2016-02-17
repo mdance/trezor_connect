@@ -6,6 +6,7 @@
 
 namespace Drupal\trezor_connect\Challenge;
 
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -178,5 +179,14 @@ interface ChallengeManagerInterface {
    * Deletes all challenges.
    */
   public function deleteAll();
+
+  /**
+   * Deletes any expired challenges.
+   *
+   * @param ChallengeResponseManagerInterface $challenge_response_manager
+   *   The challenge response manager used to retrieve any challenges associated
+   * with challenges, as these cannot be deleted.
+   */
+  public function deleteExpired(ChallengeResponseManagerInterface $challenge_response_manager);
 
 }

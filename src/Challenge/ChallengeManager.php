@@ -5,6 +5,7 @@
 
 namespace Drupal\trezor_connect\Challenge;
 
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -223,6 +224,57 @@ class ChallengeManager implements ChallengeManagerInterface {
     $this->backend->deleteAll();
 
     return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteExpired(ChallengeResponseManagerInterface $challenge_response_manager) {
+    $now = time();
+    $offset = $this->getChallengeOffset();
+
+    $value = $now - $offset;
+
+    $conditions = array();
+
+    $condition = array(
+      'field' => 'created',
+      'value' => $value,
+      'operator' => '<=',
+    );
+
+    $conditions[] = $condition;
+
+    $challenges = $this->backend->get(NULL, $conditions);
+
+    $ids = array();
+
+    foreach ($challenges as $challenge) {
+      $id = $challenge->getId();
+
+      $ids[$id] = $id;
+    }
+
+    $conditions = array();
+
+    $condition = array(
+      'field' => 'challenge_id',
+      'value' => $ids,
+      'operator' => 'IN',
+    );
+
+    $conditions[] = $condition;
+
+    // Filter out any ids used in challenge responses
+    $challenge_responses = $challenge_response_manager->get(array(), $conditions);
+
+    foreach ($challenge_responses as $challenge_response) {
+      $challenge_id = $challenge_response->getChallenge()->getId();
+
+      unset($ids[$challenge_id]);
+    }
+
+    $this->backend->delete($ids);
   }
 
 }
