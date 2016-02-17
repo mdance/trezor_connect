@@ -63,6 +63,8 @@ Current maintainers:
 
 TODO/Wishlist
 -----------
+Refactor get helpers
+
 Fix access control to user/[not-me]/trezor-connect
 
 For error messages, don't remove button
