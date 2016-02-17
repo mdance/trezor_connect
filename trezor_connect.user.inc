@@ -5,6 +5,9 @@
  */
 
 use Drupal\user\Entity\User;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\trezor_connect\TrezorConnectInterface;
 
 /**
  * Implements hook_user_insert().
@@ -39,28 +42,32 @@ function trezor_connect_user_delete(User $account) {
  * Responsible for prompting a user to map their TREZOR device to their account.
  */
 function trezor_connect_user_login($account) {
-  // TODO: Refactor hook_user_login logic
-  /*
-  $result = \Drupal::service('trezor_connect')->checkChallengeResponseState($account->id());
+  $uid = $account->id();
 
-  if ($result == TrezorConnect::STATE_CHALLENGE_RESPONSE_NEW || $result == TrezorConnect::STATE_CHALLENGE_RESPONSE_UPDATE) {
-    $text = t('Click here to map your TREZOR device to your account.');
+  $result = \Drupal::service('trezor_connect')->checkChallengeResponseState($uid);
+
+  if ($result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NEW || $result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_UPDATE) {
+    $text = t('Click here to manage your authentication devices.');
 
     $route_parameters = array();
 
-    $route_parameters['user'] = $account;
+    $route_parameters['user'] = $uid;
 
-    $url = Url::fromRoute(TrezorConnect::ROUTE_MANAGE, $route_parameters);
+    $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
 
-    $link = new Link($text, $url);
+    $link = Link::fromTextAndUrl($text, $url)->toString();
 
     $args = array(
-      '!link' => $link,
+      '@link' => $link,
     );
 
-    $message = t('A TREZOR device has been authenticated to saved to your session, but is not mapped to your account.  @link', $args);
+    if ($result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NEW) {
+      $message = t('A TREZOR device has been authenticated, but is not linked to your account.  @link', $args);
+    }
+    else if ($result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_UPDATE) {
+      $message = t('A new TREZOR device has been authenticated, but is not linked to your account.  @link', $args);
+    }
 
     drupal_set_message($message);
   }
-  */
 }
