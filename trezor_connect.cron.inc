@@ -10,16 +10,6 @@
  * Responsible for removing expired challenges.
  */
 function trezor_connect_cron() {
-  $config = \Drupal::config(TREZOR_CONNECT_NS);
-
-  $now = time();
-  $offset = $config->get('offset');
-
-  $value = $now - $offset;
-
-  $query = db_delete(TREZOR_CONNECT_TABLE_CHALLENGES);
-
-  $query->condition('created', $value, '<=');
-
-  $query->execute();
+  \Drupal::service('trezor_connect')->deleteExpiredChallengeResponses();
+  \Drupal::service('trezor_connect')->deleteExpiredChallenges();
 }
