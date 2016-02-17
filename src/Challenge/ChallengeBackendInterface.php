@@ -78,6 +78,15 @@ interface ChallengeBackendInterface {
   public function delete($id);
 
   /**
+   * Deletes an array of challenges.
+   *
+   * @param array $ids
+   *
+   * @return mixed
+   */
+  public function deleteMultiple(array $ids);
+
+  /**
    * Deletes all challenges.
    *
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::deleteAll()
