@@ -44,12 +44,15 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
   /**
    * @inheritDoc
    */
-  public function get($id) {
-    if (!is_array($id)) {
+  public function get($id, array $conditions = NULL) {
+    if (is_null($id)) {
+      $id = array();
+    }
+    else if (!is_array($id)) {
       $id = array($id);
     }
 
-    $output = $this->getMultiple($id);
+    $output = $this->getMultiple($id, $conditions);
 
     return $output;
   }
@@ -57,11 +60,30 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
   /**
    * @inheritDoc
    */
-  public function getMultiple(array $ids) {
+  public function getMultiple(array $ids, array $conditions = NULL) {
     $query = $this->connection->select(self::TABLE, 'm');
 
     $query->fields('m');
-    $query->condition('id', $ids, 'IN');
+
+    $total = count($ids);
+
+    if ($total) {
+      $query->condition('id', $ids, 'IN');
+    }
+
+    if (!is_null($conditions)) {
+      $defaults = array(
+        'field' => NULL,
+        'value' => NULL,
+        'operator' => '=',
+      );
+
+      foreach ($conditions as $key => $condition) {
+        $condition = array_merge($defaults, $condition);
+
+        $query->condition($condition['field'], $condition['value'], $condition['operator']);
+      }
+    }
 
     $results = $query->execute();
 
