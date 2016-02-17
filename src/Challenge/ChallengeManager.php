@@ -210,8 +210,13 @@ class ChallengeManager implements ChallengeManagerInterface {
    * @inheritDoc
    */
   public function delete($id) {
-    // TODO: Implement cache tag invalidation
     $this->backend->delete($id);
+
+    $tags = array(
+      'trezor_connect_challenge:' . $id,
+    );
+
+    $this->cache_tags_invalidator->invalidateTags($tags);
 
     return $this;
   }
