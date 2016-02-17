@@ -4,46 +4,57 @@ trezor_connect.admin:
     _form: '\Drupal\trezor_connect\Form\SettingsForm'
     _title: 'TREZOR Connect'
   requirements:
-    _permission: 'administer TREZOR connect'
+    _permission: 'administer authentication device settings'
 trezor_connect.user.register:
   path: '/user/register/trezor/{js}'
   defaults:
     _controller: '\Drupal\trezor_connect\Controller\TrezorConnectController::userRegister'
   requirements:
-    _permission: 'use TREZOR connect'
+    _permission: 'register with authentication device'
     js: 'nojs|ajax'
+    _csrf_token: 'TRUE'
 trezor_connect.user.login:
   path: '/user/login/trezor/{js}'
   defaults:
     _controller: '\Drupal\trezor_connect\Controller\TrezorConnectController::userLogin'
   requirements:
-    _permission: 'use TREZOR connect'
+    _permission: 'login with authentication device'
     js: 'nojs|ajax'
+    _csrf_token: 'TRUE'
 trezor_connect.user.manage:
   path: '/user/{user}/trezor-connect'
   defaults:
     _title: 'Authentication Device'
     _form: '\Drupal\trezor_connect\Form\ManageForm'
   requirements:
-    _permission: 'use TREZOR connect'
+    user: \d+
+    _access_authentication_device: 'TRUE'
 trezor_connect.user.manage.js:
   path: '/user/{user}/trezor-connect/{js}'
   defaults:
     _controller: '\Drupal\trezor_connect\Controller\TrezorConnectController::userManage'
   requirements:
-    _permission: 'use TREZOR connect'
+    user: \d+
     js: 'nojs|ajax'
+    _access_authentication_device: 'TRUE'
+    _csrf_token: 'TRUE'
 trezor_connect.user.manage.disable:
   path: '/user/{user}/trezor-connect/disable'
   defaults:
     _title: 'Disable Authentication Device'
     _form: '\Drupal\trezor_connect\Form\DisableForm'
   requirements:
-    _permission: 'use TREZOR connect'
+    #_permission: 'disable authentication device'
+    user: \d+
+    _csrf_token: 'TRUE'
+    _access_authentication_device: 'TRUE'
 trezor_connect.user.manage.remove:
   path: '/user/{user}/trezor-connect/remove'
   defaults:
     _title: 'Remove Authentication Device'
     _form: '\Drupal\trezor_connect\Form\RemoveForm'
   requirements:
-    _permission: 'use TREZOR connect'
+    #_permission: 'remove authentication device'
+    user: \d+
+    _csrf_token: 'TRUE'
+    _access_authentication_device: 'TRUE'
