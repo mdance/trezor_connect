@@ -1,6 +1,8 @@
 /**
  * @file
  * Provides TREZOR Connect clientside functionality.
+ *
+ * TODO: Implement javascript API
  */
 /*jslint vars: false, white: true, indent: 2 */
 /*global window, document, Drupal, drupalSettings */
