@@ -1,8 +1,6 @@
 <?php
 /**
  * Contains \Drupal\trezor_connect\Challenge\ChallengeBackendDatabase.
- *
- * TODO: Use doctrine
  */
 
 namespace Drupal\trezor_connect\Challenge;

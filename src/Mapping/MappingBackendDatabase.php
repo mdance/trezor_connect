@@ -1,8 +1,6 @@
 <?php
 /**
  * Contains \Drupal\trezor_connect\MappingBackendDatabase.
- *
- * TODO: Use doctrine
  */
 
 namespace Drupal\trezor_connect\Mapping;

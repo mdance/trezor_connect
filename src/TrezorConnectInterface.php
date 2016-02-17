@@ -97,7 +97,6 @@ interface TrezorConnectInterface {
    */
   const JS_CALLBACK = 'trezorLogin';
 
-  // TODO: Document constants
   const STATE_CHALLENGE_RESPONSE_NOT_FOUND = 0;
   const STATE_CHALLENGE_RESPONSE_INVALID = 1;
   const STATE_CHALLENGE_RESPONSE_NEW = 2;

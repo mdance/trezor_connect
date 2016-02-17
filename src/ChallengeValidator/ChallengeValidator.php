@@ -52,6 +52,8 @@ class ChallengeValidator implements ChallengeValidatorInterface {
    *
    * Adapted from:
    * https://github.com/trezor/connect/blob/gh-pages/examples/server.php
+   *
+   * @throws LogicException
    */
   public function validate() {
     $output = FALSE;
@@ -77,7 +79,6 @@ class ChallengeValidator implements ChallengeValidatorInterface {
       $challenge_visual = hash('sha256', $challenge_visual, TRUE);
     }
     else {
-      // TODO: Document thrown exception in docblock
       throw new LogicException('The challenge response version is unknown.');
     }
 
