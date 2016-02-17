@@ -46,6 +46,9 @@ trezor_connect.settings:
     challenge_offset:
       type: integer
       label: 'Challenge Offset'
+    challenge_response_offset:
+      type: integer
+      label: 'Challenge Response Offset'
     challenge_backend:
       type: string
       label: 'TREZOR Connect challenge backend'

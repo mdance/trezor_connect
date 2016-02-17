@@ -413,6 +413,26 @@ class SettingsForm extends ConfigFormBase {
       '#options' => $options,
     );
 
+    $key = 'challenge_response_offset';
+
+    $description = t('Please specify the number of seconds a challenge response should be valid for.');
+
+    $options = array(1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400);
+    $options = array_combine($options, $options);
+
+    $options = array_map(array($this->date_formatter, 'formatInterval'), $options);
+
+    $default_value = $config->get($key);
+
+    $form[$key] = array(
+      '#type' => 'select',
+      '#required' => TRUE,
+      '#title' => t('Challenge Response Offset'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+      '#options' => $options,
+    );
+
     $key = 'challenge_backend';
 
     $description = t('Please specify the challenge backend to use.');
@@ -595,6 +615,7 @@ class SettingsForm extends ConfigFormBase {
       'flood_threshold',
       'flood_window',
       'challenge_offset',
+      'challenge_response_offset',
       'challenge_backend',
       'challenge_response_backend',
       'mapping_backend',

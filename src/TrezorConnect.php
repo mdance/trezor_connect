@@ -200,6 +200,12 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
+  /**
+   * @inheritDoc
+   */
+  public function getChallengeResponseOffset() {
+    return $this->config->get('challenge_response_offset');
+  }
   public function challengeBackendOptions() {
     $output = array();
 
