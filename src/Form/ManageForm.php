@@ -283,6 +283,9 @@ class ManageForm extends FormBase {
 
           $this->logger($channel)->notice($message, $context);
         }
+        else {
+          $this->flood->clear($name, $identifier);
+        }
       }
     }
   }
