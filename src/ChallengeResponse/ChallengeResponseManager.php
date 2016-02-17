@@ -118,7 +118,6 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function get($id = NULL) {
   public function setChallengeResponseOffset($challenge_response_offset) {
     $this->challenge_response_offset = $challenge_response_offset;
   }
@@ -129,6 +128,11 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   public function getChallengeResponseOffset() {
     return $this->challenge_response_offset;
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function get($id = NULL, array $conditions = NULL) {
     if (is_null($id)) {
       // Check if a challenge exists on the current request
       $output = $this->getRequestChallengeResponse();
@@ -148,7 +152,7 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
     }
     else {
       // Retrieve a specific challenge response
-      $output = $this->backend->get($id);
+      $output = $this->backend->get($id, $conditions);
     }
 
     return $output;
@@ -210,8 +214,8 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function getMultiple(array $ids) {
-    $output = $this->backend->getMultiple($ids);
+  public function getMultiple(array $ids, array $conditions = NULL) {
+    $output = $this->backend->getMultiple($ids, $conditions);
 
     return $output;
   }

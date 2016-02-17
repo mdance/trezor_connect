@@ -105,17 +105,28 @@ interface ChallengeResponseManagerInterface {
    * Returns the challenge response offset.
    */
   public function getChallengeResponseOffset();
+
+  /**
+   * Returns the challenge responses associated with an id.
    *
-   * @param int $id
-   *   The challenge response id to retrieve.  If not specified, the request,
-   * and session will be checked for a challenge response.
+   * @param int|array|NULL $id
+   *   The challenge response id to retrieve.  If null, the current request will
+   * be checked for a challenge, otherwise a new challenge will be generated and
+   * returned.
    *
-   * @return ChallengeResponse|false
-   *   The challenge response object or FALSE.
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
+   *
+   * @return array
+   *   An array of ChallengeResponse objects.
    *
    * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::getMultiple()
    */
-  public function get($id = NULL);
+  public function get($id = NULL, array $conditions = NULL);
 
   /**
    * Returns a challenge response associated with the current request.
@@ -128,17 +139,24 @@ interface ChallengeResponseManagerInterface {
   public function getRequestChallengeResponse();
 
   /**
-   * Returns the challenges response associated with an array of ids.
+   * Returns the challenges responses associated with an array of ids.
    *
    * @param array $ids
-   *   An array of challenge response ids.
+   *   The challenge response ids to retrieve.
+   *
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
    *
    * @return array
-   *   An array of challenge response objects.
+   *   An array of ChallengeResponse objects.
    *
    * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::get()
    */
-  public function getMultiple(array $ids);
+  public function getMultiple(array $ids, array $conditions = NULL);
 
   /**
    * Returns the challenge response associated with the public key.
