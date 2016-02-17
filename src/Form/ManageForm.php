@@ -134,12 +134,12 @@ class ManageForm extends FormBase {
     }
 
     if (!$admin && $toggle || $remove) {
-      $description = $this->t('Please enter your current password to make changes to your accounts authenticated devices.');
+      $description = $this->t('Required if you want to toggle or remove an authentication device.');
 
       $form['password'] = array(
         '#type' => 'password',
         '#required' => TRUE,
-        '#title' => t('Current Password'),
+        '#title' => t('Current password'),
         '#description' => $description,
       );
     }
