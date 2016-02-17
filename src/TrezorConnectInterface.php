@@ -8,6 +8,7 @@ namespace Drupal\trezor_connect;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\trezor_connect\Challenge\Challenge;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 
 interface TrezorConnectInterface {
 
@@ -120,6 +121,26 @@ interface TrezorConnectInterface {
   public function getText($mode = MODE_LOGIN, AccountInterface $account = NULL);
 
   /**
+   * Returns a string containing the login text.
+   */
+  public function getLoginText();
+
+  /**
+   * Returns a string containing the registration text.
+   */
+  public function getRegistrationText();
+
+  /**
+   * Returns a string containing the authentication device text.
+   */
+  public function getManageText(AccountInterface $account = NULL);
+
+  /**
+   * Returns a string containing the administrator authentication device text.
+   */
+  public function getAdminManageText(AccountInterface $account = NULL);
+
+  /**
    * Returns a string containing the icon path.
    *
    * @return mixed
@@ -149,11 +170,47 @@ interface TrezorConnectInterface {
   public function getCallback();
 
   /**
+   * Returns an integer containing the number of invalid password attempts allowed.
+   *
+   * @return int
+   */
+  public function getFloodThreshold();
+
+  /**
+   * Returns an integer containing the number of seconds an invalid password attempt is remembered for.
+   *
+   * @return int
+   */
+  public function getFloodWindow();
+
+  /**
+   * Returns an integer containing the number of seconds before a challenge expires.
+   *
+   * @return int
+   */
+  public function getChallengeOffset();
+
+  /**
+   * Returns an integer containing the number of seconds before a challenge
+   * response expires.
+   *
+   * @return int
+   */
+  public function getChallengeResponseOffset();
+
+  /**
    * Returns an array of challenge backends suitable for a form api #options.
    *
    * @return mixed
    */
   public function challengeBackendOptions();
+
+  /**
+   * Returns a string containing the challenge backend.
+   *
+   * @return string
+   */
+  public function getChallengeBackend();
 
   /**
    * Returns an array of challenge response backends suitable for a form api #options.
@@ -163,11 +220,25 @@ interface TrezorConnectInterface {
   public function challengeResponseBackendOptions();
 
   /**
+   * Returns a string containing the challenge response backend.
+   *
+   * @return string
+   */
+  public function getChallengeResponseBackend();
+
+  /**
    * Returns an array of mapping backends suitable for a form api #options.
    *
    * @return mixed
    */
   public function mappingBackendOptions();
+
+  /**
+   * Returns a string containing the mapping backend.
+   *
+   * @return string
+   */
+  public function getMappingBackend();
 
   /**
    * Responsible for mapping the challenge response to an account.
@@ -187,5 +258,19 @@ interface TrezorConnectInterface {
    * @return mixed
    */
   public function deleteMapping($uid);
+
+  /**
+   * Deletes expired challenge responses.
+   *
+   * @return mixed
+   */
+  public function deleteExpiredChallengeResponses();
+
+  /**
+   * Deletes expired challenges.
+   *
+   * @return mixed
+   */
+  public function deleteExpiredChallenges();
 
 }

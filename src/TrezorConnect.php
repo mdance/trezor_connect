@@ -151,6 +151,42 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getLoginText() {
+    $output = $this->config->get('text');
+
+    return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getRegistrationText() {
+    $output = $this->config->get('text_register');
+
+    return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getManageText(AccountInterface $account = NULL) {
+    $output = $this->config->get('text_manage');
+
+    return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getAdminManageText(AccountInterface $account = NULL) {
+    $output = $this->config->get('text_manage_admin');
+
+    return $output;
+  }
+
+  /**
    * @inheritDoc
    */
   public function getIcon() {
@@ -200,12 +236,34 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
+  public function getFloodThreshold() {
+    return $this->config->get('flood_threshold');
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getFloodWindow() {
+    return $this->config->get('flood_window');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getChallengeOffset() {
+    return $this->config->get('challenge_offset');
+  }
+
   /**
    * @inheritDoc
    */
   public function getChallengeResponseOffset() {
     return $this->config->get('challenge_response_offset');
   }
+
+  /**
+   * @inheritdoc
+   */
   public function challengeBackendOptions() {
     $output = array();
 
@@ -214,6 +272,13 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
     }
 
     return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getChallengeBackend() {
+    return $this->config->get('trezor_connect_challenge_backend');
   }
 
   /**
@@ -232,6 +297,13 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
+  public function getChallengeResponseBackend() {
+    return $this->config->get('trezor_connect_challenge_response_backend');
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function mappingBackendOptions() {
     $output = array();
 
@@ -240,6 +312,13 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
     }
 
     return $output;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getMappingBackend() {
+    return $this->config->get('trezor_connect_mapping_backend');
   }
 
   /**
@@ -254,6 +333,20 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
    */
   public function deleteMapping($uid) {
     $this->mapping_manager->delete($uid);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteExpiredChallengeResponses() {
+    $this->challenge_response_manager->deleteExpired($this->mapping_manager);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteExpiredChallenges() {
+    $this->challenge_manager->deleteExpired($this->challenge_response_manager);
   }
 
 }
