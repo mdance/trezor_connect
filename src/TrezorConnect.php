@@ -331,6 +331,47 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritDoc
    */
+  public function checkChallengeResponseState($uid) {
+    $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NOT_FOUND;
+
+    $challenge_response = $this->challenge_response_manager->get();
+
+    if ($challenge_response) {
+      $public_key = $challenge_response->getPublicKey();
+
+      $mappings = $this->mapping_manager->getFromPublicKey($public_key);
+      $total = count($mappings);
+
+      if (!$total) {
+        $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NEW;
+
+        $mappings = $this->mapping_manager->getFromUid($uid);
+        $total = count($mappings);
+
+        if ($total) {
+          $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_UPDATE;
+        }
+      }
+      else {
+        $mapping = array_shift($mappings);
+
+        $mapping_uid = $mapping->getUid();
+
+        if ($uid != $mapping_uid) {
+          $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_OTHER_ACCOUNT;
+        }
+        else {
+          $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_EXISTS;
+        }
+      }
+    }
+
+    return $output;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function deleteMapping($uid) {
     $this->mapping_manager->delete($uid);
   }

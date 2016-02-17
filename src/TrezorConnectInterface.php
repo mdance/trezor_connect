@@ -250,6 +250,15 @@ interface TrezorConnectInterface {
   public function mapChallengeResponse($uid);
 
   /**
+   * Returns the challenge response state.
+   *
+   * @param $uid
+   *
+   * @return mixed
+   */
+  public function checkChallengeResponseState($uid);
+
+  /**
    * Deletes mappings associated with an account.
    *
    * @param $uid
