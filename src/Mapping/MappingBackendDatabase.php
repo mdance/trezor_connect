@@ -99,7 +99,6 @@ class MappingBackendDatabase implements MappingBackendInterface {
       $public_key = array($public_key);
     }
 
-
     $output = $this->getMultipleFromPublicKeys($public_key);
 
     return $output;
@@ -133,7 +132,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
 
       $query->fields('m');
 
-      $query->condition('id', $ids, 'IN');
+      $query->condition('challenge_response_id', $ids, 'IN');
 
       $results = $query->execute();
 

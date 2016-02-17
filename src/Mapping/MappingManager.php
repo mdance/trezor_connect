@@ -86,7 +86,7 @@ class MappingManager implements MappingManagerInterface {
    * @inheritDoc
    */
   public function getFromPublicKey($public_key) {
-    $output = $this->backend->get($public_key);
+    $output = $this->backend->getFromPublicKey($public_key);
 
     return $output;
   }
@@ -95,7 +95,7 @@ class MappingManager implements MappingManagerInterface {
    * @inheritDoc
    */
   public function getMultipleFromPublicKeys(array $public_keys) {
-    $output = $this->backend->getMultiple($public_keys);
+    $output = $this->backend->getMultipleFromPublicKeys($public_keys);
 
     return $output;
   }

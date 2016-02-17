@@ -102,7 +102,7 @@ class TrezorConnectController extends ControllerBase {
 
         $public_key = $challenge_response->getPublicKey();
 
-        $mappings = $mapping_manager->get($public_key);
+        $mappings = $mapping_manager->getFromPublicKey($public_key);
         $total = count($mappings);
 
         if ($total > 0) {
@@ -158,7 +158,6 @@ class TrezorConnectController extends ControllerBase {
       $arguments['redirect'] = FALSE;
       $arguments['redirect_url'] = NULL;
 
-      // TODO: Fix trezor_connect_message twig template rendering
       $message = array(
         '#theme' => 'trezor_connect_message',
         '#type' => $type,
@@ -234,7 +233,7 @@ class TrezorConnectController extends ControllerBase {
 
         $public_key = $challenge_response->getPublicKey();
 
-        $mappings = $mapping_manager->get($public_key);
+        $mappings = $mapping_manager->getFromPublicKey($public_key);
         $total = count($mappings);
 
         if (!$total) {
@@ -322,7 +321,6 @@ EOF;
       $arguments['redirect'] = $redirect;
       $arguments['redirect_url'] = $redirect_url;
 
-      // TODO: Fix trezor_connect_message twig template rendering
       $message = array(
         '#theme' => 'trezor_connect_message',
         '#type' => $type,
@@ -401,7 +399,7 @@ EOF;
 
         $public_key = $challenge_response->getPublicKey();
 
-        $mappings = $mapping_manager->get($public_key);
+        $mappings = $mapping_manager->getFromPublicKey($public_key);
         $total = count($mappings);
 
         if ($total > 0) {
@@ -461,7 +459,6 @@ EOF;
       $arguments['redirect'] = $redirect;
       $arguments['redirect_url'] = $redirect_url;
 
-      // TODO: Fix trezor_connect_message twig template rendering
       $message = array(
         '#theme' => 'trezor_connect_message',
         '#type' => $type,
