@@ -7,6 +7,7 @@
 
 namespace Drupal\trezor_connect\Controller;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Controller\ControllerBase;
@@ -148,9 +149,8 @@ class TrezorConnectController extends ControllerBase {
       if (isset($_POST['selector'])) {
         $selector = $_POST['selector'];
 
-        // TODO: Port to drupal 8
-        //$selector = check_plain($selector);
-        //$selector = '#' . $selector;
+        $selector = Html::escape($selector);
+        $selector = '#' . $selector;
       }
 
       $arguments = array();
@@ -311,9 +311,8 @@ EOF;
       if (isset($_POST['selector'])) {
         $selector = $_POST['selector'];
 
-        // TODO: Port to drupal 8
-        //$selector = check_plain($selector);
-        //$selector = '#' . $selector;
+        $selector = Html::escape($selector);
+        $selector = '#' . $selector;
       }
 
       $arguments = array();
@@ -449,9 +448,8 @@ EOF;
       if (isset($_POST['selector'])) {
         $selector = $_POST['selector'];
 
-        // TODO: Port to drupal 8
-        //$selector = check_plain($selector);
-        //$selector = '#' . $selector;
+        $selector = Html::escape($selector);
+        $selector = '#' . $selector;
       }
 
       $arguments = array();
