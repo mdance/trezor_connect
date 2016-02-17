@@ -90,38 +90,35 @@ class MappingBackendDatabase implements MappingBackendInterface {
 
     return $output;
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function getFromPublicKey($public_key) {
     if (!is_array($public_key)) {
       $public_key = array($public_key);
     }
 
-    $output = $this->getMultiple($public_key);
+
+    $output = $this->getMultipleFromPublicKeys($public_key);
 
     return $output;
   }
 
-  /**
-   * @inheritDoc
-   */
-  public function getFromUid($uid) {
-    $query = $this->connection->select(self::TABLE, 'm');
-
-    $query->fields('m');
-    $query->condition('uid', $uid);
-
-    $results = $query->execute();
-
-    $output = $this->results($results);
-
-    return $output;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getMultiple(array $public_keys) {
+  public function getMultipleFromPublicKeys(array $public_keys) {
     $output = array();
 
-    $challenge_responses = $this->challenge_response_manager->getMultipleFromPublicKey($public_keys);
+    $conditions = array();
+
+    $condition = array(
+      'field' => 'public_key',
+      'value' => $public_keys,
+      'operator' => 'IN',
+    );
+
+    $conditions[] = $condition;
+
+    $challenge_responses = $this->challenge_response_manager->get(array(), $conditions);
 
     $ids = array();
 

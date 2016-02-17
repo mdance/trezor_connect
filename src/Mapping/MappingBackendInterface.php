@@ -55,10 +55,8 @@ interface MappingBackendInterface {
    *
    * @return Mapping|false
    *   The mapping object or FALSE.
-   *
-   * @see \Drupal\trezor_connect\MappingBackendInterface::getMultiple()
    */
-  public function get($public_key);
+  public function getFromPublicKey($public_key);
 
   /**
    * Returns a mapping associated with a user id.
@@ -82,7 +80,7 @@ interface MappingBackendInterface {
    *
    * @see \Drupal\trezor_connect\MappingBackendInterface::get()
    */
-  public function getMultiple(array $public_keys);
+  public function getMultipleFromPublicKeys(array $public_keys);
 
   /**
    * Stores a mapping.
