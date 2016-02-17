@@ -143,6 +143,22 @@ class MappingBackendDatabase implements MappingBackendInterface {
     return $output;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getFromUid($uid) {
+    $query = $this->connection->select(self::TABLE, 'm');
+
+    $query->fields('m');
+    $query->condition('uid', $uid);
+
+    $results = $query->execute();
+
+    $output = $this->results($results);
+
+    return $output;
+  }
+
   private function results($results, array $challenge_responses = NULL) {
     $output = array();
 
