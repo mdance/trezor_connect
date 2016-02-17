@@ -7,6 +7,7 @@ namespace Drupal\trezor_connect\ChallengeResponse;
 
 use Drupal\trezor_connect\Challenge\ChallengeInterface;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
+use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -300,6 +301,57 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
     $this->session->remove(self::KEY);
 
     return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function deleteExpired(MappingManagerInterface $mapping_manager) {
+    $now = time();
+    $offset = $this->getChallengeResponseOffset();
+
+    $value = $now - $offset;
+
+    $conditions = array();
+
+    $condition = array(
+      'field' => 'created',
+      'value' => $value,
+      'operator' => '<=',
+    );
+
+    $conditions[] = $condition;
+
+    $challenge_responses = $this->backend->get(NULL, $conditions);
+
+    $ids = array();
+
+    foreach ($challenge_responses as $challenge_response) {
+      $id = $challenge_response->getId();
+
+      $ids[$id] = $id;
+    }
+
+    $conditions = array();
+
+    $condition = array(
+      'field' => 'challenge_response_id',
+      'value' => $ids,
+      'operator' => 'IN',
+    );
+
+    $conditions[] = $condition;
+
+    // Filter out any ids used in mappings
+    $mappings = $mapping_manager->get(array(), $conditions);
+
+    foreach ($mappings as $mapping) {
+      $challenge_response_id = $mapping->getChallengeResponse()->getId();
+
+      unset($ids[$challenge_response_id]);
+    }
+
+    $this->backend->delete($ids);
   }
 
 }

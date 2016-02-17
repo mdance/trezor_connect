@@ -8,6 +8,7 @@ namespace Drupal\trezor_connect\ChallengeResponse;
 
 use Drupal\trezor_connect\Challenge\ChallengeInterface;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
+use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -215,5 +216,14 @@ interface ChallengeResponseManagerInterface {
    * @return mixed
    */
   public function deleteSessionChallengeResponse();
+
+  /**
+   * Deletes any expired challenge responses.
+   *
+   * @param MappingManagerInterface $mapping_manager
+   *   The mapping manager used to retrieve any mappings associated with the
+   * challenge responses, as these cannot be deleted.
+   */
+  public function deleteExpired(MappingManagerInterface $mapping_manager);
 
 }
