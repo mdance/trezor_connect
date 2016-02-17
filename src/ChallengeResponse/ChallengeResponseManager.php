@@ -119,6 +119,16 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
    * @inheritDoc
    */
   public function get($id = NULL) {
+  public function setChallengeResponseOffset($challenge_response_offset) {
+    $this->challenge_response_offset = $challenge_response_offset;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getChallengeResponseOffset() {
+    return $this->challenge_response_offset;
+  }
     if (is_null($id)) {
       // Check if a challenge exists on the current request
       $output = $this->getRequestChallengeResponse();

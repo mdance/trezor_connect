@@ -93,8 +93,18 @@ interface ChallengeResponseManagerInterface {
    */
   public function getChallengeManager();
 
+
   /**
-   * Returns a challenge response associated with an id.
+   * Sets the challenge response offset.
+   *
+   * @param int $challenge_response_offset
+   */
+  public function setChallengeResponseOffset($challenge_response_offset);
+
+  /**
+   * Returns the challenge response offset.
+   */
+  public function getChallengeResponseOffset();
    *
    * @param int $id
    *   The challenge response id to retrieve.  If not specified, the request,
