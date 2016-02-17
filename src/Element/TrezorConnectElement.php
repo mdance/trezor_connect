@@ -91,8 +91,8 @@ class TrezorConnectElement extends RenderElement {
 
     $uid = $account->id();
 
-    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
-    $access = $account->hasPermission(TrezorConnectInterface::PERMISSION_USE);
+    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
+    $access = $account->hasPermission(TrezorConnectInterface::PERMISSION_LOGIN);
 
     if (($uid == $current_uid && $access) || $admin) {
       $form_id = $element['#form_id'];
