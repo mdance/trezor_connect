@@ -3,7 +3,7 @@ text_register: 'Register with TREZOR'
 text_manage: 'Authorise TREZOR device'
 text_manage_admin: 'Authorise TREZOR device'
 icon:
-  source: ''
+  source: 'default'
   path: ''
   url: ''
 external: 1
