@@ -1,0 +1,23 @@
+uuid: c814c430-06cd-47a6-9a02-2de3e6cd8d45
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_authentication_mode
+  module:
+    - options
+    - user
+id: user.user.field_authentication_mode
+field_name: field_authentication_mode
+entity_type: user
+bundle: user
+label: 'Authentication Mode'
+description: 'Please specify which authentication mode you would like to use for your account.'
+required: true
+translatable: false
+default_value:
+  -
+    value: all
+default_value_callback: ''
+settings: {  }
+field_type: list_string

@@ -1,0 +1,16 @@
+uuid: 6e31171c-8277-43ee-8c00-d1b7a0516883
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.user.compact
+    - field.field.user.user.field_authentication_mode
+  module:
+    - user
+id: user.user.compact
+targetEntityType: user
+bundle: user
+mode: compact
+content:
+hidden:
+  field_authentication_mode: true

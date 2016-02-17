@@ -1,0 +1,30 @@
+uuid: 54c53c35-7125-4eaa-8700-f0c45b664ced
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - user
+id: user.field_authentication_mode
+field_name: field_authentication_mode
+entity_type: user
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: all
+      label: 'Login Credentials and Authentication Device'
+    -
+      value: authentication_device
+      label: 'Authentication Device'
+    -
+      value: login
+      label: 'Login Credentials'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

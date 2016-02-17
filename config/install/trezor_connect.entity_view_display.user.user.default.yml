@@ -1,0 +1,21 @@
+uuid: 9e532d74-2a93-43e9-b605-5d6efd5fe7ee
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.user.user.field_authentication_mode
+  module:
+    - options
+    - user
+id: user.user.default
+targetEntityType: user
+bundle: user
+mode: default
+content:
+  field_authentication_mode:
+    weight: 6
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+hidden: {  }
