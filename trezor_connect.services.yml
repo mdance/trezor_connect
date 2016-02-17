@@ -1,4 +1,9 @@
 services:
+  # access checks
+  access_check.trezor_connect.authentication_device:
+      class: Drupal\trezor_connect\Access\AuthenticationDeviceAccessCheck
+      tags:
+        - { name: access_check, applies_to: _access_authentication_device }
   # cache context
   cache_context.trezor_connect_challenge:
     class: Drupal\trezor_connect\Cache\Context\TrezorConnectChallengeCacheContext
