@@ -122,19 +122,64 @@ interface TrezorConnectInterface {
    */
   const JS_CALLBACK = 'trezorLogin';
 
+  /**
+   * Provides an integer representing the challenge response not found state.
+   */
   const STATE_CHALLENGE_RESPONSE_NOT_FOUND = 0;
+
+  /**
+   * Provides an integer representing the invalid challenge response state.
+   */
   const STATE_CHALLENGE_RESPONSE_INVALID = 1;
+
+  /**
+   * Provides an integer representing the new challenge response state.
+   */
   const STATE_CHALLENGE_RESPONSE_NEW = 2;
+
+  /**
+   * Provides an integer representing the challenge response exists state.
+   */
   const STATE_CHALLENGE_RESPONSE_EXISTS = 3;
+
+  /**
+   * Provides an integer representing the updated challenge response state.
+   */
   const STATE_CHALLENGE_RESPONSE_UPDATE = 4;
+
+  /**
+   * Provides an integer representing the other account challenge response state.
+   */
   const STATE_CHALLENGE_RESPONSE_OTHER_ACCOUNT = 5;
 
+  /**
+   * Provides an integer representing the login mode.
+   */
   const MODE_LOGIN = 0;
+
+  /**
+   * Provides an integer representing the register mode.
+   */
   const MODE_REGISTER = 1;
+
+  /**
+   * Provides an integer representing the manage mode.
+   */
   const MODE_MANAGE = 2;
 
+  /**
+   * Provides a string representing a default icon source.
+   */
   const ICON_SOURCE_DEFAULT = 'default';
+
+  /**
+   * Provides a string representing a theme logo icon source.
+   */
   const ICON_SOURCE_THEME = 'theme';
+
+  /**
+   * Provides a string representing a custom icon source.
+   */
   const ICON_SOURCE_CUSTOM = 'custom';
 
   /**
