@@ -16,6 +16,7 @@ function trezor_connect_theme() {
 
   $output['trezor_connect_message'] = array(
     'variables' => array(
+      'type' => NULL,
       'message' => NULL,
     ),
   );
@@ -28,7 +29,7 @@ function trezor_connect_theme() {
  *
  * @param $variables
  */
-function template_trezor_connect_message(&$variables) {
+function template_preprocess_trezor_connect_message(&$variables) {
   $type = 'info';
 
   if (isset($variables['type'])) {
