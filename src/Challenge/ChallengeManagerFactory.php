@@ -10,6 +10,7 @@ namespace Drupal\trezor_connect\Challenge;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
+use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -91,7 +92,7 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
    */
   public function __construct(Settings $settings, ConfigFactoryInterface $config_factory, RequestStack $request_stack, SessionInterface $session, array $backends = array(), $backend, ChallengeInterface $challenge, CacheTagsInvalidatorInterface $cache_tags_invalidator) {
     $this->settings = $settings;
-    $this->config = $config_factory->get('trezor_connect.settings');
+    $this->config = $config_factory->get(TrezorConnectInterface::CONFIG_NS);
     $this->request = $request_stack->getCurrentRequest();
     $this->session = $session;
 
