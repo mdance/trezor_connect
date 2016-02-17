@@ -106,18 +106,25 @@ interface ChallengeManagerInterface {
   /**
    * Returns a challenge associated with an id.
    *
-   * @param int $id
+   * @param int|array|NULL $id
    *   The challenge id to retrieve.  If null, the current request will be
    * checked for a challenge, otherwise a new challenge will be generated and
    * returned.
    *
-   * @return Challenge|false
-   *   The challenge object or FALSE.
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
+   *
+   * @return array
+   *   An array of Challenge objects.
    *
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::getRequestChallenge()
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::getMultiple()
    */
-  public function get($id = NULL, $reset = FALSE);
+  public function get($id = NULL, array $conditions = NULL);
 
   /**
    * Returns a challenge associated with the current request.
@@ -130,15 +137,24 @@ interface ChallengeManagerInterface {
   /**
    * Returns the challenges associated with an array of ids.
    *
-   * @param array $ids
-   *   An array of challenge ids.
+   * @param int|array|NULL $ids
+   *   The challenge ids to retrieve.  If null, the current request will be
+   * checked for a challenge, otherwise a new challenge will be generated and
+   * returned.
+   *
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
    *
    * @return array
    *   An array of Challenge objects.
    *
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::get()
    */
-  public function getMultiple(array $ids);
+  public function getMultiple(array $ids, array $conditions = NULL);
 
   /**
    * Stores a challenge.

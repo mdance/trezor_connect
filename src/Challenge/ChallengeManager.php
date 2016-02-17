@@ -138,12 +138,12 @@ class ChallengeManager implements ChallengeManagerInterface {
   /**
    * @inheritDoc
    */
-  public function get($id = NULL, $reset = FALSE) {
+  public function get($id = NULL, array $conditions = NULL) {
     if (is_null($id)) {
       // Check if a challenge exists on the current request
       $output = $this->getRequestChallenge();
 
-      if (!$output || $reset) {
+      if (!$output) {
         $output = $this->getChallenge();
 
         $id = $output->getId();
@@ -159,7 +159,7 @@ class ChallengeManager implements ChallengeManagerInterface {
     }
     else {
       // Retrieve a specific challenge
-      $output = $this->backend->get($id);
+      $output = $this->backend->get($id, $conditions);
     }
 
     return $output;
@@ -190,8 +190,8 @@ class ChallengeManager implements ChallengeManagerInterface {
   /**
    * @inheritDoc
    */
-  public function getMultiple(array $ids) {
-    $output = $this->backend->getMultiple($ids);
+  public function getMultiple(array $ids, array $conditions = NULL) {
+    $output = $this->backend->getMultiple($ids, $conditions);
 
     return $output;
   }
