@@ -61,6 +61,46 @@ interface MappingManagerInterface {
   public function getChallengeResponseManager();
 
   /**
+   * Returns the mapping associated with an id.
+   *
+   * @param int|array|NULL $id
+   *   The mapping id to retrieve.
+   *
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
+   *
+   * @return array
+   *   An array of Mapping objects.
+   *
+   * @see \Drupal\trezor_connect\Mapping\MappingManagerInterface::getMultiple()
+   */
+  public function get($id = NULL, array $conditions = NULL);
+
+  /**
+   * Returns the mappings associated with an array of ids.
+   *
+   * @param array $ids
+   *   The mapping ids to retrieve.
+   *
+   * @param array $conditions
+   *   An array of conditions.  The array should contain the following keys:
+   *
+   *     field - A string containing the name of the field.
+   *     value - A string containing the value for the condition.
+   *     operator - A string containing the condition operator.
+   *
+   * @return array
+   *   An array of Mapping objects.
+   *
+   * @see \Drupal\trezor_connect\Mapping\MappingManagerInterface::get()
+   */
+  public function getMultiple(array $ids, array $conditions = NULL);
+
+  /**
    * Returns a mapping associated with a public key.
    *
    * @param string $public_key

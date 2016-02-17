@@ -67,8 +67,8 @@ class MappingManager implements MappingManagerInterface {
   /**
    * @inheritDoc
    */
-  public function get($public_key) {
-    $output = $this->backend->get($public_key);
+  public function get($id = NULL, array $conditions = NULL) {
+    $output = $this->backend->get($id, $conditions);
 
     return $output;
   }
@@ -76,8 +76,11 @@ class MappingManager implements MappingManagerInterface {
   /**
    * @inheritDoc
    */
-  public function getFromUid($uid) {
-    $output = $this->backend->getFromUid($uid);
+  public function getMultiple(array $ids, array $conditions = NULL) {
+    $output = $this->backend->getMultiple($ids, $conditions);
+
+    return $output;
+  }
 
     return $output;
   }
