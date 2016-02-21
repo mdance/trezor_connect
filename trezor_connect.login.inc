@@ -13,8 +13,9 @@ function trezor_connect_page_callback_login($type = 'nojs') {
   $output = NULL;
 
   $response = $_POST['response'];
+  $challenge = $_POST['challenge'];
 
-  $result = trezor_connect_response_valid($response);
+  $result = trezor_connect_response_valid($response, $challenge);
 
   if (!$result) {
     if ($type == 'nojs') {
@@ -118,6 +119,7 @@ EOF;
     }
     else {
       $_SESSION['trezor_connect_response'] = $response;
+      $_SESSION['trezor_connect_challenge'] = $challenge;
 
       $text = t('click here to register an account');
       $path = 'user/register';

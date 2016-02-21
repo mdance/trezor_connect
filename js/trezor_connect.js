@@ -26,7 +26,7 @@
   };
 
   methods.authenticate = function(response) {
-    var settings, id, url, element_settings, selector;
+    var settings, id, url, element_settings, selector, challenge;
 
     if (response.success) {
       settings = Drupal.settings[namespace];
@@ -40,6 +40,8 @@
         url = settings.url;
         url += '/nojs';
 
+        challenge = settings.challenge;
+
         element_settings = {
           url: url,
           effect: 'none',
@@ -48,7 +50,8 @@
           submit: {
             js: true,
             selector: selector,
-            response: response
+            response: response,
+            challenge: challenge
           },
           event: 'authenticate.' + namespace
         };

@@ -171,8 +171,9 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
   $output = NULL;
 
   $response = $_POST['response'];
+  $challenge = $_POST['challenge'];
 
-  $result = trezor_connect_response_valid($response);
+  $result = trezor_connect_response_valid($response, $challenge);
 
   if (!$result) {
     if ($type == 'nojs') {
@@ -232,6 +233,15 @@ function trezor_connect_page_callback_manage($account, $type = 'nojs') {
       drupal_set_message($message, 'warning');
     }
     else {
+      $keys = array(
+        'challenge_hidden',
+        'challenge_visual',
+      );
+
+      foreach ($keys as $key) {
+        $response[$key] = $challenge[$key];
+      }
+
       $response['uid'] = $account->uid;
 
       trezor_connect_write_map($response);

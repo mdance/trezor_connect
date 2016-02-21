@@ -18,6 +18,16 @@
 function trezor_connect_user_insert(&$edit, $account, $category) {
   if (isset($_SESSION['trezor_connect_response'])) {
     $record = $_SESSION['trezor_connect_response'];
+    $challenge = $_SESSION['trezor_connect_challenge'];
+
+    $keys = array(
+      'challenge_hidden',
+      'challenge_visual',
+    );
+
+    foreach ($keys as $key) {
+      $record[$key] = $challenge[$key];
+    }
 
     $record['uid'] = $account->uid;
 
@@ -45,8 +55,9 @@ function trezor_connect_user_delete($account) {
 function trezor_connect_user_login(&$edit, $account) {
   if (isset($_SESSION['trezor_connect_response'])) {
     $response = $_SESSION['trezor_connect_response'];
+    $challenge = $_SESSION['trezor_connect_challenge'];
 
-    $result = trezor_connect_response_valid($response);
+    $result = trezor_connect_response_valid($response, $challenge);
 
     if ($result) {
       $result = trezor_connect_mapping($response);

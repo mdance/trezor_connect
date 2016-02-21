@@ -12,8 +12,9 @@ function trezor_connect_page_callback_register($type = 'nojs') {
   $output = NULL;
 
   $response = $_POST['response'];
+  $challenge = $_POST['challenge'];
 
-  $result = trezor_connect_response_valid($response);
+  $result = trezor_connect_response_valid($response, $challenge);
 
   if (!$result) {
     if ($type == 'nojs') {
@@ -84,6 +85,7 @@ function trezor_connect_page_callback_register($type = 'nojs') {
     }
     else {
       $_SESSION['trezor_connect_response'] = $response;
+      $_SESSION['trezor_connect_challenge'] = $challenge;
 
       $message = t('Your TREZOR device authentication has been saved to your session, please complete the registration process to associate your TREZOR device with your account.');
 

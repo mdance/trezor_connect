@@ -61,6 +61,16 @@ define('TREZOR_CONNECT_URL_MANAGE_JS', TREZOR_CONNECT_URL_MANAGE . '/js');
 define('TREZOR_CONNECT_OFFSET', 60 * 60);
 
 /**
+ * Provides an integer representing challenge response version 1.
+ */
+define('TREZOR_CONNECT_VERSION_1', 1);
+
+/**
+ * Provides an integer representing challenge response version 2.
+ */
+define('TREZOR_CONNECT_VERSION_2', 2);
+
+/**
  * Returns a boolean indicating if the TREZOR connect javascript should be
  * loaded externally.
  */
@@ -187,23 +197,43 @@ function trezor_connect_write_challenge($record) {
  *
  * @param $response
  *
+ * @param $challenge
+ *
  * @return string
  */
-function trezor_connect_response_valid($response) {
+function trezor_connect_response_valid($response, $challenge) {
   $output = FALSE;
 
   if (is_array($response)) {
+    $version = TREZOR_CONNECT_VERSION_1;
+
+    if (isset($response['version'])) {
+      $version = $response['version'];
+    }
+
     $challenge_hidden = NULL;
 
-    if (isset($response['challenge_hidden'])) {
-      $challenge_hidden = $response['challenge_hidden'];
-      $challenge_hidden = hex2bin($challenge_hidden);
+    if (isset($challenge['challenge_hidden'])) {
+      $challenge_hidden = $challenge['challenge_hidden'];
     }
 
     $challenge_visual = NULL;
 
-    if (isset($response['challenge_visual'])) {
-      $challenge_visual = $response['challenge_visual'];
+    if (isset($challenge['challenge_visual'])) {
+      $challenge_visual = $challenge['challenge_visual'];
+    }
+
+    if ($version == TREZOR_CONNECT_VERSION_1) {
+      $challenge_hidden = hex2bin($challenge_hidden);
+    }
+    else if ($version == TREZOR_CONNECT_VERSION_2) {
+      $challenge_hidden = hex2bin($challenge_hidden);
+      $challenge_hidden = hash('sha256', $challenge_hidden, TRUE);
+
+      $challenge_visual = hash('sha256', $challenge_visual, TRUE);
+    }
+    else {
+      throw new LogicException('The challenge response version is unknown.');
     }
 
     $message = $challenge_hidden . $challenge_visual;
@@ -243,11 +273,15 @@ function trezor_connect_response_valid($response) {
     $result = $ecdsa->checkSignaturePoints($public_key, $R, $S, $hash);
 
     if($result) {
+      /*
       $result = $ecdsa->getAddress($public_key);
 
       if ($result == $address) {
         $output = TRUE;
       }
+      */
+
+      $output = TRUE;
     }
   }
 

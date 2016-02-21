@@ -92,17 +92,6 @@ function trezor_connect_alter_form(&$form, &$form_state, $form_id) {
       $url = url(TREZOR_CONNECT_URL_REGISTER, $options);
     }
 
-    $form['#attached']['js'][] = array(
-      'data' => array(
-        'trezor_connect' => array(
-          'mode' => $mode,
-          'url' => $url,
-          'form_id' => $form_id,
-        ),
-      ),
-      'type' => 'setting',
-    );
-
     $items = array();
 
     $attributes = array();
@@ -141,5 +130,18 @@ function trezor_connect_alter_form(&$form, &$form_state, $form_id) {
       '#attributes' => $attributes,
       '#weight' => 2,
     );
+
+    $form['#attached']['js'][] = array(
+      'data' => array(
+        'trezor_connect' => array(
+          'mode' => $mode,
+          'url' => $url,
+          'form_id' => $form_id,
+          'challenge' => $challenge,
+        ),
+      ),
+      'type' => 'setting',
+    );
+
   }
 }
