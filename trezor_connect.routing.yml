@@ -12,7 +12,7 @@ trezor_connect.user.register:
   requirements:
     _permission: 'register with authentication device'
     js: 'nojs|ajax'
-    _csrf_token: 'TRUE'
+    #_csrf_token: 'TRUE'
 trezor_connect.user.login:
   path: '/user/login/trezor/{js}'
   defaults:
@@ -20,7 +20,7 @@ trezor_connect.user.login:
   requirements:
     _permission: 'login with authentication device'
     js: 'nojs|ajax'
-    _csrf_token: 'TRUE'
+    #_csrf_token: 'TRUE'
 trezor_connect.user.manage:
   path: '/user/{user}/trezor-connect'
   defaults:
@@ -37,7 +37,8 @@ trezor_connect.user.manage.js:
     user: \d+
     js: 'nojs|ajax'
     _access_authentication_device: 'TRUE'
-    _csrf_token: 'TRUE'
+    # TODO: Fix csrf tokens
+    #_csrf_token: 'TRUE'
 trezor_connect.user.manage.disable:
   path: '/user/{user}/trezor-connect/disable'
   defaults:
@@ -46,8 +47,8 @@ trezor_connect.user.manage.disable:
   requirements:
     #_permission: 'disable authentication device'
     user: \d+
-    _csrf_token: 'TRUE'
     _access_authentication_device: 'TRUE'
+    #_csrf_token: 'TRUE'
 trezor_connect.user.manage.remove:
   path: '/user/{user}/trezor-connect/remove'
   defaults:
@@ -56,5 +57,5 @@ trezor_connect.user.manage.remove:
   requirements:
     #_permission: 'remove authentication device'
     user: \d+
-    _csrf_token: 'TRUE'
     _access_authentication_device: 'TRUE'
+    #_csrf_token: 'TRUE'
