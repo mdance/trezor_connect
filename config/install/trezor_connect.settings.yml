@@ -8,7 +8,9 @@ icon:
   url: ''
 external: 1
 url: 'https://trezor.github.io/connect/login.js'
+implementation: 'button'
 callback: 'trezorLogin'
+tag: 'trezor:login'
 flood_threshold: 50
 flood_window: 3600
 challenge_offset: 3600

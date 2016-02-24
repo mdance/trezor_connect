@@ -11,7 +11,9 @@
  * @ingroup themeable
  */
 #}
-%}
-<trezor:login{{ attributes }}>
+<{{ tag }}{{ attributes }}>
+  {% if tag != "trezor:login" %}
+  {{ text }}
+  {% endif %}
   {{ children }}
-</trezor:login>
+</{{ tag }}>

@@ -19,3 +19,6 @@ disable authentication device:
 remove authentication device:
   title: 'Remove authentication device'
   description: 'Should the user be allowed to remove their authentication device.'
+bypass password check:
+  title: 'Bypass the password check'
+  description: 'Should the user be allowed to bypass the password check while managing their authentication device.'

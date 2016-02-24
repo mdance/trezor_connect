@@ -18,6 +18,7 @@ use Drupal\Core\Url;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\ChallengeValidator\ChallengeValidatorInterface;
+use Drupal\trezor_connect\Mapping\MappingInterface;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -168,8 +169,6 @@ class TrezorConnectController extends ControllerBase {
 
       $arguments['message'] = $message;
 
-      // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
-      // requires a very specific format otherwise the $arguments will be passed as undefined
       $arguments = array(
         'callback',
         $arguments,
@@ -255,48 +254,70 @@ class TrezorConnectController extends ControllerBase {
         else {
           $mapping = array_shift($mappings);
 
-          $uid = $mapping->getUid();
+          $status = $mapping->getStatus();
 
-          $account = User::load($uid);
+          if ($status == MappingInterface::STATUS_DISABLED) {
+            $message = t('The mapping associated with your TREZOR device is currently disabled.  Please login to your account with your username, and password and re-enable your TREZOR device.');
 
-          $result = $account->isBlocked();
+            $error = TRUE;
+            $type = 'error';
 
-          if ($result) {
-            $message = <<<EOF
+            if ($js == 'nojs') {
+              drupal_set_message($message, $type);
+
+              $this->redirect(TrezorConnectInterface::ROUTE_LOGIN);
+            }
+          }
+          else {
+            $uid = $mapping->getUid();
+
+            $account = User::load($uid);
+
+            $result = $account->isBlocked();
+
+            if ($result) {
+              $message = <<<EOF
 The account associated with your TREZOR device is not active.  If you have just
 registered, your account may be waiting to be approved by an administrator.
 EOF;
 
-            $message = t($message);
+              $message = t($message);
 
-            $error = TRUE;
-            $type = 'error';
-          }
-          else {
-            user_login_finalize($account);
+              $error = TRUE;
+              $type = 'error';
 
-            $message = t('You have been successfully logged in using your TREZOR device.');
+              if ($js == 'nojs') {
+                drupal_set_message($message, $type);
 
-            if ($js == 'nojs') {
-              drupal_set_message($message);
-
-              $this->redirect(TrezorConnectInterface::ROUTE_USER);
+                $this->redirect(TrezorConnectInterface::ROUTE_LOGIN);
+              }
             }
             else {
-              $text = t('click here');
-              $url = Url::fromRoute(TrezorConnectInterface::ROUTE_USER);
+              user_login_finalize($account);
 
-              $link = Link::fromTextAndUrl($text, $url);
-              $link = $link->toString();
+              $message = t('You have been successfully logged in using your TREZOR device.');
 
-              $args = array(
-                '@link' => $link,
-              );
+              if ($js == 'nojs') {
+                drupal_set_message($message);
 
-              $message = t('You have been successfully logged in using your TREZOR device, you should now be automatically redirected, otherwise @link', $args);
+                $this->redirect(TrezorConnectInterface::ROUTE_USER);
+              }
+              else {
+                $text = t('click here');
+                $url = Url::fromRoute(TrezorConnectInterface::ROUTE_USER);
 
-              $redirect = TRUE;
-              $redirect_url = $url->toString();
+                $link = Link::fromTextAndUrl($text, $url);
+                $link = $link->toString();
+
+                $args = array(
+                  '@link' => $link,
+                );
+
+                $message = t('You have been successfully logged in using your TREZOR device, you should now be automatically redirected, otherwise @link', $args);
+
+                $redirect = TRUE;
+                $redirect_url = $url->toString();
+              }
             }
           }
         }
@@ -467,8 +488,6 @@ EOF;
 
       $arguments['message'] = $message;
 
-      // IMPORTANT: misc/ajax.js line 605 $element[response.method].apply($element, response.arguments);
-      // requires a very specific format otherwise the $arguments will be passed as undefined
       $arguments = array(
         'callback',
         $arguments,

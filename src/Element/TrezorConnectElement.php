@@ -74,8 +74,7 @@ class TrezorConnectElement extends RenderElement {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRender($element) {
-    $config = \Drupal::config(TrezorConnectInterface::CONFIG_NS);
-
+    // TODO: Implement password check functionality
     $current_user = \Drupal::currentUser();
     $current_uid = $current_user->id();
 
@@ -92,9 +91,11 @@ class TrezorConnectElement extends RenderElement {
     $uid = $account->id();
 
     $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
-    $access = $account->hasPermission(TrezorConnectInterface::PERMISSION_LOGIN);
+    $login = $account->hasPermission(TrezorConnectInterface::PERMISSION_LOGIN);
+    $register = $account->hasPermission(TrezorConnectInterface::PERMISSION_REGISTER);
+    $remove = $account->hasPermission(TrezorConnectInterface::PERMISSION_REMOVE);
 
-    if (($uid == $current_uid && $access) || $admin) {
+    if (($uid == $current_uid && ($login || $register || $remove)) || $admin) {
       $form_id = $element['#form_id'];
 
       $ids = array(
@@ -153,10 +154,55 @@ class TrezorConnectElement extends RenderElement {
 
       $url = $url->toString();
 
-      if (!isset($element['#text'])) {
-        $text = $tc->getText($mode, $account);
+      $implementation = $tc->getImplementation();
 
+      if (!isset($element['#implementation'])) {
+        $element['#implementation'] = $implementation;
+      }
+      else {
+        $implementation = $element['#implementation'];
+      }
+
+      $tag = $tc->getTag();
+
+      if (!isset($element['#tag'])) {
+        $element['#tag'] = $tag;
+      }
+      else {
+        $tag = $element['#tag'];
+      }
+
+      $text = $tc->getText($mode, $account);
+
+      if (!isset($element['#text'])) {
         $element['#text'] = $text;
+      }
+      else {
+        $text = $element['#text'];
+      }
+
+      if (!isset($element['#text_login'])) {
+        $text_login = $tc->getLoginText();
+
+        $element['#text_login'] = $text_login;
+      }
+
+      if (!isset($element['#text_register'])) {
+        $text_register = $tc->getRegistrationText();
+
+        $element['#text_register'] = $text_register;
+      }
+
+      if (!isset($element['#text_manage'])) {
+        $text_manage = $tc->getManageText();
+
+        $element['#text_manage'] = $text_manage;
+      }
+
+      if (!isset($element['#text_manage_admin'])) {
+        $text_manage_admin = $tc->getAdminManageText();
+
+        $element['#text_manage_admin'] = $text_manage_admin;
       }
 
       if (!isset($element['#icon'])) {
@@ -179,22 +225,45 @@ class TrezorConnectElement extends RenderElement {
       $element['#challenge_visual'] = $challenge->getChallengeVisual();
 
       Element::setAttributes($element, array(
+        'implementation',
+        'tag',
         'text',
+        'text_login',
+        'text_register',
+        'text_manage',
+        'text_manage_admin',
         'icon',
         'callback',
         'challenge_id',
         'challenge_hidden',
-        'challenge_visual'
+        'challenge_visual',
       ));
 
       $challenge_js = $challenge->toArray();
 
-      $element['#attached']['drupalSettings']['trezor_connect'] = array(
+      $element['#attached']['drupalSettings']['trezor_connect']['elements'][$element['#id']] = array(
         'mode' => $mode,
         'url' => $url,
         'form_id' => $form_id,
+        'id' => $element['#id'],
+        'implementation' => $element['#implementation'],
+        'tag' => $element['#tag'],
+        'text' => $element['#text'],
+        'text_login' => $element['#text_login'],
+        'text_register' => $element['#text_register'],
+        'text_manage' => $element['#text_manage'],
+        'text_manage_admin' => $element['#text_manage_admin'],
+        'icon' => $element['#icon'],
+        'callback' => $element['#callback'],
         'challenge' => $challenge_js,
       );
+
+      if ($tag != TrezorConnectInterface::TAG_TREZORLOGIN) {
+        $element['text'] = array(
+          '#type' => 'markup',
+          '#markup' => $text,
+        );
+      }
 
       $renderer = \Drupal::service('renderer');
 

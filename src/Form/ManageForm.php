@@ -113,6 +113,7 @@ class ManageForm extends FormBase {
     $current_uid = $current_user->id();
 
     $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
+    $bypass = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_BYPASS);
     $view = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_VIEW);
     $toggle = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_DISABLE);
     $remove = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_REMOVE);
@@ -133,7 +134,7 @@ class ManageForm extends FormBase {
       drupal_set_message($message, 'warning');
     }
 
-    if (!$admin && $toggle || $remove) {
+    if (!$admin && !$bypass && ($toggle || $remove)) {
       $description = $this->t('Required if you want to toggle or remove an authentication device.');
 
       $form['password'] = array(
@@ -238,9 +239,10 @@ class ManageForm extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $current_user = $this->current_user;
 
-    $result = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
+    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
+    $bypass = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_BYPASS);
 
-    if (!$result) {
+    if (!$admin && !$bypass) {
       $channel = 'trezor_connect';
 
       $current_uid = $current_user->id();

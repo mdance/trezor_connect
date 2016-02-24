@@ -95,6 +95,11 @@ interface TrezorConnectInterface {
   const PERMISSION_REMOVE = 'remove authentication device';
 
   /**
+   * Provides a string containing the bypass permission.
+   */
+  const PERMISSION_BYPASS = 'bypass password check';
+
+  /**
    * Provides an integer representing when the javascript assets should be
    * loaded using the TREZOR Connect CDN.
    */
@@ -183,6 +188,26 @@ interface TrezorConnectInterface {
   const ICON_SOURCE_CUSTOM = 'custom';
 
   /**
+   * Provides a string containing the button implementation type.
+   */
+  const IMPLEMENTATION_BUTTON = 'button';
+
+  /**
+   * Provides a string containing the javascript api implementation type.
+   */
+  const IMPLEMENTATION_JS = 'js';
+
+  /**
+   * Provides a string containing the trezor:login tag.
+   */
+  const TAG_TREZORLOGIN = 'trezor:login';
+
+  /**
+   * Provides a string containing the button tag.
+   */
+  const TAG_BUTTON = 'button';
+
+  /**
    * Returns a string containing the display text.
    *
    * @return boolean
@@ -232,11 +257,25 @@ interface TrezorConnectInterface {
   public function getUrl();
 
   /**
+   * Returns a string containing the TREZOR connect implementation.
+   *
+   * @return string
+   */
+  public function getImplementation();
+
+  /**
    * Returns a string containing the TREZOR connect callback function.
    *
    * @return string
    */
   public function getCallback();
+
+  /**
+   * Returns a string containing the TREZOR connect tag.
+   *
+   * @return string
+   */
+  public function getTag();
 
   /**
    * Returns an integer containing the number of invalid password attempts allowed.

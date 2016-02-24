@@ -1,8 +1,6 @@
 /**
  * @file
  * Provides TREZOR Connect clientside functionality.
- *
- * TODO: Implement javascript API
  */
 /*jslint vars: false, white: true, indent: 2 */
 /*global window, document, Drupal, drupalSettings */
@@ -12,92 +10,74 @@
   'use strict';
 
   var namespace,
-    methods,
-    $container;
+    methods;
 
   namespace = 'trezor_connect';
 
   methods = {};
 
-  methods.authenticate = function(response) {
-    var settings, id, url, element_settings, selector, found, event;
+  methods.authenticate = function(response, $element, settings) {
+    var event, found, url, selector, element_settings;
 
-    if (response.success) {
-      settings = drupalSettings[namespace];
-
+    if ($element.length && response.success) {
       event = 'authenticate.' + namespace;
-      selector = '#edit-trezor-connect';
 
-      $container = $(selector);
+      found = false;
 
-      if ($container.length) {
-        found = false;
+      $.each(
+        Drupal.ajax.instances,
+        function(key, value) {
+          var result;
 
-        $.each(
-          Drupal.ajax.instances,
-          function(key, value) {
-            var result;
+          if (value.event == event) {
+            result = $element.is(value.element);
 
-            if (value.event == event) {
-              result = $container.is(value.element);
+            if ( result ) {
+              found = true;
 
-              if ( result ) {
-                found = true;
-
-                return true;
-              }
+              return true;
             }
           }
-        );
-
-        if (!found) {
-          id = namespace;
-          url = settings.url;
-
-          element_settings = {
-            url: url,
-            effect: 'none',
-            wrapper: null,
-            method: namespace,
-            submit: {
-              js: true,
-              selector: selector,
-              trezor_connect_challenge: settings.challenge,
-              trezor_connect_challenge_response: response
-            },
-            event: event,
-            base: id,
-            element: $container
-          };
-
-          Drupal.ajax(element_settings);
-
-          /*
-          Drupal.ajax[id].success = function (response, status) {
-            Drupal.ajax.prototype.success.call(this, response, status);
-          };
-          */
         }
+      );
 
-        $container.trigger('authenticate.' + namespace);
+      if (!found) {
+        url = settings.url;
+        selector = settings.id;
+
+        element_settings = {
+          url: url,
+          effect: 'none',
+          wrapper: null,
+          method: namespace,
+          submit: {
+            js: true,
+            selector: selector,
+            trezor_connect_challenge: settings.challenge,
+            trezor_connect_challenge_response: response
+          },
+          event: event,
+          base: settings.id,
+          element: $element
+        };
+
+        Drupal.ajax(element_settings);
       }
+
+      $element.trigger('authenticate.' + namespace);
     }
   };
 
-  window.trezorLogin = methods.authenticate;
-
   methods.callback = function(options) {
-    var settings, mode, message, redirect;
+    var $element, message, redirect;
 
-    settings = drupalSettings[namespace];
-
-    mode = settings.mode;
+    $element = this;
 
     message = options.message;
 
-    $container.fadeOut();
-    $container.html(message);
-    $container.fadeIn();
+    $element.fadeOut();
+    $element.html(message);
+    $element.fadeIn();
 
     redirect = true;
 
@@ -114,6 +94,46 @@
           3000
         );
       }
+    }
+  };
+
+  Drupal.behaviors.trezor_connect = {
+    attach: function() {
+      $.each(
+        drupalSettings.trezor_connect.elements,
+        function(selector, element_settings) {
+          var $element, callback;
+
+          $element = $('#' + selector);
+
+          if (element_settings.implementation == 'js') {
+            if ($element.length) {
+              $element.once(namespace).click(
+                function(event) {
+                  TrezorConnect.requestLogin(
+                    element_settings.icon,
+                    element_settings.challenge.challenge_hidden,
+                    element_settings.challenge.challenge_visual,
+                    function(response) {
+                      methods.authenticate(response, $element, element_settings);
+                    }
+                  );
+                }
+              );
+            }
+          }
+          else if (element_settings.implementation == 'button') {
+            callback = element_settings.callback;
+
+            if (!window[callback]) {
+              window[callback] = function(response) {
+                debugger;
+                methods.authenticate(response, $element, element_settings);
+              }
+            }
+          }
+        }
+      );
     }
   };
 

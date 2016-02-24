@@ -31,17 +31,7 @@ class AuthenticationDeviceAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function applies(Route $route) {
-    $output = FALSE;
-
-    /*
-    $requirements = $route->getRequirements();
-
-    $uid = 44;
-
-    if ($current_uid == $uid) {
-      $output = TRUE;
-    }
-    */
+    $output = NULL;
 
     return $output;
   }

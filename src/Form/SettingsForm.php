@@ -12,9 +12,9 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -99,6 +99,8 @@ class SettingsForm extends ConfigFormBase {
    */
   protected $theme_handler;
 
+  protected $element_info_manager;
+
   /**
    * Constructs a new form.
    *
@@ -107,7 +109,7 @@ class SettingsForm extends ConfigFormBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state keyvalue collection to use.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, $challenge_backends, $challenge_backend, $challenge_response_backends, $challenge_response_backend, $mapping_backends, $mapping_backend, TrezorConnectInterface $trezor_connect, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, StateInterface $state, $challenge_backends, $challenge_backend, $challenge_response_backends, $challenge_response_backend, $mapping_backends, $mapping_backend, TrezorConnectInterface $trezor_connect, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ElementInfoManagerInterface $element_info_manager) {
     parent::__construct($config_factory);
 
     $this->state = $state;
@@ -128,6 +130,8 @@ class SettingsForm extends ConfigFormBase {
     $this->module_handler = $module_handler;
 
     $this->theme_handler = $theme_handler;
+
+    $this->element_info_manager = $element_info_manager;
   }
 
   /**
@@ -146,7 +150,8 @@ class SettingsForm extends ConfigFormBase {
       $container->get('trezor_connect'),
       $container->get('date.formatter'),
       $container->get('module_handler'),
-      $container->get('theme_handler')
+      $container->get('theme_handler'),
+      $container->get('element_info')
     );
   }
   /**
@@ -346,6 +351,51 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => $default_value,
     );
 
+    $key = 'implementation';
+
+    $description = t('Please specify the TREZOR connect implementation.');
+    $default_value = $config->get($key);
+
+    $options = array(
+      TrezorConnectInterface::IMPLEMENTATION_BUTTON => $this->t('Default'),
+      TrezorConnectInterface::IMPLEMENTATION_JS => $this->t('Javascript'),
+    );
+
+    $form[$key] = array(
+      '#type' => 'radios',
+      '#required' => TRUE,
+      '#title' => t('TREZOR Connect Implementation'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+      '#options' => $options,
+    );
+
+    $key = 'tag';
+
+    $description = t('Please specify the TREZOR connect tag.');
+    $default_value = $config->get($key);
+
+    $options = array(
+      TrezorConnectInterface::TAG_TREZORLOGIN => $this->t('trezor:login'),
+      TrezorConnectInterface::TAG_BUTTON => $this->t('button'),
+    );
+
+    $form[$key] = array(
+      '#type' => 'radios',
+      '#required' => TRUE,
+      '#title' => t('TREZOR Connect Tag'),
+      '#description' => $description,
+      '#default_value' => $default_value,
+      '#options' => $options,
+      '#states' => array(
+        'visible' => array(
+          'input[name="implementation"]' => array(
+            'value' => TrezorConnectInterface::IMPLEMENTATION_JS,
+          ),
+        ),
+      ),
+    );
+
     $key = 'callback';
 
     $description = t('Please specify the TREZOR connect callback function.');
@@ -357,6 +407,13 @@ class SettingsForm extends ConfigFormBase {
       '#title' => t('TREZOR Connect Callback'),
       '#description' => $description,
       '#default_value' => $default_value,
+      '#states' => array(
+        'visible' => array(
+          'input[name="implementation"]' => array(
+            'value' => TrezorConnectInterface::IMPLEMENTATION_BUTTON,
+          ),
+        ),
+      ),
     );
 
     $key = 'flood_threshold';
@@ -611,6 +668,8 @@ class SettingsForm extends ConfigFormBase {
       'text_manage_admin',
       'external',
       'url',
+      'implementation',
+      'tag',
       'callback',
       'flood_threshold',
       'flood_window',
@@ -651,6 +710,10 @@ class SettingsForm extends ConfigFormBase {
     $config->set('icon.source', $source);
 
     $config->save();
+
+    // TrezorConnectElement->getInfo needs to be refreshed if changes are made
+    // to the implementation or tag.
+    $this->element_info_manager->clearCachedDefinitions();
   }
 
 }

@@ -25,7 +25,38 @@ function trezor_connect_theme() {
 }
 
 /**
- * Provides the template preprocess function.
+ * Provides the trezor_connect preprocess function.
+ *
+ * @param $variables
+ */
+function template_preprocess_trezor_connect(&$variables) {
+  $element = &$variables['element'];
+
+  $keys = array(
+    'form_id',
+    'implementation',
+    'tag',
+    'text',
+    'text_login',
+    'text_register',
+    'text_manage',
+    'text_manage_admin',
+    'icon',
+    'callback',
+    'challenge_id',
+    'challenge_hidden',
+    'challenge_visual',
+  );
+
+  foreach ($keys as $key) {
+    if (isset($element['#' . $key])) {
+      $variables[$key] = $element['#' . $key];
+    }
+  }
+}
+
+/**
+ * Provides the trezor_connect_message preprocess function.
  *
  * @param $variables
  */

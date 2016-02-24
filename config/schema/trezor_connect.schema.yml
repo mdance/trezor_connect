@@ -34,9 +34,15 @@ trezor_connect.settings:
     url:
       type: string
       label: 'External TREZOR Connect Javascript URL'
+    implementation:
+      type: string
+      label: 'TREZOR Connect Implementation'
     callback:
       type: string
       label: 'TREZOR Connect Callback'
+    tag:
+      type: string
+      label: 'TREZOR Connect Tag'
     flood_threshold:
       type: integer
       label: 'Flood Threshold'
