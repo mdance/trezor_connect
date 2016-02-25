@@ -10,6 +10,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
+    "commerceguys/enum": "dev-master",
     "bitcoin-php/bitcoin-ecdsa": "dev-master"
   }
 }
