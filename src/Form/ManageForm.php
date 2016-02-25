@@ -13,11 +13,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Password\PasswordInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\trezor_connect\Mapping\MappingInterface;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
-use Drupal\trezor_connect\TrezorConnectInterface;
-use Drupal\user\UserAuthInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\trezor_connect\Enum\Permissions;
+use Drupal\trezor_connect\Enum\Routes;
+use Drupal\trezor_connect\Enum\MappingStatus;
 
 /**
  * Allows you to manage the authenticated devices associated with your account.
@@ -112,11 +112,11 @@ class ManageForm extends FormBase {
     $current_user = $this->current_user;
     $current_uid = $current_user->id();
 
-    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
-    $bypass = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_BYPASS);
-    $view = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_VIEW);
-    $toggle = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_DISABLE);
-    $remove = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_REMOVE);
+    $admin = $current_user->hasPermission(Permissions::ACCOUNTS);
+    $bypass = $current_user->hasPermission(Permissions::BYPASS);
+    $view = $current_user->hasPermission(Permissions::VIEW);
+    $toggle = $current_user->hasPermission(Permissions::DISABLE);
+    $remove = $current_user->hasPermission(Permissions::REMOVE);
 
     $name = self::FLOOD_NAME;
     $threshold = $config->get('flood_threshold');
@@ -179,7 +179,7 @@ class ManageForm extends FormBase {
 
         $status = $mapping->getStatus();
 
-        if ($status == MappingInterface::STATUS_ACTIVE) {
+        if ($status == MappingStatus::ACTIVE) {
           $status_display = t('Active');
         }
         else {
@@ -203,7 +203,7 @@ class ManageForm extends FormBase {
         '#access' => $view,
       );
 
-      if ($status == MappingInterface::STATUS_ACTIVE) {
+      if ($status == MappingStatus::ACTIVE) {
         $value = t('Disable Authentication Device');
       }
       else {
@@ -239,8 +239,8 @@ class ManageForm extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $current_user = $this->current_user;
 
-    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
-    $bypass = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_BYPASS);
+    $admin = $current_user->hasPermission(Permissions::ACCOUNTS);
+    $bypass = $current_user->hasPermission(Permissions::BYPASS);
 
     if (!$admin && !$bypass) {
       $channel = 'trezor_connect';
@@ -340,8 +340,8 @@ class ManageForm extends FormBase {
 
       $status = $mapping->getStatus();
 
-      if ($status == MappingInterface::STATUS_ACTIVE) {
-        $route_name = TrezorConnectInterface::ROUTE_MANAGE_DISABLE;
+      if ($status == MappingStatus::ACTIVE) {
+        $route_name = Routes::MANAGE_DISABLE;
       }
       else {
         $this->mapping_manager->enable($uid);
@@ -361,11 +361,11 @@ class ManageForm extends FormBase {
 
         drupal_set_message($message);
 
-        $route_name = TrezorConnectInterface::ROUTE_MANAGE;
+        $route_name = Routes::MANAGE;
       }
     }
     else if ($triggering_element['#name'] == $form['remove']['#name']) {
-      $route_name = TrezorConnectInterface::ROUTE_MANAGE_REMOVE;
+      $route_name = Routes::MANAGE_REMOVE;
     }
 
     $form_state->setRedirect($route_name, $route_parameters);

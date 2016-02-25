@@ -9,6 +9,7 @@ namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
+use Drupal\trezor_connect\Enum\MappingStatus;
 
 class MappingManager implements MappingManagerInterface {
   /**
@@ -158,7 +159,7 @@ class MappingManager implements MappingManagerInterface {
 
       $mapping->setChallenge($challenge);
 
-      $mapping->setStatus(MappingInterface::STATUS_ACTIVE);
+      $mapping->setStatus(MappingStatus::ACTIVE);
 
       $this->set($mapping);
 

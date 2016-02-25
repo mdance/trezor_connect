@@ -18,6 +18,13 @@ use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 
+use Drupal\trezor_connect\Enum\Permissions;
+use Drupal\trezor_connect\Enum\IconSources;
+use Drupal\trezor_connect\Enum\Modes;
+use Drupal\trezor_connect\Enum\Implementations;
+use Drupal\trezor_connect\Enum\Tags;
+use Drupal\trezor_connect\Enum\ChallengeResponseStates;
+
 class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterface {
 
   /**
@@ -122,13 +129,13 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
-  public function getText($mode = TrezorConnectInterface::MODE_LOGIN, AccountInterface $account = NULL) {
+  public function getText($mode = Modes::LOGIN, AccountInterface $account = NULL) {
     $key = 'text';
 
-    if ($mode == TrezorConnectInterface::MODE_REGISTER) {
+    if ($mode == Modes::REGISTER) {
       $key .= '_register';
     }
-    else if ($mode == TrezorConnectInterface::MODE_MANAGE) {
+    else if ($mode == Modes::MANAGE) {
       $key .= '_manage';
 
       if (is_null($account)) {
@@ -138,7 +145,7 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
       $current_uid = $this->current_user->id();
       $uid = $account->id();
 
-      $admin = $this->current_user->hasPermission(TrezorConnectInterface::PERMISSION_ADMIN);
+      $admin = $this->current_user->hasPermission(Permissions::ADMIN);
 
       if ($admin && $current_uid != $uid) {
         $key .= '_admin';
@@ -194,7 +201,7 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
 
     $source = $this->config->get('icon.source');
 
-    if ($source == TrezorConnectInterface::ICON_SOURCE_THEME) {
+    if ($source == IconSources::THEME) {
       $theme = $this->theme_handler->getDefault();
 
       $logo = theme_get_setting('logo', $theme);
@@ -203,7 +210,7 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
         $output = $logo['url'];
       }
     }
-    else if ($source == TrezorConnectInterface::ICON_SOURCE_CUSTOM) {
+    else if ($source == IconSources::CUSTOM) {
       $path = $this->config->get('icon.path');
 
       $output = file_create_url($path);
@@ -246,8 +253,8 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   public function getTag() {
     $implementation = $this->getImplementation();
 
-    if ($implementation == TrezorConnectInterface::IMPLEMENTATION_BUTTON) {
-      $output = TrezorConnectInterface::TAG_TREZORLOGIN;
+    if ($implementation == Implementations::BUTTON) {
+      $output = Tags::TREZORLOGIN;
     }
     else {
       $output = $this->config->get('tag');
@@ -355,7 +362,7 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
    * @inheritDoc
    */
   public function checkChallengeResponseState($uid) {
-    $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NOT_FOUND;
+    $output = ChallengeResponseStates::NOT_FOUND;
 
     $challenge_response = $this->challenge_response_manager->get();
 
@@ -366,13 +373,13 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
       $total = count($mappings);
 
       if (!$total) {
-        $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NEW;
+        $output = ChallengeResponseStates::CREATE;
 
         $mappings = $this->mapping_manager->getFromUid($uid);
         $total = count($mappings);
 
         if ($total) {
-          $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_UPDATE;
+          $output = ChallengeResponseStates::UPDATE;
         }
       }
       else {
@@ -381,10 +388,10 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
         $mapping_uid = $mapping->getUid();
 
         if ($uid != $mapping_uid) {
-          $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_OTHER_ACCOUNT;
+          $output = ChallengeResponseStates::OTHER_ACCOUNT;
         }
         else {
-          $output = TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_EXISTS;
+          $output = ChallengeResponseStates::EXISTS;
         }
       }
     }

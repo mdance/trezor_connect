@@ -15,8 +15,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\trezor_connect\Enum\Implementations;
+use Drupal\trezor_connect\Enum\Tags;
+use Drupal\trezor_connect\Enum\IconSources;
+use Drupal\trezor_connect\Enum\Namespaces;
 
 /**
  * Provides TREZOR Connect settings.
@@ -165,14 +168,14 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [TrezorConnectInterface::CONFIG_NS];
+    return [Namespaces::CONFIG];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config(TrezorConnectInterface::CONFIG_NS);
+    $config = $this->config(Namespaces::CONFIG);
 
     $key = 'text';
 
@@ -261,15 +264,15 @@ class SettingsForm extends ConfigFormBase {
 
       $options = array();
 
-      $options[TrezorConnectInterface::ICON_SOURCE_DEFAULT] = $this->t('Default');
+      $options[IconSources::NONE] = $this->t('Default');
 
       $result = in_array('logo', $features);
 
       if ($result) {
-        $options[TrezorConnectInterface::ICON_SOURCE_THEME] = $this->t('Theme');
+        $options[IconSources::THEME] = $this->t('Theme');
       }
 
-      $options[TrezorConnectInterface::ICON_SOURCE_CUSTOM] = $this->t('Custom');
+      $options[IconSources::CUSTOM] = $this->t('Custom');
 
       $icon[$key] = array(
         '#type' => 'radios',
@@ -357,8 +360,8 @@ class SettingsForm extends ConfigFormBase {
     $default_value = $config->get($key);
 
     $options = array(
-      TrezorConnectInterface::IMPLEMENTATION_BUTTON => $this->t('Default'),
-      TrezorConnectInterface::IMPLEMENTATION_JS => $this->t('Javascript'),
+      Implementations::BUTTON => $this->t('Default'),
+      Implementations::JS => $this->t('Javascript'),
     );
 
     $form[$key] = array(
@@ -376,8 +379,8 @@ class SettingsForm extends ConfigFormBase {
     $default_value = $config->get($key);
 
     $options = array(
-      TrezorConnectInterface::TAG_TREZORLOGIN => $this->t('trezor:login'),
-      TrezorConnectInterface::TAG_BUTTON => $this->t('button'),
+      Tags::TREZORLOGIN => $this->t('trezor:login'),
+      Tags::BUTTON => $this->t('button'),
     );
 
     $form[$key] = array(
@@ -390,7 +393,7 @@ class SettingsForm extends ConfigFormBase {
       '#states' => array(
         'visible' => array(
           'input[name="implementation"]' => array(
-            'value' => TrezorConnectInterface::IMPLEMENTATION_JS,
+            'value' => Implementations::JS,
           ),
         ),
       ),
@@ -410,7 +413,7 @@ class SettingsForm extends ConfigFormBase {
       '#states' => array(
         'visible' => array(
           'input[name="implementation"]' => array(
-            'value' => TrezorConnectInterface::IMPLEMENTATION_BUTTON,
+            'value' => Implementations::BUTTON,
           ),
         ),
       ),
@@ -576,7 +579,7 @@ class SettingsForm extends ConfigFormBase {
 
     $source = $form_state->getValue('source');
 
-    if ($source == TrezorConnectInterface::ICON_SOURCE_CUSTOM) {
+    if ($source == IconSources::CUSTOM) {
       // Validate the custom icon upload
       $result = $this->module_handler->moduleExists('file');
 
@@ -659,7 +662,7 @@ class SettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $config = $this->config(TrezorConnectInterface::CONFIG_NS);
+    $config = $this->config(Namespaces::CONFIG);
 
     $keys = array(
       'text',
@@ -688,7 +691,7 @@ class SettingsForm extends ConfigFormBase {
 
     $source = $form_state->getValue($key);
 
-    if ($source == TrezorConnectInterface::ICON_SOURCE_CUSTOM) {
+    if ($source == IconSources::CUSTOM) {
       $key = 'upload';
 
       $upload = $form_state->getValue($key);

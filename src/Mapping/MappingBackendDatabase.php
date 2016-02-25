@@ -8,6 +8,7 @@ namespace Drupal\trezor_connect\Mapping;
 use Drupal\Core\Database\Connection;
 use Drupal\trezor_connect\Challenge\ChallengeResponse;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
+use Drupal\trezor_connect\Enum\MappingStatus;
 
 class MappingBackendDatabase implements MappingBackendInterface {
 
@@ -268,7 +269,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
    * @inheritDoc
    */
   public function disable($uid) {
-    $this->status($uid, MappingInterface::STATUS_DISABLED);
+    $this->status($uid, MappingStatus::DISABLED);
 
     return $this;
   }
@@ -277,7 +278,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
    * @inheritDoc
    */
   public function enable($uid) {
-    $this->status($uid, MappingInterface::STATUS_ACTIVE);
+    $this->status($uid, MappingStatus::ACTIVE);
 
     return $this;
   }
@@ -291,7 +292,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
    * @return $this
    * @throws \Exception
    */
-  private function status($uid, $status = MappingInterface::STATUS_ACTIVE) {
+  private function status($uid, $status = MappingStatus::ACTIVE) {
     $fields = array(
       'status' => $status,
     );

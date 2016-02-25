@@ -12,9 +12,9 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouterInterface;
+use Drupal\trezor_connect\Enum\Permissions;
+use Drupal\trezor_connect\Enum\Routes;
 
 /**
  * Provides the Authentication Device access check.
@@ -51,7 +51,7 @@ class AuthenticationDeviceAccessCheck implements AccessCheckInterface {
    * @return \Drupal\Core\Access\AccessResult
    */
   public function access(AccountProxyInterface $current_user, AccountInterface $user, RouteMatchInterface $current_route_match) {
-    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
+    $admin = $current_user->hasPermission(Permissions::ACCOUNTS);
 
     if ($admin) {
       return AccessResult::allowed();
@@ -64,22 +64,22 @@ class AuthenticationDeviceAccessCheck implements AccessCheckInterface {
       // User is managing their own account
       $map = array();
 
-      $map[TrezorConnectInterface::ROUTE_MANAGE] = array(
-        TrezorConnectInterface::PERMISSION_VIEW,
-        TrezorConnectInterface::PERMISSION_DISABLE,
-        TrezorConnectInterface::PERMISSION_REMOVE,
+      $map[Routes::MANAGE] = array(
+        Permissions::VIEW,
+        Permissions::DISABLE,
+        Permissions::REMOVE,
       );
 
-      $map[TrezorConnectInterface::ROUTE_MANAGE_JS] = array(
-        TrezorConnectInterface::PERMISSION_REGISTER,
+      $map[Routes::MANAGE_JS] = array(
+        Permissions::REGISTER,
       );
 
-      $map[TrezorConnectInterface::ROUTE_MANAGE_DISABLE] = array(
-        TrezorConnectInterface::PERMISSION_DISABLE,
+      $map[Routes::MANAGE_DISABLE] = array(
+        Permissions::DISABLE,
       );
 
-      $map[TrezorConnectInterface::ROUTE_MANAGE_REMOVE] = array(
-        TrezorConnectInterface::PERMISSION_REMOVE,
+      $map[Routes::MANAGE_REMOVE] = array(
+        Permissions::REMOVE,
       );
 
       $route_name = $current_route_match->getRouteName();

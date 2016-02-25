@@ -7,7 +7,8 @@
 use Drupal\user\Entity\User;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
-use Drupal\trezor_connect\TrezorConnectInterface;
+use Drupal\trezor_connect\Enum\ChallengeResponseStates;
+use Drupal\trezor_connect\Enum\Routes;
 
 /**
  * Implements hook_user_insert().
@@ -46,14 +47,14 @@ function trezor_connect_user_login($account) {
 
   $result = \Drupal::service('trezor_connect')->checkChallengeResponseState($uid);
 
-  if ($result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NEW || $result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_UPDATE) {
+  if ($result == ChallengeResponseStates::CREATE || $result == ChallengeResponseStates::UPDATE) {
     $text = t('Click here to manage your authentication devices.');
 
     $route_parameters = array();
 
     $route_parameters['user'] = $uid;
 
-    $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
+    $url = Url::fromRoute(Routes::MANAGE, $route_parameters);
 
     $link = Link::fromTextAndUrl($text, $url)->toString();
 
@@ -61,10 +62,10 @@ function trezor_connect_user_login($account) {
       '@link' => $link,
     );
 
-    if ($result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_NEW) {
+    if ($result == ChallengeResponseStates::CREATE) {
       $message = t('A TREZOR device has been authenticated, but is not linked to your account.  @link', $args);
     }
-    else if ($result == TrezorConnectInterface::STATE_CHALLENGE_RESPONSE_UPDATE) {
+    else if ($result == ChallengeResponseStates::UPDATE) {
       $message = t('A new TREZOR device has been authenticated, but is not linked to your account.  @link', $args);
     }
 

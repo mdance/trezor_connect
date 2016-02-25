@@ -13,9 +13,13 @@ use Drupal\Core\Render\Element\RenderElement;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
-use Drupal\trezor_connect\Form\ManageForm;
-use Drupal\trezor_connect\TrezorConnectInterface;
+use Drupal\trezor_connect\Enum\Permissions;
+use Drupal\trezor_connect\Enum\Modes;
+use Drupal\trezor_connect\Enum\Routes;
+use Drupal\trezor_connect\Enum\Tags;
+use Drupal\trezor_connect\Enum\JsImplementations;
 
+use Drupal\trezor_connect\Form\ManageForm;
 
 /**
  * Provides a TREZOR Connect form element.
@@ -90,10 +94,10 @@ class TrezorConnectElement extends RenderElement {
 
     $uid = $account->id();
 
-    $admin = $current_user->hasPermission(TrezorConnectInterface::PERMISSION_ACCOUNTS);
-    $login = $account->hasPermission(TrezorConnectInterface::PERMISSION_LOGIN);
-    $register = $account->hasPermission(TrezorConnectInterface::PERMISSION_REGISTER);
-    $remove = $account->hasPermission(TrezorConnectInterface::PERMISSION_REMOVE);
+    $admin = $current_user->hasPermission(Permissions::ACCOUNTS);
+    $login = $account->hasPermission(Permissions::LOGIN);
+    $register = $account->hasPermission(Permissions::REGISTER);
+    $remove = $account->hasPermission(Permissions::REMOVE);
 
     if (($uid == $current_uid && ($login || $register || $remove)) || $admin) {
       $form_id = $element['#form_id'];
@@ -106,14 +110,14 @@ class TrezorConnectElement extends RenderElement {
       $result = in_array($form_id, $ids);
 
       if ($result) {
-        $mode = TrezorConnectInterface::MODE_LOGIN;
+        $mode = Modes::LOGIN;
       }
       else {
         if ($form_id == ManageForm::FORM_ID) {
-          $mode = TrezorConnectInterface::MODE_MANAGE;
+          $mode = Modes::MANAGE;
         }
         else {
-          $mode = TrezorConnectInterface::MODE_REGISTER;
+          $mode = Modes::REGISTER;
         }
       }
 
@@ -125,17 +129,17 @@ class TrezorConnectElement extends RenderElement {
         'absolute' => TRUE,
       );
 
-      if ($mode == TrezorConnectInterface::MODE_LOGIN) {
-        $url = Url::fromRoute(TrezorConnectInterface::ROUTE_LOGIN, $route_parameters, $options);
+      if ($mode == Modes::LOGIN) {
+        $url = Url::fromRoute(Routes::LOGIN, $route_parameters, $options);
       }
       else {
-        if ($mode == TrezorConnectInterface::MODE_MANAGE) {
+        if ($mode == Modes::MANAGE) {
           $route_parameters['user'] = $account->id();
 
-          $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE_JS, $route_parameters, $options);
+          $url = Url::fromRoute(Routes::MANAGE_JS, $route_parameters, $options);
         }
         else {
-          $url = Url::fromRoute(TrezorConnectInterface::ROUTE_REGISTER, $route_parameters, $options);
+          $url = Url::fromRoute(Routes::REGISTER, $route_parameters, $options);
         }
       }
 
@@ -145,7 +149,7 @@ class TrezorConnectElement extends RenderElement {
 
       $external = $tc->getExternal();
 
-      if ($external == TrezorConnectInterface::EXTERNAL_YES) {
+      if ($external == JsImplementations::EXTERNAL) {
         $element['#attached']['library'][] = 'trezor_connect/external';
       }
       else {
@@ -258,7 +262,7 @@ class TrezorConnectElement extends RenderElement {
         'challenge' => $challenge_js,
       );
 
-      if ($tag != TrezorConnectInterface::TAG_TREZORLOGIN) {
+      if ($tag != Tags::TREZORLOGIN) {
         $element['text'] = array(
           '#type' => 'markup',
           '#markup' => $text,

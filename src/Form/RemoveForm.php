@@ -12,8 +12,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
-use Drupal\trezor_connect\TrezorConnectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\trezor_connect\Enum\Routes;
 
 /**
  * Provides the remove authentication device confirmation form.
@@ -122,7 +122,7 @@ class RemoveForm extends ConfirmFormBase {
 
     $route_parameters['user'] = $this->user->id();
 
-    $output = new Url(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
+    $output = new Url(Routes::MANAGE, $route_parameters);
 
     return $output;
   }
@@ -174,7 +174,7 @@ class RemoveForm extends ConfirmFormBase {
 
     drupal_set_message($message);
 
-    $route_name = TrezorConnectInterface::ROUTE_MANAGE;
+    $route_name = Routes::MANAGE;
 
     $route_parameters = array();
 

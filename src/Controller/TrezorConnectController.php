@@ -18,13 +18,13 @@ use Drupal\Core\Url;
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\ChallengeValidator\ChallengeValidatorInterface;
-use Drupal\trezor_connect\Mapping\MappingInterface;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Drupal\trezor_connect\TrezorConnectInterface;
+use Drupal\trezor_connect\Enum\MappingStatus;
+use Drupal\trezor_connect\Enum\Routes;
 
 class TrezorConnectController extends ControllerBase {
 
@@ -137,7 +137,7 @@ class TrezorConnectController extends ControllerBase {
         }
 
         if ($js != 'ajax') {
-          $this->redirect(TrezorConnectInterface::ROUTE_LOGIN);
+          $this->redirect(Routes::LOGIN);
         }
       }
     }
@@ -256,7 +256,7 @@ class TrezorConnectController extends ControllerBase {
 
           $status = $mapping->getStatus();
 
-          if ($status == MappingInterface::STATUS_DISABLED) {
+          if ($status == MappingStatus::DISABLED) {
             $message = t('The mapping associated with your TREZOR device is currently disabled.  Please login to your account with your username, and password and re-enable your TREZOR device.');
 
             $error = TRUE;
@@ -265,7 +265,7 @@ class TrezorConnectController extends ControllerBase {
             if ($js == 'nojs') {
               drupal_set_message($message, $type);
 
-              $this->redirect(TrezorConnectInterface::ROUTE_LOGIN);
+              $this->redirect(Routes::LOGIN);
             }
           }
           else {
@@ -289,7 +289,7 @@ EOF;
               if ($js == 'nojs') {
                 drupal_set_message($message, $type);
 
-                $this->redirect(TrezorConnectInterface::ROUTE_LOGIN);
+                $this->redirect(Routes::LOGIN);
               }
             }
             else {
@@ -300,11 +300,11 @@ EOF;
               if ($js == 'nojs') {
                 drupal_set_message($message);
 
-                $this->redirect(TrezorConnectInterface::ROUTE_USER);
+                $this->redirect(Routes::USER);
               }
               else {
                 $text = t('click here');
-                $url = Url::fromRoute(TrezorConnectInterface::ROUTE_USER);
+                $url = Url::fromRoute(Routes::USER);
 
                 $link = Link::fromTextAndUrl($text, $url);
                 $link = $link->toString();
@@ -425,7 +425,7 @@ EOF;
         if ($total > 0) {
           $text = t('please click here to manage your authentication device.');
 
-          $url = Url::fromRoute(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
+          $url = Url::fromRoute(Routes::MANAGE, $route_parameters);
 
           $link = Link::fromTextAndUrl($text, $url);
           $link = $link->toString();
@@ -456,7 +456,7 @@ EOF;
         }
 
         if ($js != 'ajax') {
-          $this->redirect(TrezorConnectInterface::ROUTE_MANAGE, $route_parameters);
+          $this->redirect(Routes::MANAGE, $route_parameters);
         }
       }
     }
