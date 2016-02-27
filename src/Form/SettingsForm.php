@@ -16,10 +16,12 @@ use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\trezor_connect\TrezorConnectInterface;
 use Drupal\trezor_connect\Enum\Implementations;
 use Drupal\trezor_connect\Enum\Tags;
 use Drupal\trezor_connect\Enum\IconSources;
 use Drupal\trezor_connect\Enum\Namespaces;
+use Drupal\trezor_connect\Enum\LibraryType;
 
 /**
  * Provides TREZOR Connect settings.
@@ -321,13 +323,13 @@ class SettingsForm extends ConfigFormBase {
       );
     }
 
-    $key = 'external';
+    $key = 'library_type';
 
-    $description = t('Please specify whether to load the TREZOR connect javascript externally.');
+    $description = t('Please specify which TREZOR Connect library to use.');
 
     $options = array(
-      TrezorConnectInterface::EXTERNAL_YES => t('Yes'),
-      TrezorConnectInterface::EXTERNAL_NO => t('No'),
+      LibraryType::EXTERNAL => t('External'),
+      LibraryType::INTERNAL => t('Internal'),
     );
 
     $default_value = $config->get($key);
@@ -669,7 +671,7 @@ class SettingsForm extends ConfigFormBase {
       'text_register',
       'text_manage',
       'text_manage_admin',
-      'external',
+      'library_type',
       'url',
       'implementation',
       'tag',

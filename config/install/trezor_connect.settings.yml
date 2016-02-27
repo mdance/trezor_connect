@@ -6,7 +6,7 @@ icon:
   source: 'default'
   path: ''
   url: ''
-external: 1
+library_type: 'external'
 url: 'https://trezor.github.io/connect/login.js'
 implementation: 'button'
 callback: 'trezorLogin'

@@ -57,12 +57,12 @@ interface TrezorConnectInterface {
   public function getIcon();
 
   /**
-   * Returns a boolean indicating if the TREZOR connect javascript should be
+   * Returns a string indicating if the TREZOR connect javascript should be
    * loaded externally.
    *
-   * @return boolean
+   * @return string
    */
-  public function getExternal();
+  public function getLibraryType();
 
   /**
    * Returns a string containing the TREZOR connect external javascript url.

@@ -222,8 +222,8 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
-  public function getExternal() {
-    return $this->config->get('external');
+  public function getLibraryType() {
+    return $this->config->get('library_type');
   }
 
   /**

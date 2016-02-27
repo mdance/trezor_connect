@@ -28,9 +28,9 @@ trezor_connect.settings:
         url:
           type: string
           label: 'Icon URL'
-    external:
-      type: integer
-      label: 'Use CDN'
+    library_type:
+      type: string
+      label: 'Library Type'
     url:
       type: string
       label: 'External TREZOR Connect Javascript URL'
