@@ -16,12 +16,13 @@
 
   methods = {};
 
-  methods.authenticate = function(response, $element, settings) {
-    var event, found, url, selector, element_settings;
+  methods.authenticate = function(response, $container, $element, settings) {
+    var event, found, url, selector, element_settings, password;
 
-    if ($element.length && response.success) {
-      event = 'authenticate.' + namespace;
+    if ($container.length && $element.length && response.success) {
+      event = settings.event;
 
+      /*
       found = false;
 
       $.each(
@@ -45,6 +46,8 @@
         url = settings.url;
         selector = settings.id;
 
+        password = $container.find('input[type="password"]').val();
+
         element_settings = {
           url: url,
           effect: 'none',
@@ -53,6 +56,7 @@
           submit: {
             js: true,
             selector: selector,
+            trezor_connect_password: password,
             trezor_connect_challenge: settings.challenge,
             trezor_connect_challenge_response: response
           },
@@ -63,8 +67,11 @@
 
         Drupal.ajax(element_settings);
       }
+      */
 
-      $element.trigger('authenticate.' + namespace);
+      $container.find('input[name*="challenge_response"]').val(JSON.stringify(response));
+
+      $element.trigger(event);
     }
   };
 
@@ -101,13 +108,19 @@
     attach: function() {
       $.each(
         drupalSettings.trezor_connect.elements,
-        function(selector, element_settings) {
-          var $element, callback;
+        function(id, element_settings) {
+          var selector, $container, $element, callback;
 
-          $element = $('#' + selector);
+          selector = '[data-drupal-selector="' + id + '"]';
+
+          $container = $(selector);
+
+          selector += ' [data-drupal-selector="' + id + '-' + element_settings.key + '"]';
+
+          $element = $(selector);
 
           if (element_settings.implementation == 'js') {
-            if ($element.length) {
+            if ($container.length && $element.length) {
               $element.once(namespace).click(
                 function(event) {
                   TrezorConnect.requestLogin(
@@ -115,9 +128,11 @@
                     element_settings.challenge.challenge_hidden,
                     element_settings.challenge.challenge_visual,
                     function(response) {
-                      methods.authenticate(response, $element, element_settings);
+                      methods.authenticate(response, $container, $element, element_settings);
                     }
                   );
+
+                  return false;
                 }
               );
             }
@@ -127,8 +142,7 @@
 
             if (!window[callback]) {
               window[callback] = function(response) {
-                debugger;
-                methods.authenticate(response, $element, element_settings);
+                methods.authenticate(response, $container, $element, element_settings);
               }
             }
           }
