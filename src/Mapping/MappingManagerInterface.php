@@ -7,6 +7,7 @@
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Mapping\MappingBackendInterface;
 
@@ -165,10 +166,15 @@ interface MappingManagerInterface {
    * Maps a challenge response to an account.
    *
    * @param $uid
+   *   Provides the account id.
+   *
+   * @param ChallengeResponseInterface|NULL $challenge_response
+   *   Provides the challenge response to map to the account.  If NULL, the
+   * session will be checked for a challenge response.
    *
    * @return mixed
    */
-  public function mapChallengeResponse($uid);
+  public function mapChallengeResponse($uid, ChallengeResponseInterface $challenge_response);
 
   /**
    * Disables a mapping associated with an account.

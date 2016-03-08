@@ -8,6 +8,7 @@
 namespace Drupal\trezor_connect\Mapping;
 
 use Drupal\trezor_connect\Challenge\ChallengeManagerInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Enum\MappingStatus;
 
@@ -145,8 +146,13 @@ class MappingManager implements MappingManagerInterface {
     return $this;
   }
 
-  public function mapChallengeResponse($uid) {
-    $challenge_response = $this->challenge_response_manager->getSessionChallengeResponse();
+  /**
+   * @inheritDoc
+   */
+  public function mapChallengeResponse($uid, ChallengeResponseInterface $challenge_response = NULL) {
+    if (is_null($challenge_response)) {
+      $challenge_response = $this->challenge_response_manager->getSessionChallengeResponse();
+    }
 
     if ($challenge_response) {
       // TODO: Check for existing mappings
