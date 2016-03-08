@@ -33,17 +33,10 @@ function template_preprocess_trezor_connect(&$variables) {
   $element = &$variables['element'];
 
   $keys = array(
-    'form_id',
-    'implementation',
     'tag',
     'text',
-    'text_login',
-    'text_register',
-    'text_manage',
-    'text_manage_admin',
     'icon',
     'callback',
-    'challenge_id',
     'challenge_hidden',
     'challenge_visual',
   );
@@ -53,6 +46,9 @@ function template_preprocess_trezor_connect(&$variables) {
       $variables[$key] = $element['#' . $key];
     }
   }
+
+  // TODO: Check if this is the right thing to do
+  $variables['children'] = \Drupal::service('renderer')->render($element);
 }
 
 /**
