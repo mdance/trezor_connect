@@ -34,7 +34,7 @@ class Challenge implements ChallengeInterface, CacheableDependencyInterface {
   public function toArray() {
     $output = array(
       'id' => $this->getId(),
-      'created' => $this->getCreated(),
+      'created' => (int)$this->getCreated(),
       'challenge_hidden' => $this->getChallengeHidden(),
       'challenge_visual' => $this->getChallengeVisual(),
     );
