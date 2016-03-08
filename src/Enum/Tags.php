@@ -17,6 +17,6 @@ class Tags extends AbstractEnum {
   /**
    * Provides a string containing the button tag.
    */
-  const BUTTON = 'button';
+  const BUTTON = 'submit';
 
 }
