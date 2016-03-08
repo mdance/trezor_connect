@@ -5,6 +5,11 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\trezor_connect\Enum\Permissions;
+use Drupal\trezor_connect\Enum\Modes;
+use Drupal\trezor_connect\Enum\Routes;
+
+use Drupal\Core\Url;
 
 /**
  * Implements hook_form_alter().
@@ -13,30 +18,59 @@ use Drupal\Core\Form\FormStateInterface;
  * login forms.
  */
 function trezor_connect_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $account = \Drupal::currentUser();
+
+  $access = FALSE;
+
+  $register = FALSE;
+
+  if ($form_id == 'user_register_form') {
+    $register = TRUE;
+    $access = $account->hasPermission(Permissions::REGISTER);
+  }
+
   $ids = array(
     'user_login_form',
     'user_login_block',
-    'user_register_form',
   );
 
-  $found = in_array($form_id, $ids);
+  $login = in_array($form_id, $ids);
 
-  if ($found) {
-    trezor_connect_alter_form($form, $form_state, $form_id);
+  if ($login) {
+    $access = $account->hasPermission(Permissions::LOGIN);
   }
-}
 
-/**
- * Responsible for adding the TREZOR connect functionality to a form.
- *
- * @param $form_id
- * @param $form
- * @param $form_state
- */
-function trezor_connect_alter_form(&$form, FormStateInterface $form_state, $form_id) {
-  $form['trezor_connect'] = array(
-    '#type' => 'trezor_connect',
-    '#form_id' => $form_id,
-    '#weight' => 1,
-  );
+  if ($access && ($register || $login)) {
+    $tc = \Drupal::service('trezor_connect');
+
+    $route_parameters = array(
+      'js' => 'nojs',
+    );
+
+    $options = array(
+      'absolute' => TRUE,
+    );
+
+    if ($register) {
+      $mode = Modes::REGISTER;
+
+      $url = Url::fromRoute(Routes::REGISTER, $route_parameters, $options);
+    }
+    else {
+      $mode = Modes::LOGIN;
+
+      $url = Url::fromRoute(Routes::LOGIN, $route_parameters, $options);
+    }
+
+    $text = $tc->getText($mode, $account);
+
+    $url = $url->toString();
+
+    $form['trezor_connect'] = array(
+      '#type' => 'trezor_connect',
+      '#weight' => 1,
+      '#text' => $text,
+      '#url' => $url,
+    );
+  }
 }
