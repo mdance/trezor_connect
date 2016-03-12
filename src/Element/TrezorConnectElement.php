@@ -163,6 +163,12 @@ class TrezorConnectElement extends RenderElement {
       // Provides a string containing the invalid challenge response error
       // message
       '#message_challenge_response_invalid' => Messages::CHALLENGE_RESPONSE_INVALID,
+      // Provides a boolean to determine whether to create an AJAX wrapper
+      '#create_ajax_wrapper' => TRUE,
+      // Provides a string containing the ajax wrapper id
+      '#ajax_wrapper_id' => NULL,
+      // Provides a string containing the ajax callback
+      '#ajax_callback' => NULL,
     );
 
     return $output;
@@ -302,12 +308,28 @@ class TrezorConnectElement extends RenderElement {
       }
     }
 
-    $parts = array_merge(['wrapper'], $element['#parents'], ['trezor-connect']);
-    $wrapper_id = implode('-', $parts);
-    $wrapper_id = Html::getId($wrapper_id);
+    $wrapper_id = $element['#ajax_wrapper_id'];
 
-    $element['#prefix'] = '<div id="' . $wrapper_id . '">';
-    $element['#suffix'] = '</div>';
+    if (empty($wrapper_id)) {
+      $parts = array_merge(['wrapper'], $element['#parents'], ['trezor-connect']);
+
+      $wrapper_id = implode('-', $parts);
+      $wrapper_id = Html::getId($wrapper_id);
+    }
+
+    $ajax_callback = $element['#ajax_callback'];
+
+    if (is_null($ajax_callback)) {
+      $ajax_callback = array(
+        get_called_class(),
+        'jsCallback',
+      );
+    }
+
+    if ($element['#create_ajax_wrapper']) {
+      $element['#prefix'] = '<div id="' . $wrapper_id . '">';
+      $element['#suffix'] = '</div>';
+    }
 
     $key = $element['#key'];
 
@@ -323,15 +345,7 @@ class TrezorConnectElement extends RenderElement {
       //),
       '#ajax' => array(
         'event' => $element['#event'],
-        'callback' => array(
-          get_called_class(),
-          'jsCallback',
-        ),
-        'options' => array(
-          'query' => array(
-            'element_parents' => implode('/', $element['#array_parents']),
-          ),
-        ),
+        'callback' => $ajax_callback,
         'wrapper' => $wrapper_id,
       ),
       '#limit_validation_errors' => array(
@@ -505,6 +519,7 @@ class TrezorConnectElement extends RenderElement {
     }
 
     if (!$valid) {
+      // TODO: Figure out why this is being triggered post delete
       $message = t($element['#message_challenge_response_invalid']);
 
       $form_state->setError($element[$challenge_response_key], $message);
