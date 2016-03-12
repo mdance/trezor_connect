@@ -25,6 +25,7 @@ use Drupal\trezor_connect\Enum\MappingStatus;
 use Drupal\trezor_connect\Enum\Modes;
 use Drupal\trezor_connect\TrezorConnectInterface;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Allows you to manage the authenticated devices associated with your account.
@@ -207,6 +208,7 @@ class ManageForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
+    // TODO: Implement AJAX
     $route_parameters = array();
 
     $route_parameters['user'] = $this->user->id();
@@ -224,17 +226,22 @@ class ManageForm extends ConfirmFormBase {
   public function buildForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL) {
     $mode = $form_state->get('mode');
 
+    $wrapper_id = 'wrapper-trezor-connect-manage';
+
     if (!$mode) {
-      $form = $this->buildManageForm($form, $form_state, $user);
+      $form = $this->buildManageForm($form, $form_state, $wrapper_id, $user);
     }
     else {
-      $form = $this->buildConfirmForm($form, $form_state, $user);
+      $form = $this->buildConfirmForm($form, $form_state, $wrapper_id, $user);
     }
+
+    $form['#prefix'] = '<div id="' . $wrapper_id . '">';
+    $form['#suffix'] = '</div>';
 
     return $form;
   }
 
-  public function buildManageForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL) {
+  public function buildManageForm(array $form, FormStateInterface $form_state, $wrapper_id, AccountInterface $user = NULL) {
     $uid = $user->id();
 
     $current_user = $this->current_user;
@@ -296,6 +303,12 @@ class ManageForm extends ConfirmFormBase {
         '#account' => $user,
         '#url' => $url,
         '#password' => $password,
+        '#create_ajax_wrapper' => FALSE,
+        '#ajax_wrapper_id' => $wrapper_id,
+        '#ajax_callback' => array(
+          get_called_class(),
+          'jsCallback',
+        ),
       );
     }
     else {
@@ -364,12 +377,21 @@ class ManageForm extends ConfirmFormBase {
         $value = t('Enable Authentication Device');
       }
 
+      $ajax = array(
+        'callback' => array(
+          get_called_class(),
+          'jsCallback',
+        ),
+        'wrapper' => $wrapper_id,
+      );
+
       $form['toggle'] = array(
         '#type' => 'submit',
         '#name' => 'toggle',
         '#value' => $value,
         '#access' => $toggle,
         '#status' => $status,
+        '#ajax' => $ajax,
       );
 
       $form['remove'] = array(
@@ -377,6 +399,7 @@ class ManageForm extends ConfirmFormBase {
         '#name' => 'remove',
         '#value' => t('Remove Authentication Device'),
         '#access' => $remove,
+        '#ajax' => $ajax,
       );
 
       $form['user'] = array(
@@ -388,7 +411,7 @@ class ManageForm extends ConfirmFormBase {
     return $form;
   }
 
-  public function buildConfirmForm(array $form, FormStateInterface $form_state, AccountInterface $user = NULL) {
+  public function buildConfirmForm(array $form, FormStateInterface $form_state, $wrapper_id, AccountInterface $user = NULL) {
     $this->user = $user;
 
     $mode = $form_state->get('mode');
@@ -396,6 +419,17 @@ class ManageForm extends ConfirmFormBase {
     $this->mode = $mode;
 
     $form = parent::buildForm($form, $form_state);
+
+    $ajax = array(
+      'callback' => array(
+        get_called_class(),
+        'jsCallback',
+      ),
+      'wrapper' => $wrapper_id,
+    );
+
+    $form['actions']['submit']['#ajax'] = $ajax;
+    //$form['actions']['cancel']['#ajax'] = $ajax;
 
     $form['user'] = array(
       '#type' => 'value',
@@ -695,6 +729,8 @@ class ManageForm extends ConfirmFormBase {
         }
 
         drupal_set_message($message);
+
+        $form_state->setRebuild(TRUE);
       }
     }
     else {
@@ -740,13 +776,14 @@ class ManageForm extends ConfirmFormBase {
 
       drupal_set_message($message);
 
-      $route_name = Routes::MANAGE;
+      $form_state->setRebuild(TRUE);
 
-      $route_parameters = array(
-        'user' => $uid,
-      );
-
-      $form_state->setRedirect($route_name, $route_parameters);
+      $form_state->set('mode', NULL);
     }
   }
+
+  public static function jsCallback(&$form, FormStateInterface &$form_state, Request $request) {
+    return $form;
+  }
+
 }
