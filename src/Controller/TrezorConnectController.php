@@ -3,6 +3,8 @@
 /**
  * @file
  * Contains \Drupal\trezor_connect\Controller\TrezorConnectController.
+ *
+ * TODO: Determine whether these routes are still necessary
  */
 
 namespace Drupal\trezor_connect\Controller;
