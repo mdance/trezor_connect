@@ -429,6 +429,7 @@ class ManageForm extends ConfirmFormBase {
       'wrapper' => $wrapper_id,
     );
 
+    $form['actions']['submit']['#button_type'] = 'danger';
     $form['actions']['submit']['#ajax'] = $ajax;
 
     // Convert the cancel link into a button to support AJAX
