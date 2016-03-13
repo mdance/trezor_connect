@@ -208,7 +208,8 @@ class ManageForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    // TODO: Implement AJAX
+    // buildConfirmForm line 475 converts the link to a input type submit to
+    // support AJAX and a form rebuild
     $route_parameters = array();
 
     $route_parameters['user'] = $this->user->id();
@@ -429,7 +430,14 @@ class ManageForm extends ConfirmFormBase {
     );
 
     $form['actions']['submit']['#ajax'] = $ajax;
-    //$form['actions']['cancel']['#ajax'] = $ajax;
+
+    // Convert the cancel link into a button to support AJAX
+    $form['actions']['cancel'] = array(
+      '#type' => 'submit',
+      '#value' => $form['actions']['cancel']['#title'],
+      '#button_type' => 'primary',
+      '#ajax' => $ajax,
+    );
 
     $form['user'] = array(
       '#type' => 'value',
@@ -734,47 +742,56 @@ class ManageForm extends ConfirmFormBase {
       }
     }
     else {
-      $mode = $form_state->getValue('mode');
+      $triggering_element = $form_state->getTriggeringElement();
 
-      if (is_null($mode)) {
-        $mode = $form_state->get('mode');
+      if ($triggering_element['#value'] != $form['actions']['cancel']['#value']) {
+        // If the cancel button was not clicked, perform the confirmed action
+        $mode = $form_state->getValue('mode');
+
+        if (is_null($mode)) {
+          $mode = $form_state->get('mode');
+        }
+
+        $user = $form_state->getValue('user');
+
+        $uid = $user->id();
+
+        if ($mode == Modes::MANAGE_ENABLE) {
+          $action = $this->t('enabled');
+
+          $this->mapping_manager->enable($uid);
+        }
+        else {
+          if ($mode == Modes::MANAGE_CONFIRM_DISABLE) {
+            $action = $this->t('disabled');
+
+            $this->mapping_manager->disable($uid);
+          }
+          else {
+            if ($mode == Modes::MANAGE_CONFIRM_REMOVE) {
+              $action = $this->t('removed');
+
+              $this->mapping_manager->delete($uid);
+            }
+          }
+        }
+
+        if ($uid == $current_uid) {
+          $target = $this->t('your account');
+        }
+        else {
+          $target = $user->getAccountName();
+        }
+
+        $args = array();
+
+        $args['%action'] = $action;
+        $args['%target'] = $target;
+
+        $message = $this->t('The authentication device has been %action for %target.', $args);
+
+        drupal_set_message($message);
       }
-
-      $user = $form_state->getValue('user');
-
-      $uid = $user->id();
-
-      if ($mode == Modes::MANAGE_ENABLE) {
-        $action = $this->t('enabled');
-
-        $this->mapping_manager->enable($uid);
-      }
-      else if ($mode == Modes::MANAGE_CONFIRM_DISABLE) {
-        $action = $this->t('disabled');
-
-        $this->mapping_manager->disable($uid);
-      }
-      else if ($mode == Modes::MANAGE_CONFIRM_REMOVE) {
-        $action = $this->t('removed');
-
-        $this->mapping_manager->delete($uid);
-      }
-
-      if ($uid == $current_uid) {
-        $target = $this->t('your account');
-      }
-      else {
-        $target = $user->getAccountName();
-      }
-
-      $args = array();
-
-      $args['%action'] = $action;
-      $args['%target'] = $target;
-
-      $message = $this->t('The authentication device has been %action for %target.', $args);
-
-      drupal_set_message($message);
 
       $form_state->setRebuild(TRUE);
 
