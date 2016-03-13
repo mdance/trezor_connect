@@ -44,7 +44,7 @@
 
       if (!found) {
         url = settings.url;
-        selector = settings.id;
+        selector = settings.selector;
 
         password = $container.find('input[type="password"]').val();
 
@@ -61,7 +61,7 @@
             trezor_connect_challenge_response: response
           },
           event: event,
-          base: settings.id,
+          base: settings.selector,
           element: $element
         };
 

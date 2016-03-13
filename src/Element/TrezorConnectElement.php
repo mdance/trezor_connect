@@ -294,7 +294,7 @@ class TrezorConnectElement extends RenderElement {
       throw new \Exception($message);
     }
 
-    $id = $element['#id'];
+    $selector = $element['#attributes']['data-drupal-selector'];
 
     if ($element['#password']) {
       $password_key = $element['#password_key'];
@@ -398,13 +398,13 @@ class TrezorConnectElement extends RenderElement {
       '#type' => 'hidden',
     );
 
-    $element['#attached']['drupalSettings']['trezor_connect']['elements'][$id] = array(
+    $element['#attached']['drupalSettings']['trezor_connect']['elements'][$selector] = array(
       'implementation' => $element['#implementation'],
       'callback' => $element['#callback'],
       'icon' => $element['#icon'],
       'challenge' => $challenge_js,
       'url' => $element['#url'],
-      'id' => $id,
+      'selector' => $selector,
       'tag' => $element['#tag'],
       'event' => $element['#event'],
       'key' => $element['#key'],
