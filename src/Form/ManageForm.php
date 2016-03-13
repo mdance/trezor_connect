@@ -306,10 +306,6 @@ class ManageForm extends ConfirmFormBase {
         '#password' => $password,
         '#create_ajax_wrapper' => FALSE,
         '#ajax_wrapper_id' => $wrapper_id,
-        '#ajax_callback' => array(
-          get_called_class(),
-          'jsCallback',
-        ),
       );
     }
     else {
@@ -379,10 +375,6 @@ class ManageForm extends ConfirmFormBase {
       }
 
       $ajax = array(
-        'callback' => array(
-          get_called_class(),
-          'jsCallback',
-        ),
         'wrapper' => $wrapper_id,
       );
 
@@ -422,10 +414,6 @@ class ManageForm extends ConfirmFormBase {
     $form = parent::buildForm($form, $form_state);
 
     $ajax = array(
-      'callback' => array(
-        get_called_class(),
-        'jsCallback',
-      ),
       'wrapper' => $wrapper_id,
     );
 
@@ -798,10 +786,6 @@ class ManageForm extends ConfirmFormBase {
 
       $form_state->set('mode', NULL);
     }
-  }
-
-  public static function jsCallback(&$form, FormStateInterface &$form_state, Request $request) {
-    return $form;
   }
 
 }

@@ -167,8 +167,6 @@ class TrezorConnectElement extends RenderElement {
       '#create_ajax_wrapper' => TRUE,
       // Provides a string containing the ajax wrapper id
       '#ajax_wrapper_id' => NULL,
-      // Provides a string containing the ajax callback
-      '#ajax_callback' => NULL,
     );
 
     return $output;
@@ -317,15 +315,6 @@ class TrezorConnectElement extends RenderElement {
       $wrapper_id = Html::getId($wrapper_id);
     }
 
-    $ajax_callback = $element['#ajax_callback'];
-
-    if (is_null($ajax_callback)) {
-      $ajax_callback = array(
-        get_called_class(),
-        'jsCallback',
-      );
-    }
-
     if ($element['#create_ajax_wrapper']) {
       $element['#prefix'] = '<div id="' . $wrapper_id . '">';
       $element['#suffix'] = '</div>';
@@ -345,7 +334,6 @@ class TrezorConnectElement extends RenderElement {
       //),
       '#ajax' => array(
         'event' => $element['#event'],
-        'callback' => $ajax_callback,
         'wrapper' => $wrapper_id,
       ),
       '#limit_validation_errors' => array(
