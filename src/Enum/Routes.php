@@ -23,6 +23,11 @@ class Routes extends AbstractEnum {
   const LOGIN = 'trezor_connect.user.login';
 
   /**
+   * Provides a string containing the user page route.
+   */
+  const USER = 'user.page';
+
+  /**
    * Provides a string containing the TREZOR connect register callback route.
    */
   const REGISTER = 'trezor_connect.user.register';
