@@ -10,67 +10,51 @@ use Drupal\trezor_connect\Enum\Modes;
 use Drupal\trezor_connect\Enum\Routes;
 
 use Drupal\Core\Url;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\trezor_connect\Enum\MappingStatus;
+use Drupal\user\Entity\User;
+use Drupal\Core\Link;
 
 /**
  * Implements hook_form_alter().
  *
- * Responsible for adding the Sign In button to the user registration, and
- * login forms.
+ * Responsible for adding the Sign In button to the user registration.
  */
 function trezor_connect_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $account = \Drupal::currentUser();
 
-  $access = FALSE;
-
-  $register = FALSE;
-
   if ($form_id == 'user_register_form') {
-    $register = TRUE;
     $access = $account->hasPermission(Permissions::REGISTER);
-  }
 
-  $ids = array(
-    'user_login_form',
-    'user_login_block',
-  );
+    if ($access) {
+      $form['#trezor_connect_validate'] = $form['#validate'];
 
-  $login = in_array($form_id, $ids);
+      $form['#validate'] = array();
 
-  if ($login) {
-    $access = $account->hasPermission(Permissions::LOGIN);
-  }
+      $form['#validate'][] = 'trezor_connect_user_register_form_validate';
 
-  if ($access && ($register || $login)) {
-    $tc = \Drupal::service('trezor_connect');
+      $wrapper_id = 'wrapper-trezor-connect';
 
-    $route_parameters = array(
-      'js' => 'nojs',
-    );
+      $form['#prefix'] = '<div id="' . $wrapper_id . '">';
+      $form['#suffix'] = '</div>';
 
-    $options = array(
-      'absolute' => TRUE,
-    );
+      /**
+       * @var Drupal\trezor_connect\TrezorConnectInterface $tc
+       */
+      $tc = \Drupal::service('trezor_connect');
 
-    if ($register) {
       $mode = Modes::REGISTER;
 
-      $url = Url::fromRoute(Routes::REGISTER, $route_parameters, $options);
+      $text = $tc->getText($mode, $account);
+
+      $key = 'trezor_connect';
+
+      $form[$key] = array(
+        '#type' => 'trezor_connect',
+        '#weight' => 1,
+        '#text' => $text,
+        '#ajax_wrapper_id' => $wrapper_id,
+      );
     }
-    else {
-      $mode = Modes::LOGIN;
-
-      $url = Url::fromRoute(Routes::LOGIN, $route_parameters, $options);
-    }
-
-    $text = $tc->getText($mode, $account);
-
-    $url = $url->toString();
-
-    $form['trezor_connect'] = array(
-      '#type' => 'trezor_connect',
-      '#weight' => 1,
-      '#text' => $text,
-      '#url' => $url,
-    );
   }
 }
