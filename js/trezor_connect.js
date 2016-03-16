@@ -17,57 +17,10 @@
   methods = {};
 
   methods.authenticate = function(response, $container, $element, settings) {
-    var event, found, url, selector, element_settings, password;
+    var event;
 
     if ($container.length && $element.length && response.success) {
       event = settings.event;
-
-      /*
-      found = false;
-
-      $.each(
-        Drupal.ajax.instances,
-        function(key, value) {
-          var result;
-
-          if (value.event == event) {
-            result = $element.is(value.element);
-
-            if ( result ) {
-              found = true;
-
-              return true;
-            }
-          }
-        }
-      );
-
-      if (!found) {
-        url = settings.url;
-        selector = settings.selector;
-
-        password = $container.find('input[type="password"]').val();
-
-        element_settings = {
-          url: url,
-          effect: 'none',
-          wrapper: null,
-          method: namespace,
-          submit: {
-            js: true,
-            selector: selector,
-            trezor_connect_password: password,
-            trezor_connect_challenge: settings.challenge,
-            trezor_connect_challenge_response: response
-          },
-          event: event,
-          base: settings.selector,
-          element: $element
-        };
-
-        Drupal.ajax(element_settings);
-      }
-      */
 
       $container.find('input[name*="challenge_response"]').val(JSON.stringify(response));
 
