@@ -10,6 +10,10 @@ services:
     arguments: ['@trezor_connect.challenge_manager']
     tags:
       - { name: cache.context}
+  trezor_connect.user_login_route_subscriber:
+    class: Drupal\trezor_connect\Routing\UserLoginRouteSubscriber
+    tags:
+      - { name: event_subscriber }
   # cache tables
   #cache.trezor_connect_challenges:
   #  class: Drupal\Core\Cache\CacheBackendInterface
