@@ -111,9 +111,6 @@ class TrezorConnectElement extends RenderElement {
       '#key' => 'button',
       // Provides a string containing the text to display for the challenge button
       '#text' => NULL,
-      // Provides a string containing the URL that will be called to handle
-      // challenge responses
-      '#url' => NULL,
       // Provides a boolean indicating whether to display the password check
       // field
       '#password' => FALSE,
@@ -167,6 +164,11 @@ class TrezorConnectElement extends RenderElement {
       '#create_ajax_wrapper' => TRUE,
       // Provides a string containing the ajax wrapper id
       '#ajax_wrapper_id' => NULL,
+      // Provides a #ajax callback callable
+      '#ajax_callback' => NULL,
+      // Provides an array of submit handlers to attach to the authenticate
+      // button
+      '#submit' => array(),
     );
 
     return $output;
@@ -343,6 +345,14 @@ class TrezorConnectElement extends RenderElement {
 
     $button = &$element[$key];
 
+    if (is_array($element['#submit'])) {
+      $button['#submit'] = $element['#submit'];
+    }
+
+    if (isset($element['#ajax_callback']) && is_callable($element['#ajax_callback'])) {
+      $button['#ajax']['callback'] = $element['#ajax_callback'];
+    }
+
     $element['#challenge_hidden'] = $challenge->getChallengeHidden();
     $element['#challenge_visual'] = $challenge->getChallengeVisual();
 
@@ -391,7 +401,6 @@ class TrezorConnectElement extends RenderElement {
       'callback' => $element['#callback'],
       'icon' => $element['#icon'],
       'challenge' => $challenge_js,
-      'url' => $element['#url'],
       'selector' => $selector,
       'tag' => $element['#tag'],
       'event' => $element['#event'],
@@ -407,13 +416,11 @@ class TrezorConnectElement extends RenderElement {
       $element['#attached']['library'][] = 'trezor_connect/local';
     }
 
-    /*
     $renderer = \Drupal::service('renderer');
 
     $renderer->addCacheableDependency($element, $challenge);
 
     \Drupal::service('page_cache_kill_switch')->trigger();
-    */
 
     return $element;
   }
@@ -467,8 +474,6 @@ class TrezorConnectElement extends RenderElement {
   }
 
   public static function validateChallengeResponse(&$element, FormStateInterface $form_state, &$complete_form) {
-    $valid = FALSE;
-
     $challenge_response_key = $element['#challenge_response_key'];
 
     $values = $form_state->getValues();
@@ -479,6 +484,8 @@ class TrezorConnectElement extends RenderElement {
 
     if ($input_exists) {
       if (isset($input[$challenge_response_key]) && $input[$challenge_response_key] instanceof ChallengeResponseInterface) {
+        $valid = FALSE;
+
         $challenge_response = $input[$challenge_response_key];
 
         $challenge_key = $element['#challenge_key'];
@@ -503,19 +510,17 @@ class TrezorConnectElement extends RenderElement {
             $form_state->setValueForElement($element['challenge_response'], $input[$challenge_response_key]);
           }
         }
+
+        if (!$valid) {
+          $message = t($element['#message_challenge_response_invalid']);
+
+          $form_state->setError($element[$challenge_response_key], $message);
+        }
       }
-    }
-
-    if (!$valid) {
-      // TODO: Figure out why this is being triggered post delete
-      $message = t($element['#message_challenge_response_invalid']);
-
-      $form_state->setError($element[$challenge_response_key], $message);
     }
   }
 
   public static function jsCallback(&$form, FormStateInterface &$form_state, Request $request) {
-    // TODO: Fix AJAX handling
     $triggering_element = $form_state->getTriggeringElement();
 
     $parents = $triggering_element['#parents'];
