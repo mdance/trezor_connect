@@ -130,22 +130,6 @@ interface ChallengeResponseManagerInterface {
   public function get($id = NULL, array $conditions = NULL);
 
   /**
-   * Returns a challenge response associated with the current request.
-   *
-   * @return ChallengeResponse|false
-   *   The challenge response object or FALSE.
-   */
-  public function getRequestChallengeResponse();
-
-  /**
-   * Returns a challenge response associated with the session.
-   *
-   * @return ChallengeResponse|false
-   *   The challenge response object or FALSE.
-   */
-  public function getSessionChallengeResponse();
-
-  /**
    * Returns the challenges responses associated with an array of ids.
    *
    * @param array $ids
@@ -188,18 +172,8 @@ interface ChallengeResponseManagerInterface {
    *
    * @param ChallengeResponse $challenge_response
    *   The challenge response object to store.
-   *
-   * @param boolean $session
-   *   Determines whether to store the challenge response on the session.
    */
-  public function set(ChallengeResponseInterface $challenge_response, $session = TRUE);
-
-  /**
-   * Stores the active challenge response on the session.
-   *
-   * @return mixed
-   */
-  public function setSessionChallengeResponse(ChallengeResponseInterface $challenge_response);
+  public function set(ChallengeResponseInterface $challenge_response);
 
   /**
    * Deletes a challenge response.
@@ -225,13 +199,6 @@ interface ChallengeResponseManagerInterface {
    * Deletes all challenge responses.
    */
   public function deleteAll();
-
-  /**
-   * Removes the active challenge response from the session.
-   *
-   * @return mixed
-   */
-  public function deleteSessionChallengeResponse();
 
   /**
    * Deletes any expired challenge responses.

@@ -134,80 +134,7 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
    * @inheritDoc
    */
   public function get($id = NULL, array $conditions = NULL) {
-    if (is_null($id)) {
-      // Check if a challenge exists on the current request
-      $output = $this->getRequestChallengeResponse();
-
-      if (!$output) {
-        $output = $this->getSessionChallengeResponse();
-      }
-
-      if ($output) {
-        $id = $output->getId();
-
-        if (is_null($id)) {
-          // Store the challenge response
-          $this->set($output);
-        }
-      }
-    }
-    else {
-      // Retrieve a specific challenge response
-      $output = $this->backend->get($id, $conditions);
-    }
-
-    return $output;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getRequestChallengeResponse() {
-    $output = NULL;
-
-    $response = $this->request->request->get(self::KEY);
-
-    if (is_array($response)) {
-      if (isset($response['success']) && $response['success']) {
-        $output = $this->getChallengeResponse();
-
-        $challenge = $this->challenge_manager->getRequestChallenge();
-
-        if ($challenge) {
-          $output->setChallenge($challenge);
-        }
-
-        $mappings = [
-          'public_key' => [
-            $output,
-            'setPublicKey',
-          ],
-          'signature' => [
-            $output,
-            'setSignature',
-          ],
-          'version' => [
-            $output,
-            'setVersion',
-          ],
-        ];
-
-        foreach ($mappings as $key => $callable) {
-          if (isset($response[$key])) {
-            $callable($response[$key]);
-          }
-        }
-      }
-    }
-
-    return $output;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getSessionChallengeResponse() {
-    $output = $this->session->get(self::KEY);
+    $output = $this->backend->get($id, $conditions);
 
     return $output;
   }
@@ -248,7 +175,7 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
   /**
    * @inheritDoc
    */
-  public function set(ChallengeResponseInterface $challenge_response, $session = TRUE) {
+  public function set(ChallengeResponseInterface $challenge_response) {
     $created = $challenge_response->getCreated();
 
     if (!$created) {
@@ -257,21 +184,8 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
       $challenge_response->setCreated($created);
     }
 
-    // Save the challenge response to the session
+    // Save the challenge response
     $this->backend->set($challenge_response);
-
-    if ($session) {
-      $this->setSessionChallengeResponse($challenge_response);
-    }
-
-    return $this;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function setSessionChallengeResponse(ChallengeResponseInterface $challenge_response) {
-    $this->session->set(self::KEY, $challenge_response);
 
     return $this;
   }
@@ -299,15 +213,6 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
    */
   public function deleteAll() {
     $this->backend->deleteAll();
-
-    return $this;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function deleteSessionChallengeResponse() {
-    $this->session->remove(self::KEY);
 
     return $this;
   }
@@ -343,24 +248,28 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
 
     $conditions = array();
 
-    $condition = array(
-      'field' => 'challenge_response_id',
-      'value' => $ids,
-      'operator' => 'IN',
-    );
+    if (count($ids)) {
+      $condition = array(
+        'field' => 'challenge_response_id',
+        'value' => $ids,
+        'operator' => 'IN',
+      );
 
-    $conditions[] = $condition;
+      $conditions[] = $condition;
 
-    // Filter out any ids used in mappings
-    $mappings = $mapping_manager->get(array(), $conditions);
+      // Filter out any ids used in mappings
+      $mappings = $mapping_manager->getMultiple(array(), $conditions);
 
-    foreach ($mappings as $mapping) {
-      $challenge_response_id = $mapping->getChallengeResponse()->getId();
+      foreach ($mappings as $mapping) {
+        $challenge_response_id = $mapping->getChallengeResponse()->getId();
 
-      unset($ids[$challenge_response_id]);
+        unset($ids[$challenge_response_id]);
+      }
     }
 
-    $this->backend->delete($ids);
+    if (count($ids)) {
+      $this->backend->delete($ids);
+    }
   }
 
 }
