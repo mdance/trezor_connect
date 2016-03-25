@@ -436,6 +436,13 @@ class SettingsForm extends ConfigFormBase {
 
     $options = $this->trezor_connect->challengeBackendOptions();
 
+    if (count($options) > 1) {
+      $type = 'radios';
+    }
+    else {
+      $type = 'hidden';
+    }
+
     $default_value = $this->challenge_backend;
 
     $result = $config->get($key);
@@ -445,7 +452,7 @@ class SettingsForm extends ConfigFormBase {
     }
 
     $form[$key] = array(
-      '#type' => 'radios',
+      '#type' => $type,
       '#required' => TRUE,
       '#title' => t('Challenge Backend'),
       '#options' => $options,
@@ -461,6 +468,13 @@ class SettingsForm extends ConfigFormBase {
 
     $options = $this->trezor_connect->challengeResponseBackendOptions();
 
+    if (count($options) > 1) {
+      $type = 'radios';
+    }
+    else {
+      $type = 'hidden';
+    }
+
     $default_value = $this->challenge_response_backend;
 
     $result = $config->get($key);
@@ -470,7 +484,7 @@ class SettingsForm extends ConfigFormBase {
     }
 
     $form[$key] = array(
-      '#type' => 'radios',
+      '#type' => $type,
       '#required' => TRUE,
       '#title' => t('Challenge Response Backend'),
       '#options' => $options,
@@ -486,6 +500,13 @@ class SettingsForm extends ConfigFormBase {
 
     $options = $this->trezor_connect->mappingBackendOptions();
 
+    if (count($options) > 1) {
+      $type = 'radios';
+    }
+    else {
+      $type = 'hidden';
+    }
+
     $default_value = $this->mapping_backend;
 
     $result = $config->get($key);
@@ -495,7 +516,7 @@ class SettingsForm extends ConfigFormBase {
     }
 
     $form[$key] = array(
-      '#type' => 'radios',
+      '#type' => $type,
       '#required' => TRUE,
       '#title' => t('Mapping Backend'),
       '#options' => $options,
