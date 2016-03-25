@@ -98,6 +98,10 @@ class TrezorConnectElement extends RenderElement {
           $class,
           'validateChallengeResponse',
         ),
+        array(
+          $class,
+          'validateChallengeResponseMapping',
+        ),
       ),
       '#theme_wrappers' => array(
         'container',
@@ -161,7 +165,7 @@ class TrezorConnectElement extends RenderElement {
       // message
       '#message_challenge_response_invalid' => Messages::CHALLENGE_RESPONSE_INVALID,
       // Provides a boolean to determine whether to create an AJAX wrapper
-      '#create_ajax_wrapper' => TRUE,
+      '#create_ajax_wrapper' => FALSE,
       // Provides a string containing the ajax wrapper id
       '#ajax_wrapper_id' => NULL,
       // Provides a #ajax callback callable
@@ -169,6 +173,20 @@ class TrezorConnectElement extends RenderElement {
       // Provides an array of submit handlers to attach to the authenticate
       // button
       '#submit' => array(),
+      // Provides a boolean indicating whether to set the #limit_validation
+      // property on the button element.
+      '#set_button_limit_validation_errors' => TRUE,
+      // Provides the #limit_validation_errors property for the button element,
+      // if NULL and #set_button_limit_validation_errors is TRUE, the
+      // $element['#parents'] will be set.
+      '#button_limit_validation_errors' => NULL,
+      // Provides a string containing the mapping manager service.
+      '#mapping_manager_service' => 'trezor_connect.mapping_manager',
+      // Provides a boolean indicating whether to check for existing challenge
+      // response mappings
+      '#validate_challenge_response_mapping' => FALSE,
+      // Provides a string containing the mapping exists message
+      '#message_challenge_response_mapping_exists' => Messages::CHALLENGE_RESPONSE_MAPPING_EXISTS,
     );
 
     return $output;
@@ -214,8 +232,6 @@ class TrezorConnectElement extends RenderElement {
         $challenge = \Drupal::service($element['#challenge_manager_service'])->get($input[$challenge_key]);
 
         if ($challenge) {
-          $challenge = array_shift($challenge);
-
           $challenge_token = static::challengeToken($challenge);
 
           // Check the internal/submitted challenge tokens match
@@ -338,9 +354,6 @@ class TrezorConnectElement extends RenderElement {
         'event' => $element['#event'],
         'wrapper' => $wrapper_id,
       ),
-      '#limit_validation_errors' => array(
-        $element['#parents'],
-      ),
     );
 
     $button = &$element[$key];
@@ -351,6 +364,17 @@ class TrezorConnectElement extends RenderElement {
 
     if (isset($element['#ajax_callback']) && is_callable($element['#ajax_callback'])) {
       $button['#ajax']['callback'] = $element['#ajax_callback'];
+    }
+
+    if ($element['#set_button_limit_validation_errors']) {
+      if (is_null($element['#button_limit_validation_errors'])) {
+        $button['#limit_validation_errors'] = array(
+          $element['#parents'],
+        );
+      }
+      else {
+        $button['#limit_validation_errors'] = $element['#button_limit_validation_errors'];
+      }
     }
 
     $element['#challenge_hidden'] = $challenge->getChallengeHidden();
@@ -507,7 +531,7 @@ class TrezorConnectElement extends RenderElement {
 
             $input[$challenge_response_key] = $challenge_response;
 
-            $form_state->setValueForElement($element['challenge_response'], $input[$challenge_response_key]);
+            $form_state->setValueForElement($element[$challenge_response_key], $input[$challenge_response_key]);
           }
         }
 
@@ -520,15 +544,31 @@ class TrezorConnectElement extends RenderElement {
     }
   }
 
-  public static function jsCallback(&$form, FormStateInterface &$form_state, Request $request) {
-    $triggering_element = $form_state->getTriggeringElement();
+  public static function validateChallengeResponseMapping(&$element, FormStateInterface $form_state, &$complete_form) {
+    if ($element['#validate_challenge_response_mapping']) {
+      $triggering_element = $form_state->getTriggeringElement();
 
-    $parents = $triggering_element['#parents'];
-    $parents = array_splice($parents, -1);
+      if ($triggering_element['#value'] == $element[$element['#key']]['#value']) {
+        $challenge_response_key = $element['#challenge_response_key'];
 
-    $subform = NestedArray::getValue($form, $parents);
+        $key = array_merge($element['#parents'], array($challenge_response_key));
 
-    return $subform;
+        $challenge_response = $form_state->getValue($key);
+
+        if ($challenge_response) {
+          $public_key = $challenge_response->getPublicKey();
+
+          $mappings = \Drupal::service($element['#mapping_manager_service'])
+            ->getFromPublicKey($public_key);
+          $total = count($mappings);
+
+          if ($total > 0) {
+            // TODO: Figure out how to register an account once this gets set.
+            $form_state->setError($element, $element['#message_challenge_response_mapping_exists']);
+          }
+        }
+      }
+    }
   }
 
 }
