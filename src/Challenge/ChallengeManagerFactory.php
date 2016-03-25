@@ -134,9 +134,11 @@ class ChallengeManagerFactory implements ChallengeManagerFactoryInterface, Conta
       throw new LogicException($message);
     }
     else {
+      /**
+       * @var ChallengeBackendInterface $backend
+       */
       $backend = $this->container->get($service);
 
-      // TODO: Refactor this so its not hardcoded
       $output = new ChallengeManager();
 
       $output->setRequest($this->request);

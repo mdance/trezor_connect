@@ -116,9 +116,11 @@ class MappingManagerFactory implements MappingManagerFactoryInterface, Container
       throw new LogicException($message);
     }
     else {
+      /**
+       * @var MappingBackendInterface $backend
+       */
       $backend = $this->container->get($service);
 
-      // TODO: Refactor this so its not hardcoded
       $output = new MappingManager($this->config_factory);
 
       $output->setBackend($backend);
