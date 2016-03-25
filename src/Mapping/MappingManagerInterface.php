@@ -168,9 +168,8 @@ interface MappingManagerInterface {
    * @param $uid
    *   Provides the account id.
    *
-   * @param ChallengeResponseInterface|NULL $challenge_response
-   *   Provides the challenge response to map to the account.  If NULL, the
-   * session will be checked for a challenge response.
+   * @param \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface $challenge_response
+   *   Provides the challenge response to map to the account.
    *
    * @return mixed
    */

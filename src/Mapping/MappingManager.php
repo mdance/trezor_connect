@@ -149,32 +149,19 @@ class MappingManager implements MappingManagerInterface {
   /**
    * @inheritDoc
    */
-  public function mapChallengeResponse($uid, ChallengeResponseInterface $challenge_response = NULL) {
-    if (is_null($challenge_response)) {
-      $challenge_response = $this->challenge_response_manager->getSessionChallengeResponse();
-    }
+  public function mapChallengeResponse($uid, ChallengeResponseInterface $challenge_response) {
+    $mapping = new Mapping();
 
-    if ($challenge_response) {
-      // TODO: Check for existing mappings
-      $mapping = new Mapping();
+    $mapping->setUid($uid);
+    $mapping->setChallengeResponse($challenge_response);
 
-      $mapping->setUid($uid);
-      $mapping->setChallengeResponse($challenge_response);
+    $challenge = $challenge_response->getChallenge();
 
-      $challenge = $challenge_response->getChallenge();
+    $mapping->setChallenge($challenge);
 
-      $mapping->setChallenge($challenge);
+    $mapping->setStatus(MappingStatus::ACTIVE);
 
-      $mapping->setStatus(MappingStatus::ACTIVE);
-
-      $this->set($mapping);
-
-      $id = $mapping->getId();
-
-      if ($id) {
-        $this->challenge_response_manager->deleteSessionChallengeResponse();
-      }
-    }
+    $this->set($mapping);
   }
 
   /**
