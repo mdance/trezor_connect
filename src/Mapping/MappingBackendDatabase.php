@@ -51,6 +51,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
     }
 
     $output = $this->getMultiple($id, $conditions);
+    $output = array_shift($output);
 
     return $output;
   }
@@ -116,7 +117,7 @@ class MappingBackendDatabase implements MappingBackendInterface {
 
     $conditions[] = $condition;
 
-    $challenge_responses = $this->challenge_response_manager->get(array(), $conditions);
+    $challenge_responses = $this->challenge_response_manager->getMultiple(array(), $conditions);
 
     $ids = array();
 
@@ -179,7 +180,6 @@ class MappingBackendDatabase implements MappingBackendInterface {
 
       if (!$found) {
         $challenge_response = $this->challenge_response_manager->get($value->challenge_response_id);
-        $challenge_response = array_shift($challenge_response);
       }
 
       if ($challenge_response) {

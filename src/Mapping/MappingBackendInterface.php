@@ -20,8 +20,8 @@ interface MappingBackendInterface {
    *     value - A string containing the value for the condition.
    *     operator - A string containing the condition operator.
    *
-   * @return array
-   *   An array of Mapping objects.
+   * @return Mapping
+   *   A Mapping object.
    *
    * @see \Drupal\trezor_connect\Mapping\MappingBackendInterface::getMultiple()
    */
