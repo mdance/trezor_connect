@@ -6,7 +6,6 @@
 namespace Drupal\trezor_connect\Enum;
 
 class Messages {
-  // TODO: Map messages to constants
 
   /**
    * Provides the password empty message.
@@ -31,6 +30,11 @@ class Messages {
   /**
    * Provides the max challenge response attempts message.
    */
-  const CHALLENGE_RESPONSE_MAX_ATTEMPTS = 'You are not allowed anymore authentication device attempts.';
+  const CHALLENGE_RESPONSE_MAX_ATTEMPTS = 'You are not allowed anymore authentication attempts.';
+
+  /**
+   * Provides the challenge response mapping exists message.
+   */
+  const CHALLENGE_RESPONSE_MAPPING_EXISTS = 'There is already an account associated with the authentication device.';
 
 }
