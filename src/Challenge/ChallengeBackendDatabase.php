@@ -40,6 +40,7 @@ class ChallengeBackendDatabase implements ChallengeBackendInterface {
     }
 
     $output = $this->getMultiple($id, $conditions);
+    $output = array_shift($output);
 
     return $output;
   }
