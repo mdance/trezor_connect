@@ -23,6 +23,16 @@ class Messages {
   const PASSWORD_MAX_ATTEMPTS = 'You are not allowed anymore password guesses.';
 
   /**
+   * Provides the invalid challenge message.
+   */
+  const CHALLENGE_INVALID = 'An error has occurred validating the challenge.';
+
+  /**
+   * Provides the invalid challenge token message.
+   */
+  const CHALLENGE_TOKEN_INVALID = 'An error has occurred validating the challenge token.';
+
+  /**
    * Provides the invalid challenge response message.
    */
   const CHALLENGE_RESPONSE_INVALID = 'An error has occurred validating your TREZOR credentials.';
