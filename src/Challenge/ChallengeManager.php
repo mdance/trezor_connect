@@ -25,6 +25,8 @@ class ChallengeManager implements ChallengeManagerInterface {
 
   /**
    * Provides the session.
+   *
+   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
    */
   protected $session;
 
@@ -142,21 +144,27 @@ class ChallengeManager implements ChallengeManagerInterface {
    */
   public function get($id = NULL, array $conditions = NULL) {
     if (is_null($id)) {
-      // Check if a challenge exists on the current request
-      $output = $this->getRequestChallenge();
+      $output = $this->getSessionChallenge();
+
+      if ($output) {
+        // Make sure the challenge still exists
+        $output = $this->backend->get($output->getId());
+      }
 
       if (!$output) {
         $output = $this->getChallenge();
+      }
 
-        $id = $output->getId();
+      $id = $output->getId();
 
-        if (is_null($id)) {
-          // Generate a new challenge
-          $output->generate();
+      if (is_null($id)) {
+        // Generate a new challenge
+        $output->generate();
 
-          // Store the challenge on the backend
-          $this->set($output);
-        }
+        // Store the challenge on the backend
+        $this->set($output);
+
+        $this->setSessionChallenge($output);
       }
     }
     else {
@@ -170,20 +178,13 @@ class ChallengeManager implements ChallengeManagerInterface {
   /**
    * @inheritDoc
    */
-  public function getRequestChallenge() {
+  public function getSessionChallenge() {
     $output = NULL;
 
-    $result = $this->request->get(self::KEY);
+    $result = $this->session->get(self::KEY);
 
-    if (is_array($result)) {
-      if (isset($result['id']) && is_numeric($result['id'])) {
-        $results = $this->backend->get($result['id']);
-        $total = count($results);
-
-        if ($total == 1) {
-          $output = array_shift($results);
-        }
-      }
+    if ($result instanceof ChallengeInterface) {
+      $output = $result;
     }
 
     return $output;
@@ -205,6 +206,10 @@ class ChallengeManager implements ChallengeManagerInterface {
     $this->backend->set($challenge);
 
     return $this;
+  }
+
+  public function setSessionChallenge(ChallengeInterface $challenge = NULL) {
+    $this->session->set(self::KEY, $challenge);
   }
 
   /**
@@ -256,7 +261,7 @@ class ChallengeManager implements ChallengeManagerInterface {
 
     $conditions[] = $condition;
 
-    $challenges = $this->backend->get(NULL, $conditions);
+    $challenges = $this->backend->getMultiple(NULL, $conditions);
 
     $ids = array();
 
@@ -266,26 +271,30 @@ class ChallengeManager implements ChallengeManagerInterface {
       $ids[$id] = $id;
     }
 
-    $conditions = array();
+    if (count($ids)) {
+      $conditions = array();
 
-    $condition = array(
-      'field' => 'challenge_id',
-      'value' => $ids,
-      'operator' => 'IN',
-    );
+      $condition = array(
+        'field' => 'challenge_id',
+        'value' => $ids,
+        'operator' => 'IN',
+      );
 
-    $conditions[] = $condition;
+      $conditions[] = $condition;
 
-    // Filter out any ids used in challenge responses
-    $challenge_responses = $challenge_response_manager->get(array(), $conditions);
+      // Filter out any ids used in challenge responses
+      $challenge_responses = $challenge_response_manager->getMultiple(array(), $conditions);
 
-    foreach ($challenge_responses as $challenge_response) {
-      $challenge_id = $challenge_response->getChallenge()->getId();
+      foreach ($challenge_responses as $challenge_response) {
+        $challenge_id = $challenge_response->getChallenge()->getId();
 
-      unset($ids[$challenge_id]);
+        unset($ids[$challenge_id]);
+      }
     }
 
-    $this->backend->delete($ids);
+    if (count($ids)) {
+      $this->backend->delete($ids);
+    }
   }
 
 }

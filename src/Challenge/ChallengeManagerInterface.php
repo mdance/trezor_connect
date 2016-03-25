@@ -129,14 +129,6 @@ interface ChallengeManagerInterface {
   public function get($id = NULL, array $conditions = NULL);
 
   /**
-   * Returns a challenge associated with the current request.
-   *
-   * @return Challenge|false
-   *   The challenge object or FALSE.
-   */
-  public function getRequestChallenge();
-
-  /**
    * Returns the challenges associated with an array of ids.
    *
    * @param int|array|NULL $ids
