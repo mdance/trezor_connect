@@ -63,10 +63,6 @@ Current maintainers:
 
 TODO/Wishlist
 -----------
-Refactor get helpers
-
-For error messages, don't remove button
-
 Review services
 
 Implement additional backends
