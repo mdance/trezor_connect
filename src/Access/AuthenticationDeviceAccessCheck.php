@@ -70,18 +70,6 @@ class AuthenticationDeviceAccessCheck implements AccessCheckInterface {
         Permissions::REMOVE,
       );
 
-      $map[Routes::MANAGE_JS] = array(
-        Permissions::REGISTER,
-      );
-
-      $map[Routes::MANAGE_DISABLE] = array(
-        Permissions::DISABLE,
-      );
-
-      $map[Routes::MANAGE_REMOVE] = array(
-        Permissions::REMOVE,
-      );
-
       $route_name = $current_route_match->getRouteName();
 
       if (!isset($map[$route_name])) {
