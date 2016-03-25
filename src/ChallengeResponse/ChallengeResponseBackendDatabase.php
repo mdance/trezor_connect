@@ -53,6 +53,7 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
     }
 
     $output = $this->getMultiple($id, $conditions);
+    $output = array_shift($output);
 
     return $output;
   }
@@ -104,7 +105,6 @@ class ChallengeResponseBackendDatabase implements ChallengeResponseBackendInterf
 
     foreach ($results as $key => $value) {
       $challenge = $this->challenge_manager->get($value->challenge_id);
-      $challenge = array_shift($challenge);
 
       if ($challenge) {
         $challenge_response = new ChallengeResponse();

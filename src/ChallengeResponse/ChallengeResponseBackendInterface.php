@@ -8,10 +8,10 @@ namespace Drupal\trezor_connect\ChallengeResponse;
 interface ChallengeResponseBackendInterface {
 
   /**
-   * Returns the mapping associated with an id.
+   * Returns the challenge response associated with an id.
    *
    * @param int|array|NULL $id
-   *   The mapping id to retrieve.
+   *   The challenge response id to retrieve.
    *
    * @param array $conditions
    *   An array of conditions.  The array should contain the following keys:
@@ -20,18 +20,18 @@ interface ChallengeResponseBackendInterface {
    *     value - A string containing the value for the condition.
    *     operator - A string containing the condition operator.
    *
-   * @return array
-   *   An array of Mapping objects.
+   * @return ChallengeResponseInterface
+   *   A ChallengeResponse object.
    *
-   * @see \Drupal\trezor_connect\Mapping\MappingBackendInterface::getMultiple()
+   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::getMultiple()
    */
   public function get($id, array $conditions = NULL);
 
   /**
-   * Returns the mappings associated with an array of ids.
+   * Returns the challenge responses associated with an array of ids.
    *
    * @param array $ids
-   *   The mapping ids to retrieve.
+   *   The challenge response ids to retrieve.
    *
    * @param array $conditions
    *   An array of conditions.  The array should contain the following keys:
@@ -41,9 +41,9 @@ interface ChallengeResponseBackendInterface {
    *     operator - A string containing the condition operator.
    *
    * @return array
-   *   An array of Mapping objects.
+   *   An array of ChallengeResponse objects.
    *
-   * @see \Drupal\trezor_connect\Mapping\MappingBackendInterface::get()
+   * @see \Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendInterface::get()
    */
   public function getMultiple(array $ids, array $conditions = NULL);
 
