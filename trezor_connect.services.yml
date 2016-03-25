@@ -30,7 +30,7 @@ services:
     calls:
       - [setContainer, ['@service_container']]
   trezor_connect.challenge_manager:
-    class: Drupal\trezor_connect\Challenge\ChallengeManager
+    class: Drupal\trezor_connect\Challenge\ChallengeManagerInterface
     factory: trezor_connect.challenge_manager_factory:get
   trezor_connect.challenges.backend.database:
     class: Drupal\trezor_connect\Challenge\ChallengeBackendDatabase
@@ -46,7 +46,7 @@ services:
     calls:
       - [setContainer, ['@service_container']]
   trezor_connect.challenge_response_manager:
-    class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManager
+    class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface
     factory: trezor_connect.challenge_response_manager_factory:get
   trezor_connect.challenge_responses.backend.database:
     class: Drupal\trezor_connect\ChallengeResponse\ChallengeResponseBackendDatabase
@@ -63,7 +63,7 @@ services:
     calls:
       - [setContainer, ['@service_container']]
   trezor_connect.mapping_manager:
-    class: Drupal\trezor_connect\Mapping\MappingManager
+    class: Drupal\trezor_connect\Mapping\MappingManagerInterface
     factory: trezor_connect.mapping_manager_factory:get
   trezor_connect.mappings.backend.database:
     class: Drupal\trezor_connect\Mapping\MappingBackendDatabase
