@@ -16,6 +16,7 @@ use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Password\PasswordInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 use Drupal\trezor_connect\Enum\Messages;
 use Drupal\trezor_connect\Mapping\MappingManagerInterface;
@@ -695,41 +696,43 @@ class ManageForm extends ConfirmFormBase {
 
       $challenge_response = $input['challenge_response'];
 
-      $challenge_response_id = $challenge_response->getId();
+      if ($challenge_response instanceof ChallengeResponseInterface) {
+        $challenge_response_id = $challenge_response->getId();
 
-      if (is_null($challenge_response_id)) {
-        $this->challenge_response_manager->set($challenge_response, FALSE);
-      }
+        if (is_null($challenge_response_id)) {
+          $this->challenge_response_manager->set($challenge_response, FALSE);
+        }
 
-      $public_key = $challenge_response->getPublicKey();
+        $public_key = $challenge_response->getPublicKey();
 
-      $mappings = $mapping_manager->getFromPublicKey($public_key);
-      $total = count($mappings);
+        $mappings = $mapping_manager->getFromPublicKey($public_key);
+        $total = count($mappings);
 
-      if ($total > 0) {
-        $message = t('There is already an account associated with the TREZOR device.');
+        if ($total > 0) {
+          $message = t('There is already an account associated with the TREZOR device.');
 
-        $type = 'warning';
+          $type = 'warning';
 
-        drupal_set_message($message, $type);
-      }
-      else {
-        $mapping_manager->mapChallengeResponse($uid, $challenge_response);
-
-        if ($current_uid == $uid) {
-          $message = t('Your TREZOR device has been associated to your account.  You should now be able to login with just your TREZOR device.');
+          drupal_set_message($message, $type);
         }
         else {
-          $args = array();
+          $mapping_manager->mapChallengeResponse($uid, $challenge_response);
 
-          $args['@username'] = $user->getAccountName();
+          if ($current_uid == $uid) {
+            $message = t('Your TREZOR device has been associated to your account.  You should now be able to login with just your TREZOR device.');
+          }
+          else {
+            $args = array();
 
-          $message = t('The TREZOR device has been associated to the @username account.  The account should now be able to login with just their TREZOR device.', $args);
+            $args['@username'] = $user->getAccountName();
+
+            $message = t('The TREZOR device has been associated to the @username account.  The account should now be able to login with just their TREZOR device.', $args);
+          }
+
+          drupal_set_message($message);
+
+          $form_state->setRebuild(TRUE);
         }
-
-        drupal_set_message($message);
-
-        $form_state->setRebuild(TRUE);
       }
     }
     else {
