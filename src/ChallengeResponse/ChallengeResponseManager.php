@@ -331,7 +331,7 @@ class ChallengeResponseManager implements ChallengeResponseManagerInterface {
 
     $conditions[] = $condition;
 
-    $challenge_responses = $this->backend->get(NULL, $conditions);
+    $challenge_responses = $this->backend->getMultiple(array(), $conditions);
 
     $ids = array();
 
