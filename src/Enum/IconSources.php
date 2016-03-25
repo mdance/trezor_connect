@@ -11,8 +11,6 @@ class IconSources extends AbstractEnum {
 
   /**
    * Provides a string representing no icon source.
-   *
-   * TODO: Refactor default to none (reserved keyword issue from enum refactor)
    */
   const NONE = 'none';
 

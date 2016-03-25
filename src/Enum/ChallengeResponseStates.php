@@ -21,8 +21,6 @@ class ChallengeResponseStates extends AbstractEnum {
 
   /**
    * Provides an integer representing the new challenge response state.
-   *
-   * TODO: Refactor NEW to CREATE (reserved keyword issue from enum refactor)
    */
   const CREATE = 2;
 

@@ -63,15 +63,7 @@ Current maintainers:
 
 TODO/Wishlist
 -----------
-Review services
-
-Implement additional backends
-
-Implement mapping config_object
-
 Add button styling (http://trezor.github.io/connect/examples/login-restyled.html)
-
-Add support for asynchronous challenges (http://trezor.github.io/connect/examples/login-async.html)
 
 Add reports
 

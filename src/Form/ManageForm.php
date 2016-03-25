@@ -4,7 +4,7 @@
  * @file
  * Contains \Drupal\trezor_connect\Form\ManageForm.
  *
- * TODO: Fixed remove auth device ajax rebinding
+ * TODO: Fix ajax rebinding on validation error
  */
 
 namespace Drupal\trezor_connect\Form;
