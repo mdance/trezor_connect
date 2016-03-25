@@ -71,7 +71,6 @@ class TrezorConnectElement extends RenderElement {
         ),
       ),
       '#pre_render' => array(
-        //array($class, 'preRender'),
         array(
           $class,
           'preRenderGroup',
@@ -319,15 +318,8 @@ class TrezorConnectElement extends RenderElement {
     $key = $element['#key'];
 
     $element[$key] = array(
-      '#type' => $element['#tag'],
+      '#type' => 'submit',
       '#value' => $element['#text'],
-      //'#theme' => 'trezor_connect',
-      //'#theme_wrappers' => array(
-      //  'container',
-      //),
-      //'#process' => array(
-      //  array(get_class(), 'processAjaxForm'),
-      //),
       '#ajax' => array(
         'event' => $element['#event'],
         'wrapper' => $wrapper_id,
@@ -386,6 +378,7 @@ class TrezorConnectElement extends RenderElement {
       '#value' => $challenge->getId(),
     );
 
+    // TODO: Check if this is still necessary
     $challenge_token = static::challengeToken($challenge);
 
     $element[$element['#challenge_token_key']] = array(
