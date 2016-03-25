@@ -83,6 +83,10 @@ class TrezorConnectElement extends RenderElement {
         ),
         array(
           $class,
+          'validateChallenge',
+        ),
+        array(
+          $class,
           'validateChallengeResponse',
         ),
         array(
@@ -164,6 +168,10 @@ class TrezorConnectElement extends RenderElement {
       '#validate_challenge_response_mapping' => FALSE,
       // Provides a string containing the mapping exists message
       '#message_challenge_response_mapping_exists' => Messages::CHALLENGE_RESPONSE_MAPPING_EXISTS,
+      // Provides a string containing the invalid challenge message
+      '#message_challenge_invalid' => Messages::CHALLENGE_INVALID,
+      // Provides a string containing the invalid challenge token message
+      '#message_challenge_token_invalid' => Messages::CHALLENGE_TOKEN_INVALID,
     );
 
     return $output;
@@ -180,69 +188,92 @@ class TrezorConnectElement extends RenderElement {
     $challenge_token_key = $element['#challenge_token_key'];
     $challenge_response_key = $element['#challenge_response_key'];
 
-    if (!$input) {
-      $output[$password_key] = NULL;
+    $password = NULL;
+    $challenge = $element['#challenge'];
+    $challenge_token = NULL;
+    $challenge_response = NULL;
 
-      $challenge = $element['#challenge'];
-
-      if (is_null($challenge)) {
-        $challenge = \Drupal::service($element['#challenge_manager_service'])->get();
-
-        $element['#challenge'] = $challenge;
-      }
-
-      if (!($challenge instanceof ChallengeInterface)) {
-        $message = 'Invalid challenge';
-
-        // TODO: Create challenge exception class
-        throw new \Exception($message);
-      }
-
-      $output[$challenge_key] = $challenge;
-      $output[$challenge_token_key] = static::challengeToken($challenge);
-
-      $output[$challenge_response_key] = NULL;
+    if (isset($input[$password_key])) {
+      $password = $input[$password_key];
     }
-    else {
-      if (isset($input[$challenge_key]) && is_numeric($input[$challenge_key])) {
-        // Convert the challenge id into a challenge object
-        $challenge = \Drupal::service($element['#challenge_manager_service'])->get($input[$challenge_key]);
 
-        if ($challenge) {
-          $challenge_token = static::challengeToken($challenge);
+    if (isset($input[$challenge_key])) {
+      $challenge = $input[$challenge_key];
+    }
 
-          // Check the internal/submitted challenge tokens match
-          if ($challenge_token != $input[$challenge_token_key]) {
-            unset($input[$challenge_token_key]);
+    if (is_numeric($challenge)) {
+      // Convert the challenge id into a challenge object
+      $challenge = \Drupal::service($element['#challenge_manager_service'])
+        ->get($challenge);
+    }
+
+    if (isset($input[$challenge_token_key])) {
+      $submitted_challenge_token = $input[$challenge_token_key];
+
+      if ($challenge) {
+        $challenge_token = static::challengeToken($challenge);
+
+        if ($submitted_challenge_token != $challenge_token) {
+          $challenge = NULL;
+          $challenge_token = NULL;
+        }
+      }
+    }
+
+    if (!$challenge) {
+      $challenge = \Drupal::service($element['#challenge_manager_service'])
+        ->get();
+    }
+
+    if (isset($input[$challenge_response_key]) && !empty($input[$challenge_response_key])) {
+      $challenge_response_obj = $input[$challenge_response_key];
+
+      // Decode the challenge response JSON
+      $challenge_response_obj = json_decode($challenge_response_obj);
+
+      if ($challenge_response_obj) {
+        // Convert to a ChallengeResponse object
+        $challenge_response = new ChallengeResponse();
+
+        $invalid = FALSE;
+
+        $mappings = array(
+          'signature' => array(
+            $challenge_response,
+            'setSignature',
+          ),
+          'public_key' => array(
+            $challenge_response,
+            'setPublicKey',
+          ),
+          'version' => array(
+            $challenge_response,
+            'setVersion',
+          ),
+        );
+
+        foreach ($mappings as $key => $callable) {
+          if (!isset($challenge_response_obj->$key)) {
+            $invalid = TRUE;
+            break;
           }
           else {
-            if (!isset($element['#challenge'])) {
-              $element['#challenge'] = $challenge;
-            }
-
-            $input[$challenge_key] = $challenge;
+            $callable($challenge_response_obj->$key);
           }
         }
-      }
 
-      if (isset($input[$challenge_response_key]) && !empty($input[$challenge_response_key])) {
-        // Decode the challenge response JSON
-        $challenge_response_obj = json_decode($input[$challenge_response_key]);
-
-        if ($challenge_response_obj) {
-          // Convert to a ChallengeResponse object
-          $challenge_response = new ChallengeResponse();
-
-          $challenge_response->setSignature($challenge_response_obj->signature);
-          $challenge_response->setPublicKey($challenge_response_obj->public_key);
-          $challenge_response->setVersion($challenge_response_obj->version);
-
-          $input[$challenge_response_key] = $challenge_response;
+        if ($invalid) {
+          $challenge_response = NULL;
         }
       }
-
-      $output = $input;
     }
+
+    $element['#challenge'] = $challenge;
+
+    $output[$password_key] = $password;
+    $output[$challenge_key] = $challenge;
+    $output[$challenge_token_key] = $challenge_token;
+    $output[$challenge_response_key] = $challenge_response;
 
     return $output;
   }
@@ -267,24 +298,15 @@ class TrezorConnectElement extends RenderElement {
     // TODO: Refactor to use lazy builder and placeholder, see form action example
     $challenge_key = $element['#challenge_key'];
 
+    /**
+     * @var \Drupal\trezor_connect\Challenge\ChallengeInterface $challenge
+     */
     $challenge = $element['#challenge'];
-
-    if (!($challenge instanceof ChallengeInterface)) {
-      $message = 'Invalid challenge';
-
-      throw new \Exception($message);
-    }
 
     if (is_null($element['#account'])) {
       $current_user = \Drupal::currentUser();
 
       $element['#account'] = $current_user;
-    }
-
-    if (!($element['#account'] instanceof AccountInterface)) {
-      $message = 'Invalid account';
-
-      throw new \Exception($message);
     }
 
     $selector = $element['#attributes']['data-drupal-selector'];
@@ -353,8 +375,24 @@ class TrezorConnectElement extends RenderElement {
       }
     }
 
-    $element['#challenge_hidden'] = $challenge->getChallengeHidden();
-    $element['#challenge_visual'] = $challenge->getChallengeVisual();
+    $challenge_id = NULL;
+    $challenge_hidden = NULL;
+    $challenge_visual = NULL;
+    $challenge_token = NULL;
+    $challenge_js = array();
+
+    if ($challenge) {
+      $challenge_id = $challenge->getId();
+      $challenge_hidden = $challenge->getChallengeHidden();
+      $challenge_visual = $challenge->getChallengeVisual();
+
+      $challenge_token = static::challengeToken($challenge);
+
+      $challenge_js = $challenge->toArray();
+    }
+
+    $element['#challenge_hidden'] = $challenge_hidden;
+    $element['#challenge_visual'] = $challenge_visual;
 
     $map = array(
       'text',
@@ -371,15 +409,10 @@ class TrezorConnectElement extends RenderElement {
 
     Element::setAttributes($button, $map);
 
-    $challenge_js = $challenge->toArray();
-
     $element[$challenge_key] = array(
       '#type' => 'hidden',
-      '#value' => $challenge->getId(),
+      '#value' => $challenge_id,
     );
-
-    // TODO: Check if this is still necessary
-    $challenge_token = static::challengeToken($challenge);
 
     $element[$element['#challenge_token_key']] = array(
       '#type' => 'hidden',
@@ -460,6 +493,33 @@ class TrezorConnectElement extends RenderElement {
             $form_state->setError($element[$key], $message);
           }
         }
+      }
+    }
+  }
+
+  public static function validateChallenge(&$element, FormStateInterface $form_state, &$complete_form) {
+    $key = $element['#challenge_key'];
+
+    $values = $form_state->getValues();
+
+    $parents = array_merge($element['#parents'], array($key));
+
+    $challenge = NestedArray::getValue($values, $parents);
+
+    if (!$challenge) {
+      $form_state->setError($element[$key], $element['#message_challenge_invalid']);
+    }
+    else {
+      $key_token = $element['#challenge_token_key'];
+
+      $challenge_token = static::challengeToken($challenge);
+
+      $parents = array_merge($element['#parents'], array($key_token));
+
+      $submitted_challenge_token = NestedArray::getValue($values, $parents);
+
+      if ($challenge_token != $submitted_challenge_token) {
+        $form_state->setError($element[$key_token], $element['#message_challenge_token_invalid']);
       }
     }
   }
