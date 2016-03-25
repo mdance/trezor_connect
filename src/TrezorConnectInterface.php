@@ -8,6 +8,7 @@ namespace Drupal\trezor_connect;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\trezor_connect\Challenge\Challenge;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseManagerInterface;
 
 interface TrezorConnectInterface {
@@ -168,9 +169,11 @@ interface TrezorConnectInterface {
    *
    * @param $uid
    *
+   * @param ChallengeResponseInterface $challenge_response
+   *
    * @return mixed
    */
-  public function mapChallengeResponse($uid);
+  public function mapChallengeResponse($uid, ChallengeResponseInterface $challenge_response = NULL);
 
   /**
    * Returns the challenge response state.

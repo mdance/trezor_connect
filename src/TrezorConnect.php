@@ -8,6 +8,8 @@ namespace Drupal\trezor_connect;
 
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponse;
+use Drupal\trezor_connect\ChallengeResponse\ChallengeResponseInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -354,8 +356,8 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
-  public function mapChallengeResponse($uid) {
-    $this->mapping_manager->mapChallengeResponse($uid);
+  public function mapChallengeResponse($uid, ChallengeResponseInterface $challenge_response = NULL) {
+    $this->mapping_manager->mapChallengeResponse($uid, $challenge_response);
   }
 
   /**
