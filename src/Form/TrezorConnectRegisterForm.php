@@ -72,10 +72,6 @@ class TrezorConnectRegisterForm extends RegisterForm {
         '#weight' => 1,
         '#text' => $text,
         '#ajax_wrapper_id' => $wrapper_id,
-        '#ajax_callback' => array(
-          get_called_class(),
-          'jsCallback',
-        ),
         '#set_button_limit_validation_errors' => FALSE,
         '#validate_challenge_response_mapping' => TRUE,
       );
@@ -143,10 +139,6 @@ class TrezorConnectRegisterForm extends RegisterForm {
           ->mapChallengeResponse($account->id(), $challenge_response);
       }
     }
-  }
-
-  public static function jsCallback(array &$form, FormStateInterface $form_state) {
-    return $form;
   }
 
 }

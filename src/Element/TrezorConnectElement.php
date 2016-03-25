@@ -365,6 +365,12 @@ class TrezorConnectElement extends RenderElement {
     if (isset($element['#ajax_callback']) && is_callable($element['#ajax_callback'])) {
       $button['#ajax']['callback'] = $element['#ajax_callback'];
     }
+    else {
+      $button['#ajax']['callback'] = array(
+        get_called_class(),
+        'jsCallback',
+      );
+    }
 
     if ($element['#set_button_limit_validation_errors']) {
       if (is_null($element['#button_limit_validation_errors'])) {
@@ -563,12 +569,15 @@ class TrezorConnectElement extends RenderElement {
           $total = count($mappings);
 
           if ($total > 0) {
-            // TODO: Figure out how to register an account once this gets set.
             $form_state->setError($element, $element['#message_challenge_response_mapping_exists']);
           }
         }
       }
     }
+  }
+
+  public static function jsCallback(array &$form, FormStateInterface $form_state) {
+    return $form;
   }
 
 }
