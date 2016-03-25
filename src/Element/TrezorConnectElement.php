@@ -474,9 +474,9 @@ class TrezorConnectElement extends RenderElement {
     $input = NestedArray::getValue($values, $element['#parents'], $input_exists);
 
     if ($input_exists) {
-      if (isset($input[$challenge_response_key]) && $input[$challenge_response_key] instanceof ChallengeResponseInterface) {
-        $valid = FALSE;
+      $valid = FALSE;
 
+      if (isset($input[$challenge_response_key]) && $input[$challenge_response_key] instanceof ChallengeResponseInterface) {
         $challenge_response = $input[$challenge_response_key];
 
         $challenge_key = $element['#challenge_key'];
@@ -501,12 +501,12 @@ class TrezorConnectElement extends RenderElement {
             $form_state->setValueForElement($element[$challenge_response_key], $input[$challenge_response_key]);
           }
         }
+      }
 
-        if (!$valid) {
-          $message = t($element['#message_challenge_response_invalid']);
+      if (!$valid) {
+        $message = t($element['#message_challenge_response_invalid']);
 
-          $form_state->setError($element[$challenge_response_key], $message);
-        }
+        $form_state->setError($element[$challenge_response_key], $message);
       }
     }
   }
