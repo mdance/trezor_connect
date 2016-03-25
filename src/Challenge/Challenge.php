@@ -1,6 +1,9 @@
 <?php
 /**
  * Contains \Drupal\trezor_connect\Challenge\Challenge
+ *
+ * TODO: Investigate using Symfony Serializer component
+ * http://symfony.com/doc/current/components/serializer.html
  */
 
 namespace Drupal\trezor_connect\Challenge;
