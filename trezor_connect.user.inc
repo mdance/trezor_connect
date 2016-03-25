@@ -26,6 +26,8 @@ function trezor_connect_user_delete(User $account) {
  * Implements hook_user_login().
  *
  * Responsible for prompting a user to map their TREZOR device to their account.
+ *
+ * TODO: Check if this is still necessary
  */
 function trezor_connect_user_login($account) {
   $uid = $account->id();
