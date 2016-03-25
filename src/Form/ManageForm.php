@@ -287,7 +287,7 @@ class ManageForm extends ConfirmFormBase {
         'absolute' => TRUE,
       );
 
-      $url = Url::fromRoute(Routes::MANAGE_JS, $route_parameters, $options);
+      $url = Url::fromRoute(Routes::MANAGE, $route_parameters, $options);
       $url = $url->toString();
 
       if ($admin || $bypass) {
