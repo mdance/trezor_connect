@@ -73,27 +73,6 @@ interface TrezorConnectInterface {
   public function getUrl();
 
   /**
-   * Returns a string containing the TREZOR connect implementation.
-   *
-   * @return string
-   */
-  public function getImplementation();
-
-  /**
-   * Returns a string containing the TREZOR connect callback function.
-   *
-   * @return string
-   */
-  public function getCallback();
-
-  /**
-   * Returns a string containing the TREZOR connect tag.
-   *
-   * @return string
-   */
-  public function getTag();
-
-  /**
    * Returns an integer containing the number of invalid password attempts allowed.
    *
    * @return int

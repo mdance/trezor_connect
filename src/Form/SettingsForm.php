@@ -356,71 +356,6 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => $default_value,
     );
 
-    $key = 'implementation';
-
-    $description = t('Please specify the TREZOR connect implementation.');
-    $default_value = $config->get($key);
-
-    $options = array(
-      Implementations::BUTTON => $this->t('Default'),
-      Implementations::JS => $this->t('Javascript'),
-    );
-
-    $form[$key] = array(
-      '#type' => 'radios',
-      '#required' => TRUE,
-      '#title' => t('TREZOR Connect Implementation'),
-      '#description' => $description,
-      '#default_value' => $default_value,
-      '#options' => $options,
-    );
-
-    $key = 'tag';
-
-    $description = t('Please specify the TREZOR connect tag.');
-    $default_value = $config->get($key);
-
-    $options = array(
-      Tags::TREZORLOGIN => $this->t('trezor:login'),
-      Tags::BUTTON => $this->t('button'),
-    );
-
-    $form[$key] = array(
-      '#type' => 'radios',
-      '#required' => TRUE,
-      '#title' => t('TREZOR Connect Tag'),
-      '#description' => $description,
-      '#default_value' => $default_value,
-      '#options' => $options,
-      '#states' => array(
-        'visible' => array(
-          'input[name="implementation"]' => array(
-            'value' => Implementations::JS,
-          ),
-        ),
-      ),
-    );
-
-    $key = 'callback';
-
-    $description = t('Please specify the TREZOR connect callback function.');
-    $default_value = $config->get($key);
-
-    $form[$key] = array(
-      '#type' => 'textfield',
-      '#required' => TRUE,
-      '#title' => t('TREZOR Connect Callback'),
-      '#description' => $description,
-      '#default_value' => $default_value,
-      '#states' => array(
-        'visible' => array(
-          'input[name="implementation"]' => array(
-            'value' => Implementations::BUTTON,
-          ),
-        ),
-      ),
-    );
-
     $key = 'flood_threshold';
 
     $description = t('Please specify the number of password attempts a user should be allowed.');
@@ -673,9 +608,6 @@ class SettingsForm extends ConfigFormBase {
       'text_manage_admin',
       'library_type',
       'url',
-      'implementation',
-      'tag',
-      'callback',
       'flood_threshold',
       'flood_window',
       'challenge_offset',

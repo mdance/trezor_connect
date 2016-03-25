@@ -238,36 +238,6 @@ class TrezorConnect implements TrezorConnectInterface, ContainerInjectionInterfa
   /**
    * @inheritdoc
    */
-  public function getImplementation() {
-    return $this->config->get('implementation');
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function getCallback() {
-    return $this->config->get('callback');
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function getTag() {
-    $implementation = $this->getImplementation();
-
-    if ($implementation == Implementations::BUTTON) {
-      $output = Tags::TREZORLOGIN;
-    }
-    else {
-      $output = $this->config->get('tag');
-    }
-
-    return $output;
-  }
-
-  /**
-   * @inheritdoc
-   */
   public function getFloodThreshold() {
     return $this->config->get('flood_threshold');
   }

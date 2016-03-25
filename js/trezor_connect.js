@@ -28,35 +28,6 @@
     }
   };
 
-  methods.callback = function(options) {
-    var $element, message, redirect;
-
-    $element = this;
-
-    message = options.message;
-
-    $element.fadeOut();
-    $element.html(message);
-    $element.fadeIn();
-
-    redirect = true;
-
-    if (typeof options.redirect != 'undefined') {
-      redirect = options.redirect;
-    }
-
-    if (redirect) {
-      if (options.redirect_url) {
-        window.setTimeout(
-          function () {
-            window.location = options.redirect_url;
-          },
-          3000
-        );
-      }
-    }
-  };
-
   Drupal.behaviors.trezor_connect = {
     attach: function() {
       $.each(
@@ -72,32 +43,21 @@
 
           $element = $(selector);
 
-          if (element_settings.implementation == 'js') {
-            if ($container.length && $element.length) {
-              $element.once(namespace).click(
-                function(event) {
-                  TrezorConnect.requestLogin(
-                    element_settings.icon,
-                    element_settings.challenge.challenge_hidden,
-                    element_settings.challenge.challenge_visual,
-                    function(response) {
-                      methods.authenticate(response, $container, $element, element_settings);
-                    }
-                  );
+          if ($container.length && $element.length) {
+            $element.once(namespace).click(
+              function(event) {
+                TrezorConnect.requestLogin(
+                  element_settings.icon,
+                  element_settings.challenge.challenge_hidden,
+                  element_settings.challenge.challenge_visual,
+                  function(response) {
+                    methods.authenticate(response, $container, $element, element_settings);
+                  }
+                );
 
-                  return false;
-                }
-              );
-            }
-          }
-          else if (element_settings.implementation == 'button') {
-            callback = element_settings.callback;
-
-            if (!window[callback]) {
-              window[callback] = function(response) {
-                methods.authenticate(response, $container, $element, element_settings);
+                return false;
               }
-            }
+            );
           }
         }
       );

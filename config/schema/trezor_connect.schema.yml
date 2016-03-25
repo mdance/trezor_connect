@@ -34,15 +34,6 @@ trezor_connect.settings:
     url:
       type: string
       label: 'External TREZOR Connect Javascript URL'
-    implementation:
-      type: string
-      label: 'TREZOR Connect Implementation'
-    callback:
-      type: string
-      label: 'TREZOR Connect Callback'
-    tag:
-      type: string
-      label: 'TREZOR Connect Tag'
     flood_threshold:
       type: integer
       label: 'Flood Threshold'
@@ -64,32 +55,3 @@ trezor_connect.settings:
     mapping_backend:
       type: string
       label: 'TREZOR Connect mapping backend'
-
-trezor_connect.mappings.*:
-  type: config_entity
-  label: 'Trezor Connect Mapping'
-  mapping:
-    id:
-      type: string
-      label: 'ID'
-    created:
-      type: integer
-      label: 'Created'
-    uid:
-      type: integer
-      label: 'UID'
-    challenge_hidden:
-      type: string
-      label: 'Hidden Challenge'
-    challenge_visual:
-      type: string
-      label: 'Visual Challenge'
-    address:
-      type: string
-      label: 'Address'
-    public_key:
-      type: string
-      label: 'Public Key'
-    signature:
-      type: string
-      label: 'Signature'

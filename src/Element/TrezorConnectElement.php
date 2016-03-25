@@ -56,9 +56,6 @@ class TrezorConnectElement extends RenderElement {
     $tc = \Drupal::service('trezor_connect');
 
     $library_type = $tc->getLibraryType();
-    $implementation = $tc->getImplementation();
-    $callback = $tc->getCallback();
-    $tag = $tc->getTag();
     $icon = $tc->getIcon();
 
     $output = array(
@@ -124,16 +121,6 @@ class TrezorConnectElement extends RenderElement {
       // Provides a string containing a LibraryType constant indicating whether
       // to use the external or internal TREZOR Connect javascript library.
       '#library_type' => $library_type,
-      // Provides a Implementation constant indicating whether to use the
-      // trezor:login button, or the javascript API
-      '#implementation' => $implementation,
-      // Provides a string containing the global javascript function to be
-      // called if the trezor:login implementation is used.  This will be
-      // set as the callback property on the trezor:login element.
-      '#callback' => $callback,
-      // Provides a Tag constant indicating which element type to use to trigger
-      // the popup window displaying the challenge
-      '#tag' => $tag,
       // Provides a IconSource constant indicating which source to use for the
       // icon.
       '#icon' => $icon,
@@ -387,16 +374,11 @@ class TrezorConnectElement extends RenderElement {
     $element['#challenge_visual'] = $challenge->getChallengeVisual();
 
     $map = array(
-      'tag',
       'text',
       'icon',
       'challenge_hidden',
       'challenge_visual',
     );
-
-    if ($element['#implementation'] == Implementations::BUTTON) {
-      $map['callback'];
-    }
 
     foreach ($map as $value) {
       $property = '#' . $value;
@@ -404,9 +386,7 @@ class TrezorConnectElement extends RenderElement {
       $button[$property] = $element[$property];
     }
 
-    if ($element['#implementation'] == Implementations::BUTTON) {
-      Element::setAttributes($button, $map);
-    }
+    Element::setAttributes($button, $map);
 
     $challenge_js = $challenge->toArray();
 
@@ -427,12 +407,9 @@ class TrezorConnectElement extends RenderElement {
     );
 
     $element['#attached']['drupalSettings']['trezor_connect']['elements'][$selector] = array(
-      'implementation' => $element['#implementation'],
-      'callback' => $element['#callback'],
       'icon' => $element['#icon'],
       'challenge' => $challenge_js,
       'selector' => $selector,
-      'tag' => $element['#tag'],
       'event' => $element['#event'],
       'key' => $element['#key'],
     );
