@@ -4,7 +4,7 @@
  * @file
  * Contains \Drupal\trezor_connect\Cache\Context\TrezorConnectChallengeCacheContext.
  *
- * TODO: Figure out if this is necessary
+ * TODO: Fix challenge caching
  */
 
 namespace Drupal\trezor_connect\Cache\Context;

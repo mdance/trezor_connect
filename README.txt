@@ -69,8 +69,6 @@ Add reports
 
 Add an option for users to disable username, and password authentication
 
-Implement authentication system override
-
 Allow users to create accounts without entering a username/password
 
 Implement unit tests
