@@ -10,7 +10,7 @@ use Drupal\trezor_connect\Challenge\ChallengeInterface;
 interface ChallengeResponseInterface {
 
   /**
-   * Returns a Challenge as an array.
+   * Returns a challenge response as an array.
    *
    * @return array
    */

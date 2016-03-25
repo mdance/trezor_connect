@@ -120,8 +120,8 @@ interface ChallengeManagerInterface {
    *     value - A string containing the value for the condition.
    *     operator - A string containing the condition operator.
    *
-   * @return array
-   *   An array of Challenge objects.
+   * @return ChallengeInterface
+   *   A Challenge object.
    *
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::getRequestChallenge()
    * @see \Drupal\trezor_connect\ChallengeBackendInterface::getMultiple()
