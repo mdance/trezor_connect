@@ -7,4 +7,3 @@
 require_once 'trezor_connect.user.inc';
 require_once 'trezor_connect.entity.inc';
 require_once 'trezor_connect.cron.inc';
-require_once 'trezor_connect.theme.inc';
