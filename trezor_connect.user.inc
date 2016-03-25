@@ -11,21 +11,6 @@ use Drupal\trezor_connect\Enum\ChallengeResponseStates;
 use Drupal\trezor_connect\Enum\Routes;
 
 /**
- * Implements hook_user_insert().
- *
- * Responsible for mapping a challenge response to an account.
- *
- * @param $edit
- * @param $account
- * @param $category
- *
- * @throws \Exception
- */
-function trezor_connect_user_insert(User $account) {
-  \Drupal::service('trezor_connect')->mapChallengeResponse($account->id());
-}
-
-/**
  * Implements hook_user_delete().
  *
  * Responsible for delete any TREZOR connect mappings associated with an
