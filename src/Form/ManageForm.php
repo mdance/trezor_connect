@@ -3,6 +3,8 @@
 /**
  * @file
  * Contains \Drupal\trezor_connect\Form\ManageForm.
+ *
+ * TODO: Fixed remove auth device ajax rebinding
  */
 
 namespace Drupal\trezor_connect\Form;
