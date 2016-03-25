@@ -34,15 +34,6 @@ use Drupal\trezor_connect\Form\ManageForm;
 /**
  * Provides a TREZOR Connect form element.
  *
- * Usage example:
- *
- * @code
- * $form['trezor_connect'] = array(
- *   '#type' => 'trezor_connect',
- *   '#text' => t('Sign in with TREZOR'),
- * );
- * @endcode
- *
  * @RenderElement("trezor_connect")
  */
 class TrezorConnectElement extends RenderElement {
