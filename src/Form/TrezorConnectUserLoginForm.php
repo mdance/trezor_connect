@@ -131,14 +131,7 @@ class TrezorConnectUserLoginForm extends UserLoginForm {
       $form['#prefix'] = '<div id="' . $wrapper_id . '">';
       $form['#suffix'] = '</div>';
 
-      /**
-       * @var Drupal\trezor_connect\TrezorConnectInterface $tc
-       */
-      $tc = \Drupal::service('trezor_connect');
-
-      $mode = Modes::LOGIN;
-
-      $text = $tc->getText($mode, $account);
+      $text = \Drupal::service('trezor_connect')->getText(Modes::LOGIN, $account);
 
       $form[$this->key] = array(
         '#type' => 'trezor_connect',
@@ -359,7 +352,12 @@ EOF;
   public static function jsCallback(array &$form, FormStateInterface $form_state, Request $request) {
     $uid = $form_state->get('uid');
 
-    if (!$uid) {
+    // This will catch situations where a authentication device authentication
+    // failed, but the username, and password authentication was successful
+    $errors = $form_state->getErrors();
+    $total = count($errors);
+
+    if (!$uid || $total) {
       return $form;
     }
     else {
@@ -383,4 +381,5 @@ EOF;
       return $output;
     }
   }
+
 }
