@@ -261,7 +261,7 @@ class ChallengeManager implements ChallengeManagerInterface {
 
     $conditions[] = $condition;
 
-    $challenges = $this->backend->getMultiple(NULL, $conditions);
+    $challenges = $this->backend->getMultiple(array(), $conditions);
 
     $ids = array();
 
