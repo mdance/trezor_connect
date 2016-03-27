@@ -3,6 +3,8 @@
 /**
  * @file
  * Contains \Drupal\user\Form\UserLoginForm.
+ *
+ * TODO: Implement authentication mode handling
  */
 
 namespace Drupal\trezor_connect\Form;
