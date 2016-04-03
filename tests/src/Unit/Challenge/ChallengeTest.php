@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\Tests\trezor_connect\Unit\Challenge\ChallengeTest
+ * Contains Drupal\Tests\trezor_connect\Unit\Challenge\ChallengeTest.
  */
 
 namespace Drupal\Tests\trezor_connect\Unit\Challenge;
@@ -15,9 +15,25 @@ use Drupal\trezor_connect\Challenge\Challenge;
  * Provides Challenge unit tests.
  *
  * @coversDefaultClass \Drupal\trezor_connect\Challenge\Challenge
+ *
  * @group trezor_connect
  */
 class ChallengeTest extends UnitTestCase {
+
+  /**
+   * @return array
+   *
+   * @todo Determine if this is necessary.
+   */
+  public static function getInfo() {
+    $output = [
+      'name' => 'Challenge Unit Tests',
+      'description' => 'Provides challenge unit tests.',
+      'group' => 'TREZOR Connect',
+    ];
+
+    return $output;
+  }
 
   /**
    * Tests a new challenge.
@@ -61,12 +77,12 @@ class ChallengeTest extends UnitTestCase {
 
     $this->assertNotEmpty($challenge_visual, $message);
 
-    $expected = array(
+    $expected = [
       'id' => $id,
       'created' => $created,
       'challenge_hidden' => $challenge_hidden,
       'challenge_visual' => $challenge_visual,
-    );
+    ];
 
     $result = $challenge->toArray();
 
@@ -110,7 +126,7 @@ class ChallengeTest extends UnitTestCase {
 
     $actual = $challenge->getCacheContexts();
 
-    $expected = array();
+    $expected = [];
 
     $message = 'The challenge cache contexts are invalid';
 
@@ -131,7 +147,7 @@ class ChallengeTest extends UnitTestCase {
 
     $actual = $challenge->getCacheTags();
 
-    $expected = array();
+    $expected = [];
 
     $expected[] = 'trezor_connect_challenge';
     $expected[] = 'trezor_connect_challenge:1';
